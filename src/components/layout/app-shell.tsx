@@ -39,6 +39,7 @@ import {
   CreditCard,
   Banknote,
   Archive,
+  BookCheck,
 } from 'lucide-react';
 import { useTranslation } from '@/context/i18n-context';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -88,6 +89,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const mainNavItems = [
     { href: '/invoices', label: t('sidebar.invoices'), icon: FileText },
     { href: '/accounts-payable', label: t('sidebar.accountsPayable'), icon: Receipt },
+    { href: '/view-payments', label: "Ver Pagos", icon: BookCheck },
   ];
 
   const documentLinks = [
