@@ -30,7 +30,7 @@ type CreditNoteFormData = Omit<CreditNote, 'id'>;
 const ITEMS_PER_PAGE = 10;
 
 export function CreditNotesClient() {
-  const { creditNotes, invoices, refreshData } = useAppData();
+  const { creditNotes, invoices, customers, consignatarios, refreshData } = useAppData();
   const [localCreditNotes, setLocalCreditNotes] = useState<CreditNote[]>([]);
   const { t } = useTranslation();
   
@@ -134,6 +134,8 @@ export function CreditNotesClient() {
               onClose={handleCloseDialog}
               isSubmitting={isSubmitting}
               invoices={invoices}
+              customers={customers}
+              consignatarios={consignatarios}
             />
           </DialogContent>
         </Dialog>

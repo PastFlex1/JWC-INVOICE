@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -10,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Textarea } from '@/components/ui/textarea';
-import type { CreditNote, Invoice } from '@/lib/types';
+import type { CreditNote, Invoice, Consignatario, Customer } from '@/lib/types';
 import { Loader2, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, toDate } from 'date-fns';
@@ -31,9 +32,13 @@ type CreditNoteFormProps = {
   onClose: () => void;
   isSubmitting: boolean;
   invoices: Invoice[];
+  customers: Customer[];
+  consignatarios: Consignatario[];
 };
 
-export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices }: CreditNoteFormProps) {
+export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices, customers, consignatarios }: CreditNoteFormProps) {
+  const [consigneeName, setConsigneeName] = useState<string>('');
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -44,6 +49,26 @@ export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices }: Cr
       date: new Date(),
     },
   });
+
+  const selectedInvoiceId = form.watch('invoiceId');
+
+  useEffect(() => {
+    if (selectedInvoiceId) {
+      const invoice = invoices.find(inv => inv.id === selectedInvoiceId);
+      if (invoice) {
+        if (invoice.consignatarioId) {
+          const consignee = consignatarios.find(c => c.id === invoice.consignatarioId);
+          setConsigneeName(consignee?.nombreConsignatario || 'Consignatario no encontrado');
+        } else {
+          const customer = customers.find(c => c.id === invoice.customerId);
+          setConsigneeName(customer?.name || 'Cliente no encontrado');
+        }
+      }
+    } else {
+      setConsigneeName('');
+    }
+  }, [selectedInvoiceId, invoices, customers, consignatarios]);
+
 
   function handleSubmit(values: z.infer<typeof formSchema>) {
     const selectedInvoice = invoices.find(inv => inv.id === values.invoiceId);
@@ -65,11 +90,11 @@ export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices }: Cr
           name="invoiceId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Invoice to Credit</FormLabel>
+              <FormLabel>Factura a Acreditar</FormLabel>
                <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select an invoice" />
+                      <SelectValue placeholder="Seleccione una factura" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -84,12 +109,22 @@ export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices }: Cr
             </FormItem>
           )}
         />
+
+        {consigneeName && (
+          <FormItem>
+            <FormLabel>Consignatario</FormLabel>
+            <FormControl>
+              <Input readOnly disabled value={consigneeName} />
+            </FormControl>
+          </FormItem>
+        )}
+
         <FormField
           control={form.control}
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount to Credit</FormLabel>
+              <FormLabel>Monto a Acreditar</FormLabel>
               <FormControl>
                 <Input type="number" step="0.01" placeholder="50.00" {...field} />
               </FormControl>
@@ -102,9 +137,9 @@ export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices }: Cr
           name="reason"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Reason</FormLabel>
+              <FormLabel>Motivo</FormLabel>
               <FormControl>
-                <Textarea placeholder="e.g., Flower quality" {...field} />
+                <Textarea placeholder="Ej: Calidad de la flor" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -112,13 +147,13 @@ export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices }: Cr
         />
          <FormField control={form.control} name="date" render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Credit Note Date</FormLabel>
+              <FormLabel>Fecha de Nota de Crédito</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}>
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {field.value ? format(toDate(field.value), "PPP") : <span>Select date</span>}
+                      {field.value ? format(toDate(field.value), "PPP") : <span>Seleccionar fecha</span>}
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
@@ -131,11 +166,11 @@ export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices }: Cr
         )}/>
         <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
-                Cancel
+                Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isSubmitting ? 'Saving...' : 'Add Credit Note'}
+                {isSubmitting ? 'Guardando...' : 'Añadir Nota de Crédito'}
             </Button>
         </div>
       </form>
