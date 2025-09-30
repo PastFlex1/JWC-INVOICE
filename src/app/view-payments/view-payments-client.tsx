@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { Payment, Invoice, Customer, Finca } from '@/lib/types';
 import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
@@ -33,6 +34,7 @@ const ITEMS_PER_PAGE = 15;
 type AugmentedPayment = Payment & {
     invoiceNumber: string;
     entityName: string;
+    status: Invoice['status'];
 };
 
 export function ViewPaymentsClient() {
@@ -63,6 +65,7 @@ export function ViewPaymentsClient() {
               ...p,
               invoiceNumber: invoice?.invoiceNumber || "N/A",
               entityName: entityName,
+              status: invoice?.status || 'Pending'
           };
       });
   }, [payments, invoices, customers, fincas, invoiceMap, customerMap, fincaMap]);
@@ -81,7 +84,7 @@ export function ViewPaymentsClient() {
     return filtered.filter(payment => {
         const lowerCaseSearch = debouncedSearchTerm.toLowerCase();
         if (!lowerCaseSearch) return true;
-        const searchFields = [payment.invoiceNumber, payment.entityName, payment.paymentMethod, payment.reference || ''];
+        const searchFields = [payment.invoiceNumber, payment.entityName, payment.paymentMethod, payment.reference || '', payment.status];
         return searchFields.some(field => field.toLowerCase().includes(lowerCaseSearch));
     });
   }, [augmentedPayments, debouncedSearchTerm, dateRange]);
@@ -170,7 +173,8 @@ export function ViewPaymentsClient() {
                         <TableHead>Cliente/Proveedor</TableHead>
                         <TableHead>Monto</TableHead>
                         <TableHead>Método</TableHead>
-                        <TableHead>Referencia</TableHead>
+                        <TableHead>Banco</TableHead>
+                        <TableHead>Estado</TableHead>
                     </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -182,6 +186,11 @@ export function ViewPaymentsClient() {
                             <TableCell>${payment.amount.toFixed(2)}</TableCell>
                             <TableCell>{payment.paymentMethod}</TableCell>
                             <TableCell>{payment.reference}</TableCell>
+                             <TableCell>
+                                <Badge variant={payment.status === 'Paid' ? 'secondary' : 'destructive'}>
+                                {payment.status}
+                                </Badge>
+                            </TableCell>
                         </TableRow>
                     ))}
                     </TableBody>
