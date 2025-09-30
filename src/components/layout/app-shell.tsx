@@ -95,7 +95,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { href: '/debit-notes', label: 'Notas de Débito', icon: FileText },
     { href: '/account-statement', label: 'Estado de Cuenta Cliente', icon: Users },
     { href: '/farm-account-statement', label: 'Estado de Cuenta Finca', icon: Building },
-    { href: '/historical-account-statement', label: 'Estado de Cuenta Histórico', icon: Archive },
+    { href: '/historical-account-statement', label: 'Estado Cuenta Histórico Cliente', icon: Archive },
+    { href: '/historical-farm-account-statement', label: 'Estado Cuenta Histórico Finca', icon: Archive },
     { href: '/payments', label: 'Registrar Pago', icon: Banknote },
     { href: '/record-purchase-payment', label: 'Registrar Pago Compra', icon: CreditCard },
   ];
