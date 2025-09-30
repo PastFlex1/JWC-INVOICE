@@ -249,7 +249,6 @@ export function AccountsPayableClient() {
                     <TableHead>Proveedor</TableHead>
                     <TableHead>Fecha Salida</TableHead>
                     <TableHead>Monto Pendiente</TableHead>
-                    <TableHead>Estado</TableHead>
                     <TableHead className="text-right">Acciones</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -266,17 +265,6 @@ export function AccountsPayableClient() {
                         <TableCell>{getFinca(invoice.farmId)?.name || 'Desconocido'}</TableCell>
                         <TableCell>{format(parseISO(invoice.farmDepartureDate), 'PPP')}</TableCell>
                         <TableCell>${balance.toFixed(2)}</TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={invoice.status === 'Paid' ? 'secondary' : invoice.status === 'Overdue' ? 'destructive' : 'outline'}
-                            className={cn({
-                              'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300': invoice.status === 'Paid',
-                              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300': invoice.status === 'Pending',
-                            })}
-                          >
-                            {invoice.status}
-                          </Badge>
-                        </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
                             <Link href={`/invoices/${invoice.id}`} passHref>

@@ -47,7 +47,7 @@ export function FarmAccountStatementClient() {
     const finca = fincas.find(f => f.id === selectedFincaId);
     if (!finca) return null;
 
-    let fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both'));
+    let fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both') && inv.status !== 'Paid');
 
     if (selectedMonth !== 'all') {
       fincaInvoices = fincaInvoices.filter(inv => format(parseISO(inv.farmDepartureDate), 'yyyy-MM') === selectedMonth);

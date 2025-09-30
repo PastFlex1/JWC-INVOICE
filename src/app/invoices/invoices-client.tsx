@@ -249,7 +249,6 @@ export function InvoicesClient() {
                     <TableHead>{t('invoices.customer')}</TableHead>
                     <TableHead>Fecha Salida</TableHead>
                     <TableHead>{t('invoices.amount')}</TableHead>
-                    <TableHead>{t('invoices.status')}</TableHead>
                     <TableHead className="text-right">{t('invoices.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -266,17 +265,6 @@ export function InvoicesClient() {
                         <TableCell>{getCustomer(invoice.customerId)?.name || t('invoices.unknownCustomer')}</TableCell>
                         <TableCell>{format(parseISO(invoice.farmDepartureDate), 'PPP')}</TableCell>
                         <TableCell>${balance.toFixed(2)}</TableCell>
-                        <TableCell>
-                          <Badge
-                            variant={invoice.status === 'Paid' ? 'secondary' : invoice.status === 'Overdue' ? 'destructive' : 'outline'}
-                            className={cn({
-                              'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-300': invoice.status === 'Paid',
-                              'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/50 dark:text-yellow-300': invoice.status === 'Pending',
-                            })}
-                          >
-                            {invoice.status}
-                          </Badge>
-                        </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
                             <Link href={`/invoices/${invoice.id}`} passHref>

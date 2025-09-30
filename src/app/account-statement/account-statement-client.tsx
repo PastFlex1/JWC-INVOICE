@@ -56,7 +56,7 @@ export function AccountStatementClient() {
     const customer = customers.find(c => c.id === selectedCustomerId);
     if (!customer) return null;
 
-    let customerInvoices = invoices.filter(inv => inv.customerId === selectedCustomerId && (inv.type === 'sale' || inv.type === 'both'));
+    let customerInvoices = invoices.filter(inv => inv.customerId === selectedCustomerId && (inv.type === 'sale' || inv.type === 'both') && inv.status !== 'Paid');
     
     if (selectedMonth !== 'all') {
       customerInvoices = customerInvoices.filter(inv => format(parseISO(inv.farmDepartureDate), 'yyyy-MM') === selectedMonth);
