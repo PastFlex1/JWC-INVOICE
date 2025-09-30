@@ -403,7 +403,7 @@ export function PaymentForm({
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Distribución de Pago</AlertDialogTitle>
             <AlertDialogDescription>
-                El monto total de ${form.getValues('amount').toFixed(2)} se aplicará a las facturas seleccionadas de la siguiente manera. ¿Desea continuar?
+                El monto total de ${Number(form.getValues('amount')).toFixed(2)} se aplicará a las facturas seleccionadas de la siguiente manera. ¿Desea continuar?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="max-h-60 overflow-y-auto">
