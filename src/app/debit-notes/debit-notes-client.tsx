@@ -29,7 +29,7 @@ type DebitNoteFormData = Omit<DebitNote, 'id'>;
 const ITEMS_PER_PAGE = 10;
 
 export function DebitNotesClient() {
-  const { debitNotes, invoices, refreshData } = useAppData();
+  const { debitNotes, invoices, customers, consignatarios, refreshData } = useAppData();
   const [localDebitNotes, setLocalDebitNotes] = useState<DebitNote[]>([]);
   const { t } = useTranslation();
   
@@ -133,6 +133,8 @@ export function DebitNotesClient() {
               onClose={handleCloseDialog}
               isSubmitting={isSubmitting}
               invoices={invoices}
+              customers={customers}
+              consignatarios={consignatarios}
             />
           </DialogContent>
         </Dialog>

@@ -1,5 +1,6 @@
 'use client';
 
+import { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -10,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Textarea } from '@/components/ui/textarea';
-import type { DebitNote, Invoice } from '@/lib/types';
+import type { DebitNote, Invoice, Consignatario, Customer } from '@/lib/types';
 import { Loader2, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, toDate } from 'date-fns';
@@ -31,9 +32,13 @@ type DebitNoteFormProps = {
   onClose: () => void;
   isSubmitting: boolean;
   invoices: Invoice[];
+  customers: Customer[];
+  consignatarios: Consignatario[];
 };
 
-export function DebitNoteForm({ onSubmit, onClose, isSubmitting, invoices }: DebitNoteFormProps) {
+export function DebitNoteForm({ onSubmit, onClose, isSubmitting, invoices, customers, consignatarios }: DebitNoteFormProps) {
+  const [consigneeName, setConsigneeName] = useState<string>('');
+
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -44,6 +49,25 @@ export function DebitNoteForm({ onSubmit, onClose, isSubmitting, invoices }: Deb
       date: new Date(),
     },
   });
+
+  const selectedInvoiceId = form.watch('invoiceId');
+
+  useEffect(() => {
+    if (selectedInvoiceId) {
+      const invoice = invoices.find(inv => inv.id === selectedInvoiceId);
+      if (invoice) {
+        if (invoice.consignatarioId) {
+          const consignee = consignatarios.find(c => c.id === invoice.consignatarioId);
+          setConsigneeName(consignee?.nombreConsignatario || 'Consignatario no encontrado');
+        } else {
+          const customer = customers.find(c => c.id === invoice.customerId);
+          setConsigneeName(customer?.name || 'Cliente no encontrado');
+        }
+      }
+    } else {
+      setConsigneeName('');
+    }
+  }, [selectedInvoiceId, invoices, customers, consignatarios]);
 
   function handleSubmit(values: z.infer<typeof formSchema>) {
     const selectedInvoice = invoices.find(inv => inv.id === values.invoiceId);
@@ -65,11 +89,11 @@ export function DebitNoteForm({ onSubmit, onClose, isSubmitting, invoices }: Deb
           name="invoiceId"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Invoice to Debit</FormLabel>
+              <FormLabel>Factura a Debitar</FormLabel>
                <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Select an invoice" />
+                      <SelectValue placeholder="Seleccione una factura" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -84,12 +108,22 @@ export function DebitNoteForm({ onSubmit, onClose, isSubmitting, invoices }: Deb
             </FormItem>
           )}
         />
+        
+        {consigneeName && (
+          <FormItem>
+            <FormLabel>Consignatario</FormLabel>
+            <FormControl>
+              <Input readOnly disabled value={consigneeName} />
+            </FormControl>
+          </FormItem>
+        )}
+
         <FormField
           control={form.control}
           name="amount"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Amount to Debit</FormLabel>
+              <FormLabel>Monto a Debitar</FormLabel>
               <FormControl>
                 <Input type="number" step="0.01" placeholder="50.00" {...field} />
               </FormControl>
@@ -102,9 +136,9 @@ export function DebitNoteForm({ onSubmit, onClose, isSubmitting, invoices }: Deb
           name="reason"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Reason</FormLabel>
+              <FormLabel>Motivo</FormLabel>
               <FormControl>
-                <Textarea placeholder="e.g., Price adjustment" {...field} />
+                <Textarea placeholder="Ej: Ajuste de precio" {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -112,13 +146,13 @@ export function DebitNoteForm({ onSubmit, onClose, isSubmitting, invoices }: Deb
         />
          <FormField control={form.control} name="date" render={({ field }) => (
             <FormItem className="flex flex-col">
-              <FormLabel>Debit Note Date</FormLabel>
+              <FormLabel>Fecha de Nota de Débito</FormLabel>
               <Popover>
                 <PopoverTrigger asChild>
                   <FormControl>
                     <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}>
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {field.value ? format(toDate(field.value), "PPP") : <span>Select date</span>}
+                      {field.value ? format(toDate(field.value), "PPP") : <span>Seleccionar fecha</span>}
                     </Button>
                   </FormControl>
                 </PopoverTrigger>
@@ -131,11 +165,11 @@ export function DebitNoteForm({ onSubmit, onClose, isSubmitting, invoices }: Deb
         )}/>
         <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
-                Cancel
+                Cancelar
             </Button>
             <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isSubmitting ? 'Saving...' : 'Add Debit Note'}
+                {isSubmitting ? 'Guardando...' : 'Añadir Nota de Débito'}
             </Button>
         </div>
       </form>
