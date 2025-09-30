@@ -31,11 +31,11 @@ import DebitNotesDownloadPdfButton from './debit-notes-download-pdf';
 import DebitNotesDownloadExcelButton from './debit-notes-download-excel';
 
 type DebitNoteFormData = Omit<DebitNote, 'id'>;
-type DebitNoteWithCustomer = DebitNote & { customerName?: string };
+type DebitNoteWithDetails = DebitNote & { consigneeName?: string };
 
 export function DebitNotesClient() {
   const { debitNotes, invoices, customers, consignatarios, refreshData } = useAppData();
-  const [localDebitNotes, setLocalDebitNotes] = useState<DebitNoteWithCustomer[]>([]);
+  const [localDebitNotes, setLocalDebitNotes] = useState<DebitNoteWithDetails[]>([]);
   const { t } = useTranslation();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -45,13 +45,21 @@ export function DebitNotesClient() {
   const { toast } = useToast();
   
   const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
-  const invoiceCustomerMap = useMemo(() => new Map(invoices.map(i => [i.id, i.customerId])), [invoices]);
+  const consignatarioMap = useMemo(() => new Map(consignatarios.map(c => [c.id, c.nombreConsignatario])), [consignatarios]);
+  const invoiceMap = useMemo(() => new Map(invoices.map(i => [i.id, i])), [invoices]);
 
   useEffect(() => {
     let filtered = debitNotes.map(note => {
-        const customerId = invoiceCustomerMap.get(note.invoiceId);
-        const customerName = customerId ? customerMap.get(customerId) : 'Desconocido';
-        return { ...note, customerName };
+        const invoice = invoiceMap.get(note.invoiceId);
+        let consigneeName = 'Desconocido';
+        if (invoice) {
+          if (invoice.consignatarioId) {
+            consigneeName = consignatarioMap.get(invoice.consignatarioId) || 'Consignatario no encontrado';
+          } else {
+            consigneeName = customerMap.get(invoice.customerId) || 'Cliente no encontrado';
+          }
+        }
+        return { ...note, consigneeName };
     });
 
     if (dateRange?.from) {
@@ -64,7 +72,7 @@ export function DebitNotesClient() {
       );
     }
     setLocalDebitNotes(filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-  }, [debitNotes, dateRange, customerMap, invoiceCustomerMap]);
+  }, [debitNotes, dateRange, customerMap, invoiceMap, consignatarioMap]);
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);

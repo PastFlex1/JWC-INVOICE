@@ -8,10 +8,10 @@ import { useToast } from '@/hooks/use-toast';
 import type { CreditNote } from '@/lib/types';
 import { format, parseISO } from 'date-fns';
 
-type CreditNoteWithCustomer = CreditNote & { customerName?: string };
+type CreditNoteWithDetails = CreditNote & { consigneeName?: string };
 
 type CreditNotesDownloadExcelButtonProps = {
-  notes: CreditNoteWithCustomer[];
+  notes: CreditNoteWithDetails[];
 };
 
 export default function CreditNotesDownloadExcelButton({ notes }: CreditNotesDownloadExcelButtonProps) {
@@ -31,7 +31,7 @@ export default function CreditNotesDownloadExcelButton({ notes }: CreditNotesDow
         ws_data.push([
           format(parseISO(note.date), 'dd/MM/yyyy'),
           note.invoiceNumber,
-          note.customerName || 'N/A',
+          note.consigneeName || 'N/A',
           note.reason,
           note.amount
         ]);

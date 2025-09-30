@@ -8,10 +8,10 @@ import { Trash2 } from 'lucide-react';
 import type { DebitNote } from '@/lib/types';
 import { useTranslation } from '@/context/i18n-context';
 
-type DebitNoteWithCustomer = DebitNote & { customerName?: string };
+type DebitNoteWithDetails = DebitNote & { consigneeName?: string };
 
 type DebitNotesViewProps = {
-  notes: DebitNoteWithCustomer[];
+  notes: DebitNoteWithDetails[];
   onDelete: (note: DebitNote) => void;
 };
 
@@ -40,37 +40,30 @@ export function DebitNotesView({ notes, onDelete }: DebitNotesViewProps) {
         </header>
 
         <section>
-          <div className="grid grid-cols-[120px,120px,1fr,200px,120px,80px] font-bold text-center bg-gray-200 border-t border-l border-r border-black text-xs">
+          <div className="grid grid-cols-[120px,120px,1fr,200px,120px] font-bold text-center bg-gray-200 border-t border-l border-r border-black text-xs">
             <div className="p-1 border-r border-black">{t('debitNotes.list.date')}</div>
             <div className="p-1 border-r border-black">{t('debitNotes.list.invoice')}</div>
             <div className="p-1 border-r border-black">CLIENTE</div>
             <div className="p-1 border-r border-black">{t('debitNotes.list.reason')}</div>
             <div className="p-1 border-r border-black">{t('debitNotes.list.amount')}</div>
-            <div className="p-1">{t('common.actions')}</div>
           </div>
           <div className="border-l border-r border-b border-black text-xs">
             {notes.length === 0 && (
                 <div className="text-center p-4 text-muted-foreground">No se encontraron notas de débito.</div>
             )}
             {notes.map(note => (
-              <div key={note.id} className="grid grid-cols-[120px,120px,1fr,200px,120px,80px] border-b border-gray-300">
+              <div key={note.id} className="grid grid-cols-[120px,120px,1fr,200px,120px] border-b border-gray-300">
                 <div className="p-1 text-center border-r border-black">{format(parseISO(note.date), 'dd/MM/yyyy')}</div>
                 <div className="p-1 text-center border-r border-black">{note.invoiceNumber}</div>
-                <div className="p-1 border-r border-black">{note.customerName}</div>
+                <div className="p-1 border-r border-black">{note.consigneeName}</div>
                 <div className="p-1 border-r border-black">{note.reason}</div>
                 <div className="p-1 text-right border-r border-black">${note.amount.toFixed(2)}</div>
-                <div className="p-1 text-center">
-                    <Button variant="ghost" size="icon" onClick={() => onDelete(note)} className="h-6 w-6">
-                        <Trash2 className="h-4 w-4 text-destructive" />
-                    </Button>
-                </div>
               </div>
             ))}
           </div>
-          <div className="grid grid-cols-[120px,120px,1fr,200px,120px,80px] font-bold text-xs bg-gray-200 border-b border-l border-r border-black">
+          <div className="grid grid-cols-[120px,120px,1fr,200px,120px] font-bold text-xs bg-gray-200 border-b border-l border-r border-black">
               <div className="p-1 border-r border-black col-span-4 text-center">TOTAL</div>
               <div className="p-1 text-right border-r border-black">${totalAmount.toFixed(2)}</div>
-              <div className="p-1"></div>
           </div>
         </section>
       </CardContent>

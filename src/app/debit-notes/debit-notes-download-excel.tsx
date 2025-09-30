@@ -8,10 +8,10 @@ import { useToast } from '@/hooks/use-toast';
 import type { DebitNote } from '@/lib/types';
 import { format, parseISO } from 'date-fns';
 
-type DebitNoteWithCustomer = DebitNote & { customerName?: string };
+type DebitNoteWithDetails = DebitNote & { consigneeName?: string };
 
 type DebitNotesDownloadExcelButtonProps = {
-  notes: DebitNoteWithCustomer[];
+  notes: DebitNoteWithDetails[];
 };
 
 export default function DebitNotesDownloadExcelButton({ notes }: DebitNotesDownloadExcelButtonProps) {
@@ -31,7 +31,7 @@ export default function DebitNotesDownloadExcelButton({ notes }: DebitNotesDownl
         ws_data.push([
           format(parseISO(note.date), 'dd/MM/yyyy'),
           note.invoiceNumber,
-          note.customerName || 'N/A',
+          note.consigneeName || 'N/A',
           note.reason,
           note.amount
         ]);

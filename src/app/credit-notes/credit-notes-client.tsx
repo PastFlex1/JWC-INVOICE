@@ -31,11 +31,11 @@ import CreditNotesDownloadPdfButton from './credit-notes-download-pdf';
 import CreditNotesDownloadExcelButton from './credit-notes-download-excel';
 
 type CreditNoteFormData = Omit<CreditNote, 'id'>;
-type CreditNoteWithCustomer = CreditNote & { customerName?: string };
+type CreditNoteWithDetails = CreditNote & { consigneeName?: string };
 
 export function CreditNotesClient() {
   const { creditNotes, invoices, customers, consignatarios, refreshData } = useAppData();
-  const [localCreditNotes, setLocalCreditNotes] = useState<CreditNoteWithCustomer[]>([]);
+  const [localCreditNotes, setLocalCreditNotes] = useState<CreditNoteWithDetails[]>([]);
   const { t } = useTranslation();
   
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -43,15 +43,24 @@ export function CreditNotesClient() {
   const [noteToDelete, setNoteToDelete] = useState<CreditNote | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const { toast } = useToast();
-
+  
   const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
-  const invoiceCustomerMap = useMemo(() => new Map(invoices.map(i => [i.id, i.customerId])), [invoices]);
+  const consignatarioMap = useMemo(() => new Map(consignatarios.map(c => [c.id, c.nombreConsignatario])), [consignatarios]);
+  const invoiceMap = useMemo(() => new Map(invoices.map(i => [i.id, i])), [invoices]);
+
 
   useEffect(() => {
     let filtered = creditNotes.map(note => {
-      const customerId = invoiceCustomerMap.get(note.invoiceId);
-      const customerName = customerId ? customerMap.get(customerId) : 'Desconocido';
-      return { ...note, customerName };
+      const invoice = invoiceMap.get(note.invoiceId);
+      let consigneeName = 'Desconocido';
+      if (invoice) {
+        if (invoice.consignatarioId) {
+          consigneeName = consignatarioMap.get(invoice.consignatarioId) || 'Consignatario no encontrado';
+        } else {
+          consigneeName = customerMap.get(invoice.customerId) || 'Cliente no encontrado';
+        }
+      }
+      return { ...note, consigneeName };
     });
 
     if (dateRange?.from) {
@@ -64,7 +73,7 @@ export function CreditNotesClient() {
       );
     }
     setLocalCreditNotes(filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-  }, [creditNotes, dateRange, customerMap, invoiceCustomerMap]);
+  }, [creditNotes, dateRange, customerMap, invoiceMap, consignatarioMap]);
   
 
   const handleOpenDialog = () => {
