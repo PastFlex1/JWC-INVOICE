@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -47,10 +46,14 @@ export function CreditNotesClient() {
 
   useEffect(() => {
     let filtered = creditNotes;
-    if (dateRange?.from && dateRange?.to) {
-        filtered = filtered.filter(note => 
-            isWithinInterval(parseISO(note.date), { start: startOfDay(dateRange.from!), end: endOfDay(dateRange.to!) })
-        );
+    if (dateRange?.from) {
+      const range = {
+        start: startOfDay(dateRange.from),
+        end: dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from),
+      };
+      filtered = filtered.filter(note => 
+        isWithinInterval(parseISO(note.date), range)
+      );
     }
     setLocalCreditNotes(filtered);
     setCurrentPage(1);
@@ -271,5 +274,3 @@ export function CreditNotesClient() {
     </>
   );
 }
-
-    

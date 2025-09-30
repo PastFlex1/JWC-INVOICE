@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -94,10 +93,14 @@ export function AccountsPayableClient() {
     const purchaseInvoices = invoices.filter(inv => inv.type === 'purchase' || inv.type === 'both');
     let filtered = purchaseInvoices;
 
-    if (dateRange?.from && dateRange?.to) {
-        filtered = filtered.filter(invoice => 
-            isWithinInterval(parseISO(invoice.farmDepartureDate), { start: startOfDay(dateRange.from!), end: endOfDay(dateRange.to!) })
-        );
+    if (dateRange?.from) {
+      const range = {
+        start: startOfDay(dateRange.from),
+        end: dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from),
+      };
+      filtered = filtered.filter(invoice => 
+        isWithinInterval(parseISO(invoice.farmDepartureDate), range)
+      );
     }
     
     return filtered.filter(invoice => {
@@ -347,5 +350,3 @@ export function AccountsPayableClient() {
     </>
   );
 }
-
-    

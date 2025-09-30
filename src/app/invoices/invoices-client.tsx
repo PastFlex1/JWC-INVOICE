@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -95,9 +94,13 @@ export function InvoicesClient() {
     
     let filtered = saleInvoices;
 
-    if (dateRange?.from && dateRange?.to) {
+    if (dateRange?.from) {
+      const range = {
+        start: startOfDay(dateRange.from),
+        end: dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from),
+      };
       filtered = filtered.filter(invoice => 
-          isWithinInterval(parseISO(invoice.farmDepartureDate), { start: startOfDay(dateRange.from!), end: endOfDay(dateRange.to!) })
+        isWithinInterval(parseISO(invoice.farmDepartureDate), range)
       );
     }
     
@@ -353,5 +356,3 @@ export function InvoicesClient() {
     </>
   );
 }
-
-    
