@@ -192,7 +192,6 @@ export function DebitNotesClient() {
                     defaultMonth={dateRange?.from}
                     selected={dateRange}
                     onSelect={setDateRange}
-                    numberOfMonths={2}
                   />
                 </PopoverContent>
               </Popover>
