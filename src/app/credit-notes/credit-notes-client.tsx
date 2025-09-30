@@ -1,10 +1,9 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Plus, Trash2, ChevronLeft, ChevronRight, Calendar as CalendarIcon, X as XIcon } from 'lucide-react';
+import { Plus, Trash2, Calendar as CalendarIcon, X as XIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import {
   AlertDialog,
@@ -20,6 +19,7 @@ import { useToast } from '@/hooks/use-toast';
 import { addCreditNote, deleteCreditNote } from '@/services/credit-notes';
 import type { CreditNote } from '@/lib/types';
 import { CreditNoteForm } from './credit-note-form';
+import { CreditNotesView } from './credit-notes-view';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
 import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
@@ -29,23 +29,29 @@ import { cn } from '@/lib/utils';
 import { type DateRange } from 'react-day-picker';
 
 type CreditNoteFormData = Omit<CreditNote, 'id'>;
-
-const ITEMS_PER_PAGE = 10;
+type CreditNoteWithCustomer = CreditNote & { customerName?: string };
 
 export function CreditNotesClient() {
   const { creditNotes, invoices, customers, consignatarios, refreshData } = useAppData();
-  const [localCreditNotes, setLocalCreditNotes] = useState<CreditNote[]>([]);
+  const [localCreditNotes, setLocalCreditNotes] = useState<CreditNoteWithCustomer[]>([]);
   const { t } = useTranslation();
   
-  const [currentPage, setCurrentPage] = useState(1);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState<CreditNote | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const { toast } = useToast();
 
+  const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
+  const invoiceCustomerMap = useMemo(() => new Map(invoices.map(i => [i.id, i.customerId])), [invoices]);
+
   useEffect(() => {
-    let filtered = creditNotes;
+    let filtered = creditNotes.map(note => {
+      const customerId = invoiceCustomerMap.get(note.invoiceId);
+      const customerName = customerId ? customerMap.get(customerId) : 'Desconocido';
+      return { ...note, customerName };
+    });
+
     if (dateRange?.from) {
       const range = {
         start: startOfDay(dateRange.from),
@@ -55,19 +61,9 @@ export function CreditNotesClient() {
         isWithinInterval(parseISO(note.date), range)
       );
     }
-    setLocalCreditNotes(filtered);
-    setCurrentPage(1);
-  }, [creditNotes, dateRange]);
+    setLocalCreditNotes(filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+  }, [creditNotes, dateRange, customerMap, invoiceCustomerMap]);
   
-  const totalPages = Math.ceil(localCreditNotes.length / ITEMS_PER_PAGE);
-
-  const paginatedNotes = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return localCreditNotes.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [localCreditNotes, currentPage]);
-
-  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
-  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
@@ -201,58 +197,11 @@ export function CreditNotesClient() {
                 </Button>
               )}
             </div>
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>{t('creditNotes.list.date')}</TableHead>
-                  <TableHead>{t('creditNotes.list.invoice')}</TableHead>
-                  <TableHead>{t('creditNotes.list.amount')}</TableHead>
-                  <TableHead>{t('creditNotes.list.reason')}</TableHead>
-                  <TableHead className="text-right">{t('common.actions')}</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {paginatedNotes.map((note) => (
-                  <TableRow key={note.id}>
-                    <TableCell>{format(parseISO(note.date), 'PPP')}</TableCell>
-                    <TableCell className="font-medium">{note.invoiceNumber}</TableCell>
-                    <TableCell>${note.amount.toFixed(2)}</TableCell>
-                    <TableCell>{note.reason}</TableCell>
-                    <TableCell className="text-right space-x-0">
-                       <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(note)}>
-                           <Trash2 className="h-4 w-4 text-destructive" />
-                       </Button>
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+             <CreditNotesView 
+              notes={localCreditNotes} 
+              onDelete={handleDeleteClick}
+            />
           </CardContent>
-           {totalPages > 1 && (
-            <CardFooter className="flex items-center justify-between">
-              <div className="text-sm text-muted-foreground">
-                {t('common.page', { currentPage: currentPage, totalPages: totalPages })}
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handlePrevPage}
-                  disabled={currentPage === 1}
-                >
-                  {t('common.previous')}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={handleNextPage}
-                  disabled={currentPage >= totalPages}
-                >
-                  {t('common.next')}
-                </Button>
-              </div>
-            </CardFooter>
-          )}
         </Card>
       </div>
 
