@@ -11,6 +11,13 @@ import HistoricalAccountStatementDownloadButton from './historical-account-state
 import HistoricalAccountStatementExcelButton from './historical-account-statement-download-excel';
 import HistoricalSendDocumentsDialog from './historical-send-documents-dialog';
 import { useTranslation } from '@/context/i18n-context';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
+import { Calendar as CalendarIcon, X as XIcon } from 'lucide-react';
+import { type DateRange } from 'react-day-picker';
+
 
 export type StatementData = {
   customer: Customer;
@@ -26,6 +33,7 @@ export type StatementData = {
 export function HistoricalAccountStatementClient() {
   const { customers, invoices, creditNotes, debitNotes, payments, consignatarios } = useAppData();
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
   const { t } = useTranslation();
 
@@ -44,6 +52,16 @@ export function HistoricalAccountStatementClient() {
 
     let customerInvoices = invoices.filter(inv => inv.customerId === selectedCustomerId && (inv.type === 'sale' || inv.type === 'both'));
     
+    if (dateRange?.from) {
+      const range = {
+        start: startOfDay(dateRange.from),
+        end: dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from),
+      };
+      customerInvoices = customerInvoices.filter(invoice => 
+        isWithinInterval(parseISO(invoice.farmDepartureDate), range)
+      );
+    }
+
     if (customerInvoices.length === 0) return null;
 
     const sortedInvoices = customerInvoices.sort((a, b) => new Date(b.farmDepartureDate).getTime() - new Date(a.farmDepartureDate).getTime());
@@ -101,7 +119,7 @@ export function HistoricalAccountStatementClient() {
       urgentPayment,
       statementDate: latestInvoiceDate,
     };
-  }, [selectedCustomerId, customers, invoices, creditNotes, debitNotes, payments, consignatarioMap]);
+  }, [selectedCustomerId, dateRange, customers, invoices, creditNotes, debitNotes, payments, consignatarioMap]);
 
   return (
     <>
@@ -125,7 +143,7 @@ export function HistoricalAccountStatementClient() {
             <CardTitle>{t('accountStatement.selectCustomer')}</CardTitle>
             <CardDescription>{t('accountStatement.selectCustomerDescription')}</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-wrap gap-4">
             <Select onValueChange={setSelectedCustomerId}>
               <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
                 <SelectValue placeholder={t('accountStatement.selectCustomerPlaceholder')} />
@@ -138,6 +156,48 @@ export function HistoricalAccountStatementClient() {
                 ))}
               </SelectContent>
             </Select>
+
+             <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[280px] justify-start text-left font-normal",
+                      !dateRange && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                     {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, "LLL dd, y")} -{" "}
+                          {format(dateRange.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(dateRange.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Todas las fechas</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={dateRange?.from}
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                    numberOfMonths={2}
+                  />
+                </PopoverContent>
+              </Popover>
+               {dateRange && (
+                <Button variant="ghost" onClick={() => setDateRange(undefined)}>
+                    <XIcon className="h-4 w-4" />
+                </Button>
+              )}
+
           </CardContent>
         </Card>
         

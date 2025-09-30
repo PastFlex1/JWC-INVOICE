@@ -11,6 +11,12 @@ import HistoricalFarmAccountStatementDownloadButton from './historical-farm-acco
 import HistoricalFarmAccountStatementExcelButton from './historical-farm-account-statement-download-excel';
 import HistoricalSendFarmDocumentsDialog from './historical-farm-send-documents-dialog';
 import { useTranslation } from '@/context/i18n-context';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
+import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
+import { Calendar as CalendarIcon, X as XIcon } from 'lucide-react';
+import { type DateRange } from 'react-day-picker';
 
 export type StatementData = {
   finca: Finca;
@@ -26,6 +32,7 @@ export type StatementData = {
 export function HistoricalFarmAccountStatementClient() {
   const { fincas, invoices, creditNotes, debitNotes, payments } = useAppData();
   const [selectedFincaId, setSelectedFincaId] = useState<string | null>(null);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
   const { t } = useTranslation();
 
@@ -37,6 +44,16 @@ export function HistoricalFarmAccountStatementClient() {
 
     let fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both'));
     
+     if (dateRange?.from) {
+      const range = {
+        start: startOfDay(dateRange.from),
+        end: dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from),
+      };
+      fincaInvoices = fincaInvoices.filter(invoice => 
+        isWithinInterval(parseISO(invoice.farmDepartureDate), range)
+      );
+    }
+
     if (fincaInvoices.length === 0) return null;
 
     const sortedInvoices = fincaInvoices.sort((a, b) => new Date(b.farmDepartureDate).getTime() - new Date(a.farmDepartureDate).getTime());
@@ -91,7 +108,7 @@ export function HistoricalFarmAccountStatementClient() {
       urgentPayment,
       statementDate: latestInvoiceDate,
     };
-  }, [selectedFincaId, fincas, invoices, creditNotes, debitNotes, payments]);
+  }, [selectedFincaId, dateRange, fincas, invoices, creditNotes, debitNotes, payments]);
 
   return (
     <>
@@ -115,7 +132,7 @@ export function HistoricalFarmAccountStatementClient() {
             <CardTitle>Seleccionar Finca</CardTitle>
             <CardDescription>Elija una finca/proveedor para generar su estado de cuenta histórico.</CardDescription>
           </CardHeader>
-          <CardContent>
+          <CardContent className="flex flex-wrap gap-4">
             <Select onValueChange={setSelectedFincaId}>
               <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
                 <SelectValue placeholder="Seleccione una finca..." />
@@ -128,6 +145,46 @@ export function HistoricalFarmAccountStatementClient() {
                 ))}
               </SelectContent>
             </Select>
+            <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[280px] justify-start text-left font-normal",
+                      !dateRange && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                     {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, "LLL dd, y")} -{" "}
+                          {format(dateRange.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(dateRange.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Todas las fechas</span>
+                    )}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    initialFocus
+                    mode="range"
+                    defaultMonth={dateRange?.from}
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                    numberOfMonths={2}
+                  />
+                </PopoverContent>
+              </Popover>
+               {dateRange && (
+                <Button variant="ghost" onClick={() => setDateRange(undefined)}>
+                    <XIcon className="h-4 w-4" />
+                </Button>
+              )}
           </CardContent>
         </Card>
         
