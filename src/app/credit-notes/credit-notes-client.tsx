@@ -27,6 +27,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { type DateRange } from 'react-day-picker';
+import CreditNotesDownloadPdfButton from './credit-notes-download-pdf';
+import CreditNotesDownloadExcelButton from './credit-notes-download-excel';
 
 type CreditNoteFormData = Omit<CreditNote, 'id'>;
 type CreditNoteWithCustomer = CreditNote & { customerName?: string };
@@ -156,7 +158,7 @@ export function CreditNotesClient() {
             <CardDescription>{t('creditNotes.list.description')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="mb-4 flex flex-wrap gap-4">
+            <div className="mb-4 flex flex-wrap items-center gap-4">
                <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -188,6 +190,7 @@ export function CreditNotesClient() {
                     defaultMonth={dateRange?.from}
                     selected={dateRange}
                     onSelect={setDateRange}
+                    numberOfMonths={1}
                   />
                 </PopoverContent>
               </Popover>
@@ -195,6 +198,13 @@ export function CreditNotesClient() {
                 <Button variant="ghost" onClick={() => setDateRange(undefined)}>
                     <XIcon className="h-4 w-4" />
                 </Button>
+              )}
+               <div className="flex-grow" />
+              {localCreditNotes.length > 0 && (
+                <div className="flex gap-2">
+                  <CreditNotesDownloadPdfButton notes={localCreditNotes} />
+                  <CreditNotesDownloadExcelButton notes={localCreditNotes} />
+                </div>
               )}
             </div>
              <CreditNotesView 

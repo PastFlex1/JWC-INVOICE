@@ -27,6 +27,8 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { type DateRange } from 'react-day-picker';
+import DebitNotesDownloadPdfButton from './debit-notes-download-pdf';
+import DebitNotesDownloadExcelButton from './debit-notes-download-excel';
 
 type DebitNoteFormData = Omit<DebitNote, 'id'>;
 type DebitNoteWithCustomer = DebitNote & { customerName?: string };
@@ -155,7 +157,7 @@ export function DebitNotesClient() {
             <CardDescription>{t('debitNotes.list.description')}</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="mb-4 flex flex-wrap gap-4">
+            <div className="mb-4 flex flex-wrap items-center gap-4">
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -187,6 +189,7 @@ export function DebitNotesClient() {
                     defaultMonth={dateRange?.from}
                     selected={dateRange}
                     onSelect={setDateRange}
+                    numberOfMonths={1}
                   />
                 </PopoverContent>
               </Popover>
@@ -195,6 +198,13 @@ export function DebitNotesClient() {
                     <XIcon className="h-4 w-4" />
                 </Button>
               )}
+               <div className="flex-grow" />
+                {localDebitNotes.length > 0 && (
+                <div className="flex gap-2">
+                    <DebitNotesDownloadPdfButton notes={localDebitNotes} />
+                    <DebitNotesDownloadExcelButton notes={localDebitNotes} />
+                </div>
+                )}
             </div>
             <DebitNotesView 
               notes={localDebitNotes} 
