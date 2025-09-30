@@ -21,13 +21,14 @@ import {
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import type { Invoice, Finca, CreditNote, DebitNote, Payment, BunchItem } from '@/lib/types';
-import { format, parseISO, isSameDay } from 'date-fns';
+import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 import { deleteInvoice } from '@/services/invoices';
 import { useToast } from '@/hooks/use-toast';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
+import { type DateRange } from 'react-day-picker';
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -48,7 +49,7 @@ export function AccountsPayableClient() {
   const { invoices, fincas, creditNotes, debitNotes, payments, refreshData } = useAppData();
   const [invoiceToDelete, setInvoiceToDelete] = useState<Invoice | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [currentPage, setCurrentPage] = useState(1);
   const { toast } = useToast();
@@ -93,9 +94,9 @@ export function AccountsPayableClient() {
     const purchaseInvoices = invoices.filter(inv => inv.type === 'purchase' || inv.type === 'both');
     let filtered = purchaseInvoices;
 
-    if (selectedDate) {
+    if (dateRange?.from && dateRange?.to) {
         filtered = filtered.filter(invoice => 
-            isSameDay(parseISO(invoice.farmDepartureDate), selectedDate)
+            isWithinInterval(parseISO(invoice.farmDepartureDate), { start: startOfDay(dateRange.from!), end: endOfDay(dateRange.to!) })
         );
     }
     
@@ -113,7 +114,7 @@ export function AccountsPayableClient() {
 
         return searchFields.some(field => field.toLowerCase().includes(lowerCaseSearch));
     });
-  }, [invoices, debouncedSearchTerm, fincaMap, selectedDate]);
+  }, [invoices, debouncedSearchTerm, fincaMap, dateRange]);
 
 
   const totalPages = Math.ceil(filteredInvoices.length / ITEMS_PER_PAGE);
@@ -202,25 +203,38 @@ export function AccountsPayableClient() {
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-[240px] justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground"
+                      "w-[280px] justify-start text-left font-normal",
+                      !dateRange && "text-muted-foreground"
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP") : <span>Todas las fechas</span>}
+                     {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, "LLL dd, y")} -{" "}
+                          {format(dateRange.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(dateRange.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Todas las fechas</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
                     initialFocus
+                    mode="range"
+                    defaultMonth={dateRange?.from}
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                    numberOfMonths={2}
                   />
                 </PopoverContent>
               </Popover>
-               {selectedDate && (
-                <Button variant="ghost" onClick={() => setSelectedDate(undefined)}>
+               {dateRange && (
+                <Button variant="ghost" onClick={() => setDateRange(undefined)}>
                     <XIcon className="h-4 w-4" />
                 </Button>
               )}
@@ -333,3 +347,5 @@ export function AccountsPayableClient() {
     </>
   );
 }
+
+    

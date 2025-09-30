@@ -23,10 +23,11 @@ import type { CreditNote } from '@/lib/types';
 import { CreditNoteForm } from './credit-note-form';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
-import { format, parseISO, isSameDay } from 'date-fns';
+import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
+import { type DateRange } from 'react-day-picker';
 
 type CreditNoteFormData = Omit<CreditNote, 'id'>;
 
@@ -41,19 +42,19 @@ export function CreditNotesClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState<CreditNote | null>(null);
-  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const { toast } = useToast();
 
   useEffect(() => {
     let filtered = creditNotes;
-    if (selectedDate) {
+    if (dateRange?.from && dateRange?.to) {
         filtered = filtered.filter(note => 
-            isSameDay(parseISO(note.date), selectedDate)
+            isWithinInterval(parseISO(note.date), { start: startOfDay(dateRange.from!), end: endOfDay(dateRange.to!) })
         );
     }
     setLocalCreditNotes(filtered);
     setCurrentPage(1);
-  }, [creditNotes, selectedDate]);
+  }, [creditNotes, dateRange]);
   
   const totalPages = Math.ceil(localCreditNotes.length / ITEMS_PER_PAGE);
 
@@ -162,25 +163,38 @@ export function CreditNotesClient() {
                   <Button
                     variant={"outline"}
                     className={cn(
-                      "w-[240px] justify-start text-left font-normal",
-                      !selectedDate && "text-muted-foreground"
+                      "w-[280px] justify-start text-left font-normal",
+                      !dateRange && "text-muted-foreground"
                     )}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
-                    {selectedDate ? format(selectedDate, "PPP") : <span>Todas las fechas</span>}
+                     {dateRange?.from ? (
+                      dateRange.to ? (
+                        <>
+                          {format(dateRange.from, "LLL dd, y")} -{" "}
+                          {format(dateRange.to, "LLL dd, y")}
+                        </>
+                      ) : (
+                        format(dateRange.from, "LLL dd, y")
+                      )
+                    ) : (
+                      <span>Todas las fechas</span>
+                    )}
                   </Button>
                 </PopoverTrigger>
                 <PopoverContent className="w-auto p-0" align="start">
                   <Calendar
-                    mode="single"
-                    selected={selectedDate}
-                    onSelect={setSelectedDate}
                     initialFocus
+                    mode="range"
+                    defaultMonth={dateRange?.from}
+                    selected={dateRange}
+                    onSelect={setDateRange}
+                    numberOfMonths={2}
                   />
                 </PopoverContent>
               </Popover>
-               {selectedDate && (
-                <Button variant="ghost" onClick={() => setSelectedDate(undefined)}>
+               {dateRange && (
+                <Button variant="ghost" onClick={() => setDateRange(undefined)}>
                     <XIcon className="h-4 w-4" />
                 </Button>
               )}
@@ -257,3 +271,5 @@ export function CreditNotesClient() {
     </>
   );
 }
+
+    
