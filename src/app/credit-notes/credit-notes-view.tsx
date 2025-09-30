@@ -54,11 +54,11 @@ export function CreditNotesView({ notes, onDelete }: CreditNotesViewProps) {
             )}
             {notes.map(note => (
               <div key={note.id} className="grid grid-cols-[120px,120px,1fr,200px,120px,80px] border-b border-gray-300">
-                <div className="p-1 text-center">{format(parseISO(note.date), 'dd/MM/yyyy')}</div>
-                <div className="p-1 text-center">{note.invoiceNumber}</div>
-                <div className="p-1">{note.customerName}</div>
-                <div className="p-1">{note.reason}</div>
-                <div className="p-1 text-right">${note.amount.toFixed(2)}</div>
+                <div className="p-1 text-center border-r border-black">{format(parseISO(note.date), 'dd/MM/yyyy')}</div>
+                <div className="p-1 text-center border-r border-black">{note.invoiceNumber}</div>
+                <div className="p-1 border-r border-black">{note.customerName}</div>
+                <div className="p-1 border-r border-black">{note.reason}</div>
+                <div className="p-1 text-right border-r border-black">${note.amount.toFixed(2)}</div>
                 <div className="p-1 text-center">
                     <Button variant="ghost" size="icon" onClick={() => onDelete(note)} className="h-6 w-6">
                         <Trash2 className="h-4 w-4 text-destructive" />
@@ -69,7 +69,7 @@ export function CreditNotesView({ notes, onDelete }: CreditNotesViewProps) {
           </div>
           <div className="grid grid-cols-[120px,120px,1fr,200px,120px,80px] font-bold text-xs bg-gray-200 border-b border-l border-r border-black">
               <div className="p-1 border-r border-black col-span-4 text-center">TOTAL</div>
-              <div className="p-1 text-right">${totalAmount.toFixed(2)}</div>
+              <div className="p-1 text-right border-r border-black">${totalAmount.toFixed(2)}</div>
               <div className="p-1"></div>
           </div>
         </section>
