@@ -2,7 +2,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Plus, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Plus, Trash2, ChevronLeft, ChevronRight, Calendar as CalendarIcon, X as XIcon } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -23,7 +23,10 @@ import type { CreditNote } from '@/lib/types';
 import { CreditNoteForm } from './credit-note-form';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
-import { format, parseISO } from 'date-fns';
+import { format, parseISO, isSameDay } from 'date-fns';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Calendar } from '@/components/ui/calendar';
+import { cn } from '@/lib/utils';
 
 type CreditNoteFormData = Omit<CreditNote, 'id'>;
 
@@ -38,12 +41,19 @@ export function CreditNotesClient() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState<CreditNote | null>(null);
+  const [selectedDate, setSelectedDate] = useState<Date | undefined>(undefined);
   const { toast } = useToast();
 
   useEffect(() => {
-    setLocalCreditNotes(creditNotes);
+    let filtered = creditNotes;
+    if (selectedDate) {
+        filtered = filtered.filter(note => 
+            isSameDay(parseISO(note.date), selectedDate)
+        );
+    }
+    setLocalCreditNotes(filtered);
     setCurrentPage(1);
-  }, [creditNotes]);
+  }, [creditNotes, selectedDate]);
   
   const totalPages = Math.ceil(localCreditNotes.length / ITEMS_PER_PAGE);
 
@@ -146,6 +156,35 @@ export function CreditNotesClient() {
             <CardDescription>{t('creditNotes.list.description')}</CardDescription>
           </CardHeader>
           <CardContent>
+            <div className="mb-4 flex flex-wrap gap-4">
+               <Popover>
+                <PopoverTrigger asChild>
+                  <Button
+                    variant={"outline"}
+                    className={cn(
+                      "w-[240px] justify-start text-left font-normal",
+                      !selectedDate && "text-muted-foreground"
+                    )}
+                  >
+                    <CalendarIcon className="mr-2 h-4 w-4" />
+                    {selectedDate ? format(selectedDate, "PPP") : <span>Todas las fechas</span>}
+                  </Button>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto p-0" align="start">
+                  <Calendar
+                    mode="single"
+                    selected={selectedDate}
+                    onSelect={setSelectedDate}
+                    initialFocus
+                  />
+                </PopoverContent>
+              </Popover>
+               {selectedDate && (
+                <Button variant="ghost" onClick={() => setSelectedDate(undefined)}>
+                    <XIcon className="h-4 w-4" />
+                </Button>
+              )}
+            </div>
             <Table>
               <TableHeader>
                 <TableRow>
