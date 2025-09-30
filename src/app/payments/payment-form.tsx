@@ -13,7 +13,7 @@ import { Calendar } from '@/components/ui/calendar';
 import { Textarea } from '@/components/ui/textarea';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Checkbox } from '@/components/ui/checkbox';
-import type { Payment, Invoice, CreditNote, DebitNote, BunchItem, Customer, Finca } from '@/lib/types';
+import type { Payment, Invoice, CreditNote, DebitNote, BunchItem, Customer, Finca, Consignatario } from '@/lib/types';
 import { Loader2, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, toDate } from 'date-fns';
@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-type InvoiceWithBalance = Invoice & { balance: number };
+type InvoiceWithBalance = Invoice & { balance: number; consigneeName?: string; };
 
 const formSchema = z.object({
   entityId: z.string().min(1, { message: "Por favor seleccione una entidad." }),
@@ -55,6 +55,7 @@ type PaymentFormProps = {
   creditNotes: CreditNote[];
   debitNotes: DebitNote[];
   payments: Payment[];
+  consignatarios: Consignatario[];
   paymentType: 'sale' | 'purchase';
 };
 
@@ -67,10 +68,14 @@ export function PaymentForm({
     creditNotes, 
     debitNotes, 
     payments, 
+    consignatarios,
     paymentType,
 }: PaymentFormProps) {
   const [invoicesWithBalance, setInvoicesWithBalance] = useState<InvoiceWithBalance[]>([]);
   const [paymentPreview, setPaymentPreview] = useState<{ invoiceNumber: string; amountToApply: number }[] | null>(null);
+
+  const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
+  const consignatarioMap = useMemo(() => new Map(consignatarios.map(c => [c.id, c.nombreConsignatario])), [consignatarios]);
 
   const form = useForm<PaymentFormData>({
     resolver: zodResolver(formSchema),
@@ -120,7 +125,20 @@ export function PaymentForm({
             const paid = payments.filter(p => p.invoiceId === invoice.id).reduce((sum, payment) => sum + payment.amount, 0);
             
             const balance = subtotal + debits - credits - paid;
-            return { ...invoice, balance };
+            
+            let consigneeName = '';
+            if(paymentType === 'sale'){
+              if (invoice.consignatarioId) {
+                consigneeName = consignatarioMap.get(invoice.consignatarioId) || 'Desconocido';
+              } else {
+                consigneeName = customerMap.get(invoice.customerId) || 'Desconocido';
+              }
+            } else {
+               const farm = fincas.find(f => f.id === invoice.farmId);
+               consigneeName = farm?.name || 'Desconocido';
+            }
+            
+            return { ...invoice, balance, consigneeName };
         }).filter(inv => inv.balance > 0.01);
         
         setInvoicesWithBalance(calculatedInvoices.sort((a,b) => new Date(a.flightDate).getTime() - new Date(b.flightDate).getTime()));
@@ -129,7 +147,7 @@ export function PaymentForm({
         setInvoicesWithBalance([]);
         form.setValue('selectedInvoiceIds', {});
     }
-  }, [selectedEntityId, paymentType, invoices, creditNotes, debitNotes, payments, form]);
+  }, [selectedEntityId, paymentType, invoices, creditNotes, debitNotes, payments, consignatarios, customers, fincas, form, consignatarioMap, customerMap]);
 
 
   const totalSelectedBalance = useMemo(() => {
@@ -255,6 +273,7 @@ export function PaymentForm({
                                         </TableHead>
                                         <TableHead>N° Factura</TableHead>
                                         <TableHead>Fecha</TableHead>
+                                        <TableHead>Consignatario</TableHead>
                                         <TableHead className="text-right">Saldo</TableHead>
                                     </TableRow>
                                     </TableHeader>
@@ -277,6 +296,7 @@ export function PaymentForm({
                                         </TableCell>
                                         <TableCell>{invoice.invoiceNumber}</TableCell>
                                         <TableCell>{format(new Date(invoice.flightDate), 'dd/MM/yyyy')}</TableCell>
+                                        <TableCell>{invoice.consigneeName}</TableCell>
                                         <TableCell className="text-right">${invoice.balance.toFixed(2)}</TableCell>
                                         </TableRow>
                                     ))}

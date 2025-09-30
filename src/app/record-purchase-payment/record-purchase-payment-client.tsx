@@ -9,7 +9,7 @@ import type { Payment } from '@/lib/types';
 import { addBulkPayment } from '@/services/payments';
 
 export function RecordPurchasePaymentClient() {
-  const { customers, fincas, invoices, creditNotes, debitNotes, payments, refreshData } = useAppData();
+  const { customers, fincas, invoices, creditNotes, debitNotes, payments, consignatarios, refreshData } = useAppData();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -61,6 +61,7 @@ export function RecordPurchasePaymentClient() {
               creditNotes={creditNotes}
               debitNotes={debitNotes}
               payments={payments}
+              consignatarios={consignatarios}
               onSubmit={handleAddBulkPayment}
               isSubmitting={isSubmitting}
               paymentType="purchase"
