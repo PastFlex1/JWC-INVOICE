@@ -168,7 +168,10 @@ export function PaymentForm({
   
   const paymentDistribution = useMemo(() => {
     const distribution: Record<string, number> = {};
-    const selected = invoicesWithBalance.filter(inv => selectedInvoiceIds[inv.id]);
+    const selected = invoicesWithBalance
+      .filter(inv => selectedInvoiceIds[inv.id])
+      .sort((a, b) => new Date(a.flightDate).getTime() - new Date(b.flightDate).getTime());
+
     let remainingAmount = paymentAmount || 0;
 
     for (const invoice of selected) {
