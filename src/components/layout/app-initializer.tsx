@@ -36,6 +36,12 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
     }
   }, [isAuthenticated, hasBeenLoaded, isDataLoading, refreshData]);
 
+  useEffect(() => {
+    if (!isAuthLoading && isAuthenticated && pathname === '/login') {
+      router.replace('/');
+    }
+  }, [isAuthenticated, isAuthLoading, pathname, router]);
+
   if (isAuthLoading) {
     return <AppLoadingScreen />;
   }
@@ -44,12 +50,14 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
      if (isDataLoading) {
         return <AppLoadingScreen />;
      }
-     if (pathname === '/login') {
-        router.replace('/');
-        return <AppLoadingScreen />;
-     }
      return <AppShell>{children}</AppShell>;
   }
 
-  return <>{children}</>;
+  // For non-authenticated users, only render children if they are on the login page
+  if (pathname === '/login') {
+    return <>{children}</>;
+  }
+  
+  // For any other non-authenticated route, show loading until redirect happens
+  return <AppLoadingScreen />;
 }
