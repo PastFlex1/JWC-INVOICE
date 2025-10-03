@@ -320,7 +320,6 @@ export function PaymentForm({
                                         <TableHead>Fecha</TableHead>
                                         <TableHead>Valor</TableHead>
                                         <TableHead>Pagos Previos</TableHead>
-                                        <TableHead>Saldo</TableHead>
                                         <TableHead className="text-right">Saldo Final</TableHead>
                                     </TableRow>
                                     </TableHeader>
@@ -340,7 +339,6 @@ export function PaymentForm({
                                             <TableCell>{format(new Date(invoice.flightDate), 'dd/MM/yyyy')}</TableCell>
                                             <TableCell>${invoice.total.toFixed(2)}</TableCell>
                                             <TableCell>${invoice.payments.toFixed(2)}</TableCell>
-                                            <TableCell>${invoice.balance.toFixed(2)}</TableCell>
                                             <TableCell className="text-right font-bold">${newBalance.toFixed(2)}</TableCell>
                                             </TableRow>
                                         );
