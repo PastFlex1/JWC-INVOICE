@@ -43,7 +43,7 @@ export function DebitNotesView({ notes, onDelete }: DebitNotesViewProps) {
           <div className="grid grid-cols-[120px,120px,1fr,200px,120px] font-bold text-center bg-gray-200 border-t border-l border-r border-black text-xs">
             <div className="p-1 border-r border-black">{t('debitNotes.list.date')}</div>
             <div className="p-1 border-r border-black">{t('debitNotes.list.invoice')}</div>
-            <div className="p-1 border-r border-black">CLIENTE</div>
+            <div className="p-1 border-r border-black">CONSIGNATARIO</div>
             <div className="p-1 border-r border-black">{t('debitNotes.list.reason')}</div>
             <div className="p-1 border-r border-black">{t('debitNotes.list.amount')}</div>
           </div>

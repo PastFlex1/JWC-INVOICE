@@ -30,6 +30,8 @@ import { type DateRange } from 'react-day-picker';
 import CreditNotesDownloadPdfButton from './credit-notes-download-pdf';
 import CreditNotesDownloadExcelButton from './credit-notes-download-excel';
 import SendReportDialog from '@/app/shared/send-report-dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+
 
 type CreditNoteFormData = Omit<CreditNote, 'id'>;
 type CreditNoteWithDetails = CreditNote & { consigneeName?: string };
@@ -39,6 +41,7 @@ export function CreditNotesClient() {
   const [localCreditNotes, setLocalCreditNotes] = useState<CreditNoteWithDetails[]>([]);
   const { t } = useTranslation();
   
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
@@ -52,7 +55,14 @@ export function CreditNotesClient() {
 
 
   useEffect(() => {
-    let filtered = creditNotes.map(note => {
+    if (!selectedCustomerId) {
+      setLocalCreditNotes([]);
+      return;
+    }
+
+    const customerInvoiceIds = new Set(invoices.filter(inv => inv.customerId === selectedCustomerId).map(inv => inv.id));
+
+    let filtered = creditNotes.filter(note => customerInvoiceIds.has(note.invoiceId)).map(note => {
       const invoice = invoiceMap.get(note.invoiceId);
       let consigneeName = 'Desconocido';
       if (invoice) {
@@ -75,7 +85,7 @@ export function CreditNotesClient() {
       );
     }
     setLocalCreditNotes(filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-  }, [creditNotes, dateRange, customerMap, invoiceMap, consignatarioMap]);
+  }, [creditNotes, dateRange, customerMap, invoiceMap, consignatarioMap, selectedCustomerId, invoices]);
   
 
   const handleOpenDialog = () => {
@@ -170,6 +180,18 @@ export function CreditNotesClient() {
           </CardHeader>
           <CardContent>
             <div className="mb-4 flex flex-wrap items-center gap-4">
+              <Select onValueChange={setSelectedCustomerId}>
+                <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
+                  <SelectValue placeholder="Seleccione un cliente..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {customers.map(customer => (
+                    <SelectItem key={customer.id} value={customer.id}>
+                      {customer.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
                <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -178,6 +200,7 @@ export function CreditNotesClient() {
                       "w-[280px] justify-start text-left font-normal",
                       !dateRange && "text-muted-foreground"
                     )}
+                    disabled={!selectedCustomerId}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                      {dateRange?.from ? (

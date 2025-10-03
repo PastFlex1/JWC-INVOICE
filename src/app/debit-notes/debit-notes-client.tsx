@@ -30,6 +30,7 @@ import { type DateRange } from 'react-day-picker';
 import DebitNotesDownloadPdfButton from './debit-notes-download-pdf';
 import DebitNotesDownloadExcelButton from './debit-notes-download-excel';
 import SendReportDialog from '@/app/shared/send-report-dialog';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 
 type DebitNoteFormData = Omit<DebitNote, 'id'>;
@@ -40,6 +41,7 @@ export function DebitNotesClient() {
   const [localDebitNotes, setLocalDebitNotes] = useState<DebitNoteWithDetails[]>([]);
   const { t } = useTranslation();
   
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
@@ -52,7 +54,14 @@ export function DebitNotesClient() {
   const invoiceMap = useMemo(() => new Map(invoices.map(i => [i.id, i])), [invoices]);
 
   useEffect(() => {
-    let filtered = debitNotes.map(note => {
+    if (!selectedCustomerId) {
+      setLocalDebitNotes([]);
+      return;
+    }
+
+    const customerInvoiceIds = new Set(invoices.filter(inv => inv.customerId === selectedCustomerId).map(inv => inv.id));
+    
+    let filtered = debitNotes.filter(note => customerInvoiceIds.has(note.invoiceId)).map(note => {
         const invoice = invoiceMap.get(note.invoiceId);
         let consigneeName = 'Desconocido';
         if (invoice) {
@@ -75,7 +84,7 @@ export function DebitNotesClient() {
       );
     }
     setLocalDebitNotes(filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-  }, [debitNotes, dateRange, customerMap, invoiceMap, consignatarioMap]);
+  }, [debitNotes, dateRange, customerMap, invoiceMap, consignatarioMap, selectedCustomerId, invoices]);
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
@@ -169,6 +178,18 @@ export function DebitNotesClient() {
           </CardHeader>
           <CardContent>
             <div className="mb-4 flex flex-wrap items-center gap-4">
+               <Select onValueChange={setSelectedCustomerId}>
+                <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
+                  <SelectValue placeholder="Seleccione un cliente..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {customers.map(customer => (
+                    <SelectItem key={customer.id} value={customer.id}>
+                      {customer.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
               <Popover>
                 <PopoverTrigger asChild>
                   <Button
@@ -177,6 +198,7 @@ export function DebitNotesClient() {
                       "w-[280px] justify-start text-left font-normal",
                       !dateRange && "text-muted-foreground"
                     )}
+                    disabled={!selectedCustomerId}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                      {dateRange?.from ? (
