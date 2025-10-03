@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-type InvoiceWithBalance = Invoice & { balance: number; total: number; consigneeName?: string; };
+type InvoiceWithBalance = Invoice & { balance: number; total: number; payments: number; consigneeName?: string; };
 
 const paymentPerInvoiceSchema = z.object({
   paymentAmount: z.coerce.number().optional()
@@ -142,7 +142,7 @@ export function PaymentForm({
                consigneeName = farm?.name || 'Desconocido';
             }
             
-            return { ...invoice, balance, total, consigneeName };
+            return { ...invoice, balance, total, payments: paid, consigneeName };
         }).filter(inv => inv.balance > 0.01);
         
         setInvoicesWithBalance(calculatedInvoices.sort((a,b) => new Date(a.flightDate).getTime() - new Date(b.flightDate).getTime()));
@@ -284,14 +284,15 @@ export function PaymentForm({
                                         <TableHead>Fecha</TableHead>
                                         <TableHead>Consignatario</TableHead>
                                         <TableHead className="text-right">Valor</TableHead>
+                                        <TableHead className="text-right">Pagos</TableHead>
                                         <TableHead className="text-right">Saldo</TableHead>
-                                        <TableHead className="w-40 text-right">Pago</TableHead>
+                                        <TableHead className="w-40 text-right">Abono</TableHead>
                                     </TableRow>
                                     </TableHeader>
                                     <TableBody>
                                     {invoicesWithBalance.map((invoice, index) => {
                                       const fieldName = `invoices.${invoice.id}.paymentAmount`;
-                                      const isChecked = !!watchedInvoices[invoice.id]?.paymentAmount;
+                                      const isChecked = !!watchedInvoices[invoice.id];
                                       return (
                                         <TableRow key={invoice.id}>
                                             <TableCell>
@@ -313,6 +314,7 @@ export function PaymentForm({
                                             <TableCell>{format(new Date(invoice.flightDate), 'dd/MM/yyyy')}</TableCell>
                                             <TableCell>{invoice.consigneeName}</TableCell>
                                             <TableCell className="text-right">${invoice.total.toFixed(2)}</TableCell>
+                                            <TableCell className="text-right">${invoice.payments.toFixed(2)}</TableCell>
                                             <TableCell className="text-right">${invoice.balance.toFixed(2)}</TableCell>
                                             <TableCell className="text-right">
                                               <FormField
@@ -323,7 +325,7 @@ export function PaymentForm({
                                                           type="number"
                                                           step="0.01"
                                                           placeholder="0.00"
-                                                          disabled={!watchedInvoices[invoice.id]}
+                                                          disabled={!isChecked}
                                                           {...field}
                                                           onChange={e => field.onChange(e.target.value === '' ? undefined : e.target.value)}
                                                           className="text-right"
