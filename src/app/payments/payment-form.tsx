@@ -321,7 +321,6 @@ export function PaymentForm({
                                         <TableHead>Valor</TableHead>
                                         <TableHead>Pagos Previos</TableHead>
                                         <TableHead>Saldo</TableHead>
-                                        <TableHead>Abono Actual</TableHead>
                                         <TableHead className="text-right">Saldo Final</TableHead>
                                     </TableRow>
                                     </TableHeader>
@@ -342,9 +341,6 @@ export function PaymentForm({
                                             <TableCell>${invoice.total.toFixed(2)}</TableCell>
                                             <TableCell>${invoice.payments.toFixed(2)}</TableCell>
                                             <TableCell>${invoice.balance.toFixed(2)}</TableCell>
-                                            <TableCell className={paymentForThisInvoice > 0 ? 'text-green-600 font-bold' : ''}>
-                                                ${paymentForThisInvoice.toFixed(2)}
-                                            </TableCell>
                                             <TableCell className="text-right font-bold">${newBalance.toFixed(2)}</TableCell>
                                             </TableRow>
                                         );
