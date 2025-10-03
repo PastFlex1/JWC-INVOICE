@@ -48,9 +48,7 @@ const formSchema = z.object({
     (data) => {
         const hasSelectedInvoices = Object.keys(data.invoices).length > 0;
         if (!hasSelectedInvoices) {
-            // If no invoices are selected, we don't need to validate payment amounts.
-            // But if we are trying to submit, we should show an error.
-             return !paymentPreviewTriggered;
+            return !paymentPreviewTriggered;
         }
 
         const hasSomePaymentValue = Object.values(data.invoices).some(inv => inv?.paymentAmount && inv.paymentAmount > 0);
