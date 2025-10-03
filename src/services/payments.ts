@@ -124,18 +124,17 @@ export async function addPayment(paymentData: Omit<Payment, 'id'>): Promise<stri
 
 export async function addBulkPayment(
   paymentData: Omit<Payment, 'id' | 'invoiceId' | 'amount'>, 
-  invoiceBalances: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', flightDate: string }[],
+  invoicesToPay: { invoiceId: string; balance: number; amountToPay: number; type: 'sale' | 'purchase' | 'both', flightDate: string }[],
   totalAmountToApply: number
 ): Promise<void> {
   if (!db) throw new Error("Firebase is not configured. Check your .env file.");
 
   const batch = writeBatch(db);
-  let remainingAmount = totalAmountToApply;
 
-  for (const { invoiceId, balance, type, flightDate } of invoiceBalances) {
-    if (remainingAmount <= 0) break;
+  for (const { invoiceId, balance, amountToPay, flightDate } of invoicesToPay) {
+    if (amountToPay <= 0) continue;
 
-    const paymentAmountForInvoice = Math.min(remainingAmount, balance);
+    const paymentAmountForInvoice = Math.min(amountToPay, balance);
     
     const newPaymentRef = doc(collection(db, 'payments'));
     const newPaymentData = {
@@ -158,15 +157,6 @@ export async function addBulkPayment(
 
     const invoiceRef = doc(db, 'invoices', invoiceId);
     batch.update(invoiceRef, { status: newStatus });
-
-    remainingAmount -= paymentAmountForInvoice;
-  }
-  
-  if (remainingAmount > 0.01) {
-    // This could happen if the total amount is greater than the sum of balances.
-    // The current logic simply stops. You could add handling for this case,
-    // e.g., creating a credit for the customer, but for now we'll just log it.
-    console.warn(`Payment amount of ${totalAmountToApply} exceeded the total balance of selected invoices. $${remainingAmount.toFixed(2)} was not applied.`);
   }
 
   await batch.commit();
