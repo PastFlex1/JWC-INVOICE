@@ -231,17 +231,13 @@ export function PaymentForm({
   }
 
   const handleSelectAll = (checked: boolean) => {
-    const currentInvoices = form.getValues('invoices');
-    invoicesWithBalance.forEach(inv => {
-      if (checked) {
-        if (!currentInvoices[inv.id]) {
-          currentInvoices[inv.id] = { paymentAmount: undefined };
-        }
-      } else {
-        delete currentInvoices[inv.id];
-      }
-    });
-    form.setValue('invoices', currentInvoices, { shouldValidate: true });
+    const newInvoices: Record<string, { paymentAmount: number | undefined }> = {};
+    if (checked) {
+      invoicesWithBalance.forEach(inv => {
+        newInvoices[inv.id] = { paymentAmount: undefined };
+      });
+    }
+    form.setValue('invoices', newInvoices, { shouldValidate: true });
     form.trigger('invoices');
   };
 
@@ -323,7 +319,7 @@ export function PaymentForm({
                                                 <Checkbox
                                                     checked={isChecked}
                                                     onCheckedChange={(checked) => {
-                                                        const currentInvoices = form.getValues('invoices');
+                                                        const currentInvoices = { ...form.getValues('invoices') };
                                                         if (checked) {
                                                             currentInvoices[invoice.id] = { paymentAmount: undefined };
                                                         } else {
