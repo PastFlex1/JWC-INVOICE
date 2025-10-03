@@ -232,17 +232,15 @@ export function PaymentForm({
 
   const handleSelectAll = (checked: boolean) => {
     const currentInvoices = form.getValues('invoices');
-    if (checked) {
-      invoicesWithBalance.forEach(inv => {
+    invoicesWithBalance.forEach(inv => {
+      if (checked) {
         if (!currentInvoices[inv.id]) {
           currentInvoices[inv.id] = { paymentAmount: undefined };
         }
-      });
-    } else {
-      invoicesWithBalance.forEach(inv => {
+      } else {
         delete currentInvoices[inv.id];
-      });
-    }
+      }
+    });
     form.setValue('invoices', currentInvoices, { shouldValidate: true });
     form.trigger('invoices');
   };
@@ -378,7 +376,7 @@ export function PaymentForm({
             </Card>
           )}
 
-          {Object.values(watchedInvoices).some(inv => inv?.paymentAmount && inv.paymentAmount > 0) && (
+          {Object.keys(watchedInvoices).length > 0 && (
              <div className="space-y-4 border p-4 rounded-md">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="paymentDate" render={({ field }) => (
