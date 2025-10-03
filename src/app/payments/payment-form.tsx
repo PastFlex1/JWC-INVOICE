@@ -44,14 +44,26 @@ const formSchema = z.object({
   invoices: z.record(paymentPerInvoiceSchema)
 }).refine(
     (data) => {
-        if (Object.keys(data.invoices).length === 0) return true; // Don't validate if no invoices are checked
-        return Object.values(data.invoices).some(inv => inv.paymentAmount && inv.paymentAmount > 0);
+        if (Object.keys(data.invoices).length === 0) return true;
+        
+        const hasSomePaymentValue = Object.values(data.invoices).some(inv => inv?.paymentAmount && inv.paymentAmount > 0);
+        
+        // This validation will only trigger if a confirmation is attempted.
+        // We handle the preview logic separately to avoid showing this error prematurely.
+        if (paymentPreviewTriggered) {
+          return hasSomePaymentValue;
+        }
+
+        return true;
     },
     {
         message: "Debe ingresar un monto de pago para al menos una factura al intentar confirmar.",
         path: ["invoices"],
     }
 );
+
+// This is a global flag to know when the form submission/preview is happening.
+let paymentPreviewTriggered = false;
 
 type PaymentFormData = z.infer<typeof formSchema>;
 type FormSubmitData = Omit<Payment, 'id' | 'invoiceId' | 'amount'>;
@@ -168,7 +180,9 @@ export function PaymentForm({
 
 
   const handlePreview = () => {
+    paymentPreviewTriggered = true;
     form.trigger().then(isValid => {
+        paymentPreviewTriggered = false; // Reset the flag
         if (!isValid) {
             setPaymentPreview(null);
             return;
@@ -184,7 +198,9 @@ export function PaymentForm({
                 };
             });
         
-        setPaymentPreview(preview);
+        if (preview.length > 0) {
+            setPaymentPreview(preview);
+        }
     });
   };
 
@@ -227,25 +243,25 @@ export function PaymentForm({
     }
   }
 
- const handleSelectAll = (checked: boolean) => {
-    const newInvoices: Record<string, { paymentAmount: number | undefined }> = {};
+ const handleSelectAll = (checked: boolean | string) => {
+    const newInvoicesValue: Record<string, { paymentAmount: number | undefined }> = {};
     if (checked) {
-      invoicesWithBalance.forEach(inv => {
-        newInvoices[inv.id] = { paymentAmount: undefined };
-      });
+        invoicesWithBalance.forEach(inv => {
+            newInvoicesValue[inv.id] = { paymentAmount: watchedInvoices[inv.id]?.paymentAmount };
+        });
     }
-    form.setValue('invoices', newInvoices, { shouldValidate: false, shouldDirty: true });
-  };
-  
-  const handleSingleCheck = (checked: boolean, invoiceId: string) => {
+    form.setValue('invoices', newInvoicesValue);
+};
+
+const handleSingleCheck = (checked: boolean | string, invoiceId: string) => {
     const currentInvoices = { ...form.getValues('invoices') };
     if (checked) {
-      currentInvoices[invoiceId] = { paymentAmount: undefined };
+        currentInvoices[invoiceId] = { paymentAmount: undefined };
     } else {
-      delete currentInvoices[invoiceId];
+        delete currentInvoices[invoiceId];
     }
-    form.setValue('invoices', currentInvoices, { shouldValidate: false, shouldDirty: true });
-  };
+    form.setValue('invoices', currentInvoices);
+};
 
 
   const isAllSelected = invoicesWithBalance.length > 0 && invoicesWithBalance.every(inv => !!watchedInvoices[inv.id]);
@@ -325,7 +341,7 @@ export function PaymentForm({
                                             <TableCell>
                                                 <Checkbox
                                                     checked={isChecked}
-                                                    onCheckedChange={(checked) => handleSingleCheck(Boolean(checked), invoice.id)}
+                                                    onCheckedChange={(checked) => handleSingleCheck(checked, invoice.id)}
                                                 />
                                             </TableCell>
                                             <TableCell>{invoice.invoiceNumber}</TableCell>
