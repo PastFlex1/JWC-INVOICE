@@ -230,6 +230,26 @@ export function PaymentForm({
     }
   }
 
+  const handleSelectAll = (checked: boolean) => {
+    const currentInvoices = form.getValues('invoices');
+    if (checked) {
+      invoicesWithBalance.forEach(inv => {
+        if (!currentInvoices[inv.id]) {
+          currentInvoices[inv.id] = { paymentAmount: undefined };
+        }
+      });
+    } else {
+      invoicesWithBalance.forEach(inv => {
+        delete currentInvoices[inv.id];
+      });
+    }
+    form.setValue('invoices', currentInvoices, { shouldValidate: true });
+    form.trigger('invoices');
+  };
+
+  const isAllSelected = invoicesWithBalance.length > 0 && invoicesWithBalance.every(inv => !!watchedInvoices[inv.id]);
+
+
   const entities = paymentType === 'purchase' ? fincas : customers;
   const entityLabel = paymentType === 'purchase' ? 'Proveedor (Finca)' : 'Cliente';
   const entityPlaceholder = paymentType === 'purchase' ? 'Seleccione un proveedor' : 'Seleccione un cliente';
@@ -279,7 +299,13 @@ export function PaymentForm({
                                 <Table>
                                     <TableHeader>
                                     <TableRow>
-                                        <TableHead className="w-10"></TableHead>
+                                        <TableHead className="w-10">
+                                            <Checkbox
+                                                checked={isAllSelected}
+                                                onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
+                                                aria-label="Seleccionar todas"
+                                            />
+                                        </TableHead>
                                         <TableHead>N° Factura</TableHead>
                                         <TableHead>Fecha</TableHead>
                                         <TableHead>Consignatario</TableHead>
@@ -409,7 +435,7 @@ export function PaymentForm({
                         <FormItem>
                         <FormLabel>Referencia / Banco</FormLabel>
                         <FormControl>
-                            <Input placeholder="Ej: Banco Pichincha" {...field} />
+                            <Input placeholder="Ej: Banco Pichincha" {...field} value={field.value ?? ''} />
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -424,7 +450,7 @@ export function PaymentForm({
                     <FormItem>
                         <FormLabel>Notas Adicionales</FormLabel>
                         <FormControl>
-                        <Textarea placeholder="Ej: Pago masivo de facturas de Septiembre" {...field} />
+                        <Textarea placeholder="Ej: Pago masivo de facturas de Septiembre" {...field} value={field.value ?? ''} />
                         </FormControl>
                         <FormMessage />
                     </FormItem>
