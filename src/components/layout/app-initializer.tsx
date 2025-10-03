@@ -45,6 +45,7 @@ export function AppInitializer({ children }: { children: React.ReactNode }) {
         return <AppLoadingScreen />;
      }
      if (pathname === '/login') {
+        router.replace('/');
         return <AppLoadingScreen />;
      }
      return <AppShell>{children}</AppShell>;
