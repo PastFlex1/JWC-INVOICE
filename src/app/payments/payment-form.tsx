@@ -48,15 +48,18 @@ const formSchema = z.object({
     (data) => {
         const hasSelectedInvoices = Object.keys(data.invoices).length > 0;
         if (!hasSelectedInvoices) {
+            // Si no hay facturas seleccionadas, solo validamos si se intentó previsualizar.
             return !paymentPreviewTriggered;
         }
 
         const hasSomePaymentValue = Object.values(data.invoices).some(inv => inv?.paymentAmount && inv.paymentAmount > 0);
         
         if (paymentPreviewTriggered) {
+          // Si se intentó previsualizar, al menos un pago es requerido.
           return hasSomePaymentValue;
         }
 
+        // Si solo se están seleccionando facturas sin previsualizar, no validamos el monto.
         return true;
     },
     {
@@ -246,7 +249,7 @@ export function PaymentForm({
 
  const handleSelectAll = (checked: boolean | string) => {
     const newInvoicesValue: Record<string, { paymentAmount: number | undefined }> = {};
-    if (checked) {
+    if (checked === true) {
         invoicesWithBalance.forEach(inv => {
             newInvoicesValue[inv.id] = { paymentAmount: watchedInvoices[inv.id]?.paymentAmount };
         });
@@ -256,7 +259,7 @@ export function PaymentForm({
 
 const handleSingleCheck = (checked: boolean | string, invoiceId: string) => {
     const currentInvoices = { ...form.getValues('invoices') };
-    if (checked) {
+    if (checked === true) {
         currentInvoices[invoiceId] = { paymentAmount: undefined };
     } else {
         delete currentInvoices[invoiceId];
