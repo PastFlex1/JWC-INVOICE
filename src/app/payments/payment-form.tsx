@@ -165,7 +165,7 @@ export function PaymentForm({
   
   const totalAmountToPay = useMemo(() => {
     return Object.values(watchedInvoices).reduce((total, inv) => {
-      return total + (inv.paymentAmount || 0);
+      return total + (inv?.paymentAmount || 0);
     }, 0);
   }, [watchedInvoices]);
 
@@ -178,7 +178,7 @@ export function PaymentForm({
         }
         
         const preview = Object.entries(watchedInvoices)
-            .filter(([, inv]) => inv.paymentAmount && inv.paymentAmount > 0)
+            .filter(([, inv]) => inv && inv.paymentAmount && inv.paymentAmount > 0)
             .map(([invoiceId, inv]) => {
                 const invoice = invoicesWithBalance.find(i => i.id === invoiceId);
                 return {
@@ -196,7 +196,7 @@ export function PaymentForm({
     const { entityId, invoices: paymentsToApply, ...paymentDetails } = values;
 
     const invoicesToPay = Object.entries(paymentsToApply)
-      .filter(([,p]) => p.paymentAmount && p.paymentAmount > 0)
+      .filter(([,p]) => p && p.paymentAmount && p.paymentAmount > 0)
       .map(([invoiceId, p]) => {
         const invoice = invoicesWithBalance.find(inv => inv.id === invoiceId);
         return {
@@ -237,8 +237,7 @@ export function PaymentForm({
         newInvoices[inv.id] = { paymentAmount: undefined };
       });
     }
-    form.setValue('invoices', newInvoices, { shouldValidate: true });
-    form.trigger('invoices');
+    form.setValue('invoices', newInvoices, { shouldValidate: false });
   };
 
   const isAllSelected = invoicesWithBalance.length > 0 && invoicesWithBalance.every(inv => !!watchedInvoices[inv.id]);
@@ -325,8 +324,7 @@ export function PaymentForm({
                                                         } else {
                                                             delete currentInvoices[invoice.id];
                                                         }
-                                                        form.setValue('invoices', currentInvoices, { shouldValidate: true });
-                                                        form.trigger('invoices');
+                                                        form.setValue('invoices', currentInvoices, { shouldValidate: false });
                                                     }}
                                                 />
                                             </TableCell>
@@ -348,7 +346,7 @@ export function PaymentForm({
                                                           disabled={!isChecked}
                                                           {...field}
                                                           value={field.value ?? ''}
-                                                          onChange={e => field.onChange(e.target.value === '' ? '' : e.target.value)}
+                                                          onChange={e => field.onChange(e.target.value === '' ? undefined : e.target.value)}
                                                           className="text-right"
                                                       />
                                                   )}
@@ -360,7 +358,7 @@ export function PaymentForm({
                                     </TableBody>
                                 </Table>
                             </div>
-                            <FormMessage className="mt-2" />
+                            <FormMessage className="mt-2">{form.formState.errors.invoices?.message?.toString()}</FormMessage>
                         </FormItem>
                     )}
                 />
