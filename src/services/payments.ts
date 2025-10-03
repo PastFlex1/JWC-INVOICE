@@ -125,27 +125,30 @@ export async function addPayment(paymentData: Omit<Payment, 'id'>): Promise<stri
 export async function addBulkPayment(
   paymentData: Omit<Payment, 'id' | 'invoiceId' | 'amount'>, 
   invoicesToPay: { invoiceId: string; balance: number; amountToPay: number; type: 'sale' | 'purchase' | 'both', flightDate: string }[],
-  totalAmountToApply: number
+  totalAmount: number
 ): Promise<void> {
   if (!db) throw new Error("Firebase is not configured. Check your .env file.");
 
   const batch = writeBatch(db);
+  let remainingAmountToDistribute = totalAmount;
 
-  for (const { invoiceId, balance, amountToPay, flightDate } of invoicesToPay) {
-    if (amountToPay <= 0) continue;
+  const sortedInvoices = invoicesToPay.sort((a, b) => new Date(a.flightDate).getTime() - new Date(b.flightDate).getTime());
 
-    const paymentAmountForInvoice = Math.min(amountToPay, balance);
+  for (const { invoiceId, balance, flightDate } of sortedInvoices) {
+    if (remainingAmountToDistribute <= 0) continue;
+
+    const amountForThisInvoice = Math.min(remainingAmountToDistribute, balance);
     
     const newPaymentRef = doc(collection(db, 'payments'));
     const newPaymentData = {
       ...paymentData,
       invoiceId: invoiceId,
-      amount: paymentAmountForInvoice,
+      amount: amountForThisInvoice,
       paymentDate: new Date(paymentData.paymentDate),
     };
     batch.set(newPaymentRef, newPaymentData);
 
-    const newBalance = balance - paymentAmountForInvoice;
+    const newBalance = balance - amountForThisInvoice;
     let newStatus: 'Paid' | 'Pending' | 'Overdue';
     if (newBalance <= 0.01) {
         newStatus = 'Paid';
@@ -157,6 +160,8 @@ export async function addBulkPayment(
 
     const invoiceRef = doc(db, 'invoices', invoiceId);
     batch.update(invoiceRef, { status: newStatus });
+    
+    remainingAmountToDistribute -= amountForThisInvoice;
   }
 
   await batch.commit();

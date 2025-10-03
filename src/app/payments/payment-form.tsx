@@ -29,7 +29,12 @@ import {
 } from "@/components/ui/alert-dialog"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 
-type InvoiceWithBalance = Invoice & { balance: number; total: number; payments: number; consigneeName?: string; };
+type InvoiceWithBalance = Invoice & { 
+    balance: number; 
+    total: number;
+    payments: number;
+    consigneeName?: string; 
+};
 
 const formSchema = z.object({
   entityId: z.string().min(1, { message: "Por favor seleccione una entidad." }),
@@ -47,7 +52,7 @@ type PaymentFormData = z.infer<typeof formSchema>;
 type FormSubmitData = Omit<Payment, 'id' | 'invoiceId' | 'amount'>;
 
 type PaymentFormProps = {
-  onSubmit: (paymentDetails: FormSubmitData, selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', flightDate: string }[], totalAmount: number) => Promise<boolean>;
+  onSubmit: (paymentDetails: FormSubmitData, selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', flightDate: string, amountToPay: number }[], totalAmount: number) => Promise<boolean>;
   isSubmitting: boolean;
   customers: Customer[];
   fincas: Finca[];
@@ -93,6 +98,7 @@ export function PaymentForm({
 
   const selectedEntityId = form.watch('entityId');
   const selectedInvoiceIds = form.watch('selectedInvoiceIds');
+  const paymentAmount = form.watch('amount');
 
   useEffect(() => {
     if (selectedEntityId && paymentType) {
@@ -159,6 +165,19 @@ export function PaymentForm({
           return total;
       }, 0);
   }, [selectedInvoiceIds, invoicesWithBalance]);
+  
+  const paymentDistribution = useMemo(() => {
+    const distribution: Record<string, number> = {};
+    const selected = invoicesWithBalance.filter(inv => selectedInvoiceIds[inv.id]);
+    let remainingAmount = paymentAmount || 0;
+
+    for (const invoice of selected) {
+      const amountToApply = Math.min(remainingAmount, invoice.balance);
+      distribution[invoice.id] = amountToApply;
+      remainingAmount -= amountToApply;
+    }
+    return distribution;
+  }, [paymentAmount, selectedInvoiceIds, invoicesWithBalance]);
 
   const handlePreview = () => {
     form.trigger().then(isValid => {
@@ -167,16 +186,13 @@ export function PaymentForm({
             return;
         }
 
-        const amountToApply = form.getValues('amount');
-        const selectedInvoices = invoicesWithBalance.filter(inv => selectedInvoiceIds[inv.id]);
-        let remainingAmount = amountToApply;
         const preview = [];
-
-        for (const invoice of selectedInvoices) {
-        if (remainingAmount <= 0) break;
-        const appliedAmount = Math.min(remainingAmount, invoice.balance);
-        preview.push({ invoiceNumber: invoice.invoiceNumber, amountToApply: appliedAmount });
-        remainingAmount -= appliedAmount;
+        for (const invoiceId in paymentDistribution) {
+            const invoice = invoicesWithBalance.find(inv => inv.id === invoiceId);
+            const amountToApply = paymentDistribution[invoiceId];
+            if (invoice && amountToApply > 0) {
+                preview.push({ invoiceNumber: invoice.invoiceNumber, amountToApply });
+            }
         }
         setPaymentPreview(preview);
     });
@@ -184,11 +200,21 @@ export function PaymentForm({
 
 
   async function handleSubmit(values: PaymentFormData) {
-    const { entityId, selectedInvoiceIds, amount, ...paymentDetails } = values;
+    const { entityId, amount, ...paymentDetails } = values;
     
-    const invoicesToPay = invoicesWithBalance
-      .filter(inv => selectedInvoiceIds[inv.id])
-      .map(inv => ({ invoiceId: inv.id, balance: inv.balance, type: inv.type, flightDate: inv.flightDate }));
+    const invoicesToPay = Object.entries(paymentDistribution)
+      .filter(([, amountToPay]) => amountToPay > 0)
+      .map(([invoiceId, amountToPay]) => {
+          const invoice = invoicesWithBalance.find(inv => inv.id === invoiceId);
+          if (!invoice) throw new Error(`Invoice ${invoiceId} not found during submit`);
+          return {
+              invoiceId,
+              balance: invoice.balance,
+              amountToPay,
+              type: invoice.type,
+              flightDate: invoice.flightDate
+          };
+      });
 
     const finalPaymentDetails: FormSubmitData = {
       ...paymentDetails,
@@ -211,6 +237,27 @@ export function PaymentForm({
     }
   }
 
+  const handleSelectAll = (checked: boolean) => {
+    const newSelected: Record<string, boolean> = {};
+    if (checked) {
+        invoicesWithBalance.forEach(inv => {
+            newSelected[inv.id] = true;
+        });
+    }
+    form.setValue('selectedInvoiceIds', newSelected, { shouldDirty: true });
+  };
+  
+  const handleSingleCheck = (checked: boolean, invoiceId: string) => {
+      const currentSelected = form.getValues('selectedInvoiceIds');
+      const newSelected = { ...currentSelected };
+      if (checked) {
+          newSelected[invoiceId] = true;
+      } else {
+          delete newSelected[invoiceId];
+      }
+      form.setValue('selectedInvoiceIds', newSelected, { shouldDirty: true });
+  };
+
   const entities = paymentType === 'purchase' ? fincas : customers;
   const entityLabel = paymentType === 'purchase' ? 'Proveedor (Finca)' : 'Cliente';
   const entityPlaceholder = paymentType === 'purchase' ? 'Seleccione un proveedor' : 'Seleccione un cliente';
@@ -225,7 +272,7 @@ export function PaymentForm({
             render={({ field }) => (
                 <FormItem>
                 <FormLabel>{entityLabel}</FormLabel>
-                <Select onValueChange={field.onChange} defaultValue={field.value}>
+                <Select onValueChange={field.onChange} value={field.value}>
                     <FormControl>
                         <SelectTrigger>
                         <SelectValue placeholder={entityPlaceholder} />
@@ -254,53 +301,51 @@ export function PaymentForm({
                 <FormField
                     control={form.control}
                     name="selectedInvoiceIds"
-                    render={({ field }) => (
+                    render={() => (
                         <FormItem>
-                            <div className="max-h-64 overflow-y-auto border rounded-md">
+                            <div className="max-h-96 overflow-y-auto border rounded-md">
                                 <Table>
                                     <TableHeader>
                                     <TableRow>
                                         <TableHead className="w-10">
                                         <Checkbox
-                                            checked={Object.keys(selectedInvoiceIds).length > 0 && Object.keys(selectedInvoiceIds).length === invoicesWithBalance.length}
-                                            onCheckedChange={(checked) => {
-                                                const newSelected: Record<string, boolean> = {};
-                                                if (checked === true) {
-                                                    invoicesWithBalance.forEach(inv => newSelected[inv.id] = true);
-                                                }
-                                                form.setValue('selectedInvoiceIds', newSelected);
-                                            }}
+                                            checked={invoicesWithBalance.length > 0 && Object.keys(selectedInvoiceIds).length === invoicesWithBalance.length}
+                                            onCheckedChange={(checked) => handleSelectAll(checked === true)}
                                         />
                                         </TableHead>
                                         <TableHead>N° Factura</TableHead>
                                         <TableHead>Fecha</TableHead>
-                                        <TableHead>Consignatario</TableHead>
-                                        <TableHead className="text-right">Saldo</TableHead>
+                                        <TableHead>Valor</TableHead>
+                                        <TableHead>Pagos Previos</TableHead>
+                                        <TableHead>Saldo</TableHead>
+                                        <TableHead>Abono Actual</TableHead>
+                                        <TableHead className="text-right">Nuevo Saldo</TableHead>
                                     </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                    {invoicesWithBalance.map((invoice) => (
-                                        <TableRow key={invoice.id}>
-                                        <TableCell>
-                                            <Checkbox
-                                                checked={!!selectedInvoiceIds[invoice.id]}
-                                                onCheckedChange={(checked) => {
-                                                    const newSelected = {...selectedInvoiceIds};
-                                                    if (checked === true) {
-                                                        newSelected[invoice.id] = true;
-                                                    } else {
-                                                        delete newSelected[invoice.id];
-                                                    }
-                                                    form.setValue('selectedInvoiceIds', newSelected);
-                                                }}
-                                            />
-                                        </TableCell>
-                                        <TableCell>{invoice.invoiceNumber}</TableCell>
-                                        <TableCell>{format(new Date(invoice.flightDate), 'dd/MM/yyyy')}</TableCell>
-                                        <TableCell>{invoice.consigneeName}</TableCell>
-                                        <TableCell className="text-right">${invoice.balance.toFixed(2)}</TableCell>
-                                        </TableRow>
-                                    ))}
+                                    {invoicesWithBalance.map((invoice) => {
+                                        const paymentForThisInvoice = paymentDistribution[invoice.id] || 0;
+                                        const newBalance = invoice.balance - paymentForThisInvoice;
+                                        return (
+                                            <TableRow key={invoice.id}>
+                                            <TableCell>
+                                                <Checkbox
+                                                    checked={!!selectedInvoiceIds[invoice.id]}
+                                                    onCheckedChange={(checked) => handleSingleCheck(checked === true, invoice.id)}
+                                                />
+                                            </TableCell>
+                                            <TableCell>{invoice.invoiceNumber}</TableCell>
+                                            <TableCell>{format(new Date(invoice.flightDate), 'dd/MM/yyyy')}</TableCell>
+                                            <TableCell>${invoice.total.toFixed(2)}</TableCell>
+                                            <TableCell>${invoice.payments.toFixed(2)}</TableCell>
+                                            <TableCell>${invoice.balance.toFixed(2)}</TableCell>
+                                            <TableCell className={paymentForThisInvoice > 0 ? 'text-green-600 font-bold' : ''}>
+                                                ${paymentForThisInvoice.toFixed(2)}
+                                            </TableCell>
+                                            <TableCell className="text-right font-bold">${newBalance.toFixed(2)}</TableCell>
+                                            </TableRow>
+                                        );
+                                    })}
                                     </TableBody>
                                 </Table>
                             </div>
@@ -412,7 +457,7 @@ export function PaymentForm({
           )}
           
           <div className="flex justify-end gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={handlePreview} disabled={isSubmitting || Object.keys(selectedInvoiceIds).length === 0}>
+              <Button type="button" variant="outline" onClick={handlePreview} disabled={isSubmitting || Object.keys(selectedInvoiceIds).length === 0 || paymentAmount <= 0}>
                 Previsualizar Pago
               </Button>
           </div>
