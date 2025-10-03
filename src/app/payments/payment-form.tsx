@@ -41,11 +41,17 @@ const formSchema = z.object({
   paymentMethod: z.enum(['Efectivo', 'Transferencia', 'Cheque', 'Tarjeta de Crédito', 'Tarjeta de Débito', 'Transferencia Internacional']),
   reference: z.string().optional(),
   notes: z.string().optional(),
-  invoices: z.record(paymentPerInvoiceSchema).refine(
-    (invoices) => Object.values(invoices).some(inv => inv.paymentAmount && inv.paymentAmount > 0),
-    { message: "Debe ingresar un monto de pago para al menos una factura." }
-  )
-});
+  invoices: z.record(paymentPerInvoiceSchema)
+}).refine(
+    (data) => {
+        if (Object.keys(data.invoices).length === 0) return true; // Don't validate if no invoices are checked
+        return Object.values(data.invoices).some(inv => inv.paymentAmount && inv.paymentAmount > 0);
+    },
+    {
+        message: "Debe ingresar un monto de pago para al menos una factura al intentar confirmar.",
+        path: ["invoices"],
+    }
+);
 
 type PaymentFormData = z.infer<typeof formSchema>;
 type FormSubmitData = Omit<Payment, 'id' | 'invoiceId' | 'amount'>;
@@ -154,15 +160,6 @@ export function PaymentForm({
   }, [selectedEntityId, paymentType, invoices, creditNotes, debitNotes, payments, consignatarios, customers, fincas, form, consignatarioMap, customerMap]);
 
 
-  const totalSelectedBalance = useMemo(() => {
-    return invoicesWithBalance.reduce((total, inv) => {
-        if (watchedInvoices[inv.id]?.paymentAmount) {
-            return total + inv.balance;
-        }
-        return total;
-    }, 0);
-  }, [watchedInvoices, invoicesWithBalance]);
-  
   const totalAmountToPay = useMemo(() => {
     return Object.values(watchedInvoices).reduce((total, inv) => {
       return total + (inv?.paymentAmount || 0);
@@ -230,15 +227,26 @@ export function PaymentForm({
     }
   }
 
-  const handleSelectAll = (checked: boolean) => {
+ const handleSelectAll = (checked: boolean) => {
     const newInvoices: Record<string, { paymentAmount: number | undefined }> = {};
     if (checked) {
       invoicesWithBalance.forEach(inv => {
         newInvoices[inv.id] = { paymentAmount: undefined };
       });
     }
-    form.setValue('invoices', newInvoices, { shouldValidate: false });
+    form.setValue('invoices', newInvoices, { shouldValidate: false, shouldDirty: true });
   };
+  
+  const handleSingleCheck = (checked: boolean, invoiceId: string) => {
+    const currentInvoices = { ...form.getValues('invoices') };
+    if (checked) {
+      currentInvoices[invoiceId] = { paymentAmount: undefined };
+    } else {
+      delete currentInvoices[invoiceId];
+    }
+    form.setValue('invoices', currentInvoices, { shouldValidate: false, shouldDirty: true });
+  };
+
 
   const isAllSelected = invoicesWithBalance.length > 0 && invoicesWithBalance.every(inv => !!watchedInvoices[inv.id]);
 
@@ -295,7 +303,7 @@ export function PaymentForm({
                                         <TableHead className="w-10">
                                             <Checkbox
                                                 checked={isAllSelected}
-                                                onCheckedChange={(checked) => handleSelectAll(Boolean(checked))}
+                                                onCheckedChange={handleSelectAll}
                                                 aria-label="Seleccionar todas"
                                             />
                                         </TableHead>
@@ -309,7 +317,7 @@ export function PaymentForm({
                                     </TableRow>
                                     </TableHeader>
                                     <TableBody>
-                                    {invoicesWithBalance.map((invoice, index) => {
+                                    {invoicesWithBalance.map((invoice) => {
                                       const fieldName = `invoices.${invoice.id}.paymentAmount`;
                                       const isChecked = !!watchedInvoices[invoice.id];
                                       return (
@@ -317,15 +325,7 @@ export function PaymentForm({
                                             <TableCell>
                                                 <Checkbox
                                                     checked={isChecked}
-                                                    onCheckedChange={(checked) => {
-                                                        const currentInvoices = { ...form.getValues('invoices') };
-                                                        if (checked) {
-                                                            currentInvoices[invoice.id] = { paymentAmount: undefined };
-                                                        } else {
-                                                            delete currentInvoices[invoice.id];
-                                                        }
-                                                        form.setValue('invoices', currentInvoices, { shouldValidate: false });
-                                                    }}
+                                                    onCheckedChange={(checked) => handleSingleCheck(Boolean(checked), invoice.id)}
                                                 />
                                             </TableCell>
                                             <TableCell>{invoice.invoiceNumber}</TableCell>
@@ -358,7 +358,7 @@ export function PaymentForm({
                                     </TableBody>
                                 </Table>
                             </div>
-                            <FormMessage className="mt-2">{form.formState.errors.invoices?.message?.toString()}</FormMessage>
+                            <FormMessage className="mt-2">{form.formState.errors.invoices?.root?.message}</FormMessage>
                         </FormItem>
                     )}
                 />
