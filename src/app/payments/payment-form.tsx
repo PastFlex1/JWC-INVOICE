@@ -327,7 +327,8 @@ export function PaymentForm({
                                                           placeholder="0.00"
                                                           disabled={!isChecked}
                                                           {...field}
-                                                          onChange={e => field.onChange(e.target.value === '' ? undefined : e.target.value)}
+                                                          value={field.value ?? ''}
+                                                          onChange={e => field.onChange(e.target.value === '' ? '' : e.target.value)}
                                                           className="text-right"
                                                       />
                                                   )}
