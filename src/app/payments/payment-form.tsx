@@ -322,7 +322,7 @@ export function PaymentForm({
                                         <TableHead>Pagos Previos</TableHead>
                                         <TableHead>Saldo</TableHead>
                                         <TableHead>Abono Actual</TableHead>
-                                        <TableHead className="text-right">Nuevo Saldo</TableHead>
+                                        <TableHead className="text-right">Saldo Final</TableHead>
                                     </TableRow>
                                     </TableHeader>
                                     <TableBody>
