@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
-import { Plus, Trash2, Calendar as CalendarIcon, X as XIcon } from 'lucide-react';
+import { Plus, Calendar as CalendarIcon, X as XIcon, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
@@ -29,6 +29,8 @@ import { cn } from '@/lib/utils';
 import { type DateRange } from 'react-day-picker';
 import DebitNotesDownloadPdfButton from './debit-notes-download-pdf';
 import DebitNotesDownloadExcelButton from './debit-notes-download-excel';
+import SendReportDialog from '@/app/shared/send-report-dialog';
+
 
 type DebitNoteFormData = Omit<DebitNote, 'id'>;
 type DebitNoteWithDetails = DebitNote & { consigneeName?: string };
@@ -40,6 +42,7 @@ export function DebitNotesClient() {
   
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
   const [noteToDelete, setNoteToDelete] = useState<DebitNote | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const { toast } = useToast();
@@ -90,6 +93,7 @@ export function DebitNotesClient() {
       await addDebitNote(formData);
       toast({ title: t('common.success'), description: t('debitNotes.toast.added') });
       await refreshData();
+      handleCloseDialog();
     } catch (error) {
       console.error("Error submitting form:", error);
       const errorMessage = error instanceof Error ? error.message : 'Unknown error';
@@ -101,7 +105,6 @@ export function DebitNotesClient() {
       });
     } finally {
       setIsSubmitting(false);
-      handleCloseDialog();
     }
   };
 
@@ -211,6 +214,10 @@ export function DebitNotesClient() {
                 <div className="flex gap-2">
                     <DebitNotesDownloadPdfButton notes={localDebitNotes} />
                     <DebitNotesDownloadExcelButton notes={localDebitNotes} />
+                    <Button variant="outline" onClick={() => setIsSendDialogOpen(true)}>
+                      <Mail className="mr-2 h-4 w-4" />
+                      Enviar por Correo
+                    </Button>
                 </div>
                 )}
             </div>
@@ -236,6 +243,15 @@ export function DebitNotesClient() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+       <SendReportDialog
+        isOpen={isSendDialogOpen}
+        onClose={() => setIsSendDialogOpen(false)}
+        reportTitle="Reporte de Notas de Débito"
+        reportDescription="El reporte adjunto contiene un resumen de las notas de débito para el período seleccionado."
+        attachmentFileName="Reporte-Notas-de-Debito.pdf"
+        elementIdToPrint="debit-notes-to-print"
+      />
     </>
   );
 }
