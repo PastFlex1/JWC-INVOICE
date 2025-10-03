@@ -16,10 +16,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { useToast } from '@/hooks/use-toast';
-import { addCreditNote, deleteCreditNote } from '@/services/credit-notes';
-import type { CreditNote } from '@/lib/types';
-import { CreditNoteForm } from './credit-note-form';
-import { CreditNotesView } from './credit-notes-view';
+import { addDebitNote, deleteDebitNote } from '@/services/debit-notes';
+import type { DebitNote } from '@/lib/types';
+import { FarmDebitNoteForm } from './farm-debit-note-form';
+import { FarmDebitNotesView } from './farm-debit-notes-view';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
 import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
@@ -27,52 +27,43 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { type DateRange } from 'react-day-picker';
-import CreditNotesDownloadPdfButton from './credit-notes-download-pdf';
-import CreditNotesDownloadExcelButton from './credit-notes-download-excel';
 import SendReportDialog from '@/app/shared/send-report-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
+type DebitNoteFormData = Omit<DebitNote, 'id'>;
+type DebitNoteWithDetails = DebitNote & { farmName?: string };
 
-type CreditNoteFormData = Omit<CreditNote, 'id'>;
-type CreditNoteWithDetails = CreditNote & { consigneeName?: string };
-
-export function CreditNotesClient() {
-  const { creditNotes, invoices, customers, consignatarios, refreshData } = useAppData();
-  const [localCreditNotes, setLocalCreditNotes] = useState<CreditNoteWithDetails[]>([]);
+export function FarmDebitNotesClient() {
+  const { debitNotes, invoices, fincas, refreshData } = useAppData();
+  const [localDebitNotes, setLocalDebitNotes] = useState<DebitNoteWithDetails[]>([]);
   const { t } = useTranslation();
   
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [selectedFincaId, setSelectedFincaId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
-  const [noteToDelete, setNoteToDelete] = useState<CreditNote | null>(null);
+  const [noteToDelete, setNoteToDelete] = useState<DebitNote | null>(null);
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const { toast } = useToast();
   
-  const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
-  const consignatarioMap = useMemo(() => new Map(consignatarios.map(c => [c.id, c.nombreConsignatario])), [consignatarios]);
+  const fincaMap = useMemo(() => new Map(fincas.map(f => [f.id, f.name])), [fincas]);
   const invoiceMap = useMemo(() => new Map(invoices.map(i => [i.id, i])), [invoices]);
 
-
   useEffect(() => {
-    if (!selectedCustomerId) {
-      setLocalCreditNotes([]);
+    if (!selectedFincaId) {
+      setLocalDebitNotes([]);
       return;
     }
 
-    const customerInvoiceIds = new Set(invoices.filter(inv => inv.customerId === selectedCustomerId).map(inv => inv.id));
-
-    let filtered = creditNotes.filter(note => customerInvoiceIds.has(note.invoiceId)).map(note => {
-      const invoice = invoiceMap.get(note.invoiceId);
-      let consigneeName = 'Desconocido';
-      if (invoice) {
-        if (invoice.consignatarioId) {
-          consigneeName = consignatarioMap.get(invoice.consignatarioId) || 'Consignatario no encontrado';
-        } else {
-          consigneeName = customerMap.get(invoice.customerId) || 'Cliente no encontrado';
+    const fincaInvoiceIds = new Set(invoices.filter(inv => inv.farmId === selectedFincaId).map(inv => inv.id));
+    
+    let filtered = debitNotes.filter(note => fincaInvoiceIds.has(note.invoiceId)).map(note => {
+        const invoice = invoiceMap.get(note.invoiceId);
+        let farmName = 'Desconocido';
+        if (invoice) {
+          farmName = fincaMap.get(invoice.farmId) || 'Finca no encontrada';
         }
-      }
-      return { ...note, consigneeName };
+        return { ...note, farmName };
     });
 
     if (dateRange?.from) {
@@ -84,9 +75,8 @@ export function CreditNotesClient() {
         isWithinInterval(parseISO(note.date), range)
       );
     }
-    setLocalCreditNotes(filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-  }, [creditNotes, dateRange, customerMap, invoiceMap, consignatarioMap, selectedCustomerId, invoices]);
-  
+    setLocalDebitNotes(filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+  }, [debitNotes, dateRange, fincaMap, invoiceMap, selectedFincaId, invoices]);
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
@@ -97,20 +87,20 @@ export function CreditNotesClient() {
     setIsDialogOpen(false);
   };
 
-  const handleFormSubmit = async (formData: CreditNoteFormData) => {
+  const handleFormSubmit = async (formData: DebitNoteFormData) => {
     setIsSubmitting(true);
     
     try {
-      await addCreditNote(formData);
-      toast({ title: t('common.success'), description: t('creditNotes.toast.added') });
+      await addDebitNote(formData);
+      toast({ title: t('common.success'), description: 'Nota de débito añadida correctamente.' });
       await refreshData();
       handleCloseDialog();
     } catch (error) {
       console.error("Error submitting form:", error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: t('common.errorSaving'),
-        description: t('creditNotes.toast.error', { error: errorMessage }),
+        description: `No se pudo guardar la nota de débito: ${errorMessage}.`,
         variant: 'destructive',
         duration: 10000,
       });
@@ -119,7 +109,7 @@ export function CreditNotesClient() {
     }
   };
 
-  const handleDeleteClick = (note: CreditNote) => {
+  const handleDeleteClick = (note: DebitNote) => {
     setNoteToDelete(note);
   };
 
@@ -127,15 +117,15 @@ export function CreditNotesClient() {
     if (!noteToDelete) return;
     
     try {
-      await deleteCreditNote(noteToDelete.id);
+      await deleteDebitNote(noteToDelete.id);
       await refreshData();
-      toast({ title: t('common.success'), description: t('creditNotes.toast.deleted') });
+      toast({ title: t('common.success'), description: 'Nota de débito eliminada correctamente.' });
     } catch (error) {
       console.error("Error deleting note:", error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: t('common.errorDeleting'),
-        description: t('creditNotes.toast.deleteError', { error: errorMessage }),
+        description: `No se pudo eliminar la nota de débito: ${errorMessage}.`,
         variant: 'destructive',
         duration: 10000,
       });
@@ -149,50 +139,49 @@ export function CreditNotesClient() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight font-headline">Notas de Crédito (Cliente)</h2>
-            <p className="text-muted-foreground">{t('creditNotes.description')}</p>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">Notas de Débito (Finca)</h2>
+            <p className="text-muted-foreground">Gestiona notas de débito para tus facturas de compra.</p>
           </div>
           <Button onClick={() => handleOpenDialog()}>
-            <Plus className="mr-2 h-4 w-4" /> {t('creditNotes.add')}
+            <Plus className="mr-2 h-4 w-4" /> Nueva Nota de Débito
           </Button>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={(open) => !open && handleCloseDialog()}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>{t('creditNotes.addTitle')}</DialogTitle>
+              <DialogTitle>Añadir Nueva Nota de Débito (Finca)</DialogTitle>
             </DialogHeader>
-            <CreditNoteForm 
+            <FarmDebitNoteForm
               onSubmit={handleFormSubmit}
               onClose={handleCloseDialog}
               isSubmitting={isSubmitting}
               invoices={invoices}
-              customers={customers}
-              consignatarios={consignatarios}
+              fincas={fincas}
             />
           </DialogContent>
         </Dialog>
 
         <Card>
           <CardHeader>
-            <CardTitle>{t('creditNotes.list.title')}</CardTitle>
-            <CardDescription>{t('creditNotes.list.description')}</CardDescription>
+            <CardTitle>Lista de Notas de Débito</CardTitle>
+            <CardDescription>Una lista de todas tus notas de débito de fincas.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-4 flex flex-wrap items-center gap-4">
-              <Select onValueChange={setSelectedCustomerId}>
+               <Select onValueChange={setSelectedFincaId}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
-                  <SelectValue placeholder="Seleccione un cliente..." />
+                  <SelectValue placeholder="Seleccione una finca..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {customers.map(customer => (
-                    <SelectItem key={customer.id} value={customer.id}>
-                      {customer.name}
+                  {fincas.map(finca => (
+                    <SelectItem key={finca.id} value={finca.id}>
+                      {finca.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
               </Select>
-               <Popover>
+              <Popover>
                 <PopoverTrigger asChild>
                   <Button
                     variant={"outline"}
@@ -200,7 +189,7 @@ export function CreditNotesClient() {
                       "w-[280px] justify-start text-left font-normal",
                       !dateRange && "text-muted-foreground"
                     )}
-                    disabled={!selectedCustomerId}
+                    disabled={!selectedFincaId}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                      {dateRange?.from ? (
@@ -228,25 +217,14 @@ export function CreditNotesClient() {
                   />
                 </PopoverContent>
               </Popover>
-               {dateRange && (
+              {dateRange && (
                 <Button variant="ghost" onClick={() => setDateRange(undefined)}>
                     <XIcon className="h-4 w-4" />
                 </Button>
               )}
-               <div className="flex-grow" />
-              {localCreditNotes.length > 0 && (
-                <div className="flex gap-2">
-                  <CreditNotesDownloadPdfButton notes={localCreditNotes} />
-                  <CreditNotesDownloadExcelButton notes={localCreditNotes} />
-                   <Button variant="outline" onClick={() => setIsSendDialogOpen(true)}>
-                      <Mail className="mr-2 h-4 w-4" />
-                      Enviar por Correo
-                    </Button>
-                </div>
-              )}
             </div>
-             <CreditNotesView 
-              notes={localCreditNotes} 
+            <FarmDebitNotesView 
+              notes={localDebitNotes} 
               onDelete={handleDeleteClick}
             />
           </CardContent>
@@ -258,7 +236,7 @@ export function CreditNotesClient() {
           <AlertDialogHeader>
             <AlertDialogTitle>{t('common.confirmDeleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              {t('creditNotes.confirmDeleteDescription')}
+              {t('debitNotes.confirmDeleteDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -267,15 +245,6 @@ export function CreditNotesClient() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
-      <SendReportDialog
-        isOpen={isSendDialogOpen}
-        onClose={() => setIsSendDialogOpen(false)}
-        reportTitle="Reporte de Notas de Crédito"
-        reportDescription="El reporte adjunto contiene un resumen de las notas de crédito para el período seleccionado."
-        attachmentFileName="Reporte-Notas-de-Credito.pdf"
-        elementIdToPrint="credit-notes-to-print"
-      />
     </>
   );
 }

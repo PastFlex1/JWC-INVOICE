@@ -93,8 +93,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   ];
 
   const documentLinks = [
-    { href: '/credit-notes', label: 'Notas de Crédito', icon: FileText },
-    { href: '/debit-notes', label: 'Notas de Débito', icon: FileText },
+    { href: '/credit-notes', label: 'Notas de Crédito (Cliente)', icon: FileText },
+    { href: '/debit-notes', label: 'Notas de Débito (Cliente)', icon: FileText },
+    { href: '/farm-credit-notes', label: 'Notas de Crédito (Finca)', icon: FileText },
+    { href: '/farm-debit-notes', label: 'Notas de Débito (Finca)', icon: FileText },
     { href: '/account-statement', label: 'Estado de Cuenta Cliente', icon: Users },
     { href: '/farm-account-statement', label: 'Estado de Cuenta Finca', icon: Building },
     { href: '/historical-account-statement', label: 'Estado Cuenta Histórico Cliente', icon: Archive },

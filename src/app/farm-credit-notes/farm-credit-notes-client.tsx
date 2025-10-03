@@ -18,8 +18,8 @@ import {
 import { useToast } from '@/hooks/use-toast';
 import { addCreditNote, deleteCreditNote } from '@/services/credit-notes';
 import type { CreditNote } from '@/lib/types';
-import { CreditNoteForm } from './credit-note-form';
-import { CreditNotesView } from './credit-notes-view';
+import { FarmCreditNoteForm } from './farm-credit-note-form';
+import { FarmCreditNotesView } from './farm-credit-notes-view';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
 import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
@@ -27,21 +27,18 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Calendar } from '@/components/ui/calendar';
 import { cn } from '@/lib/utils';
 import { type DateRange } from 'react-day-picker';
-import CreditNotesDownloadPdfButton from './credit-notes-download-pdf';
-import CreditNotesDownloadExcelButton from './credit-notes-download-excel';
 import SendReportDialog from '@/app/shared/send-report-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
-
 type CreditNoteFormData = Omit<CreditNote, 'id'>;
-type CreditNoteWithDetails = CreditNote & { consigneeName?: string };
+type CreditNoteWithDetails = CreditNote & { farmName?: string };
 
-export function CreditNotesClient() {
-  const { creditNotes, invoices, customers, consignatarios, refreshData } = useAppData();
+export function FarmCreditNotesClient() {
+  const { creditNotes, invoices, fincas, refreshData } = useAppData();
   const [localCreditNotes, setLocalCreditNotes] = useState<CreditNoteWithDetails[]>([]);
   const { t } = useTranslation();
   
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [selectedFincaId, setSelectedFincaId] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
@@ -49,30 +46,24 @@ export function CreditNotesClient() {
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const { toast } = useToast();
   
-  const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
-  const consignatarioMap = useMemo(() => new Map(consignatarios.map(c => [c.id, c.nombreConsignatario])), [consignatarios]);
+  const fincaMap = useMemo(() => new Map(fincas.map(f => [f.id, f.name])), [fincas]);
   const invoiceMap = useMemo(() => new Map(invoices.map(i => [i.id, i])), [invoices]);
 
-
   useEffect(() => {
-    if (!selectedCustomerId) {
+    if (!selectedFincaId) {
       setLocalCreditNotes([]);
       return;
     }
 
-    const customerInvoiceIds = new Set(invoices.filter(inv => inv.customerId === selectedCustomerId).map(inv => inv.id));
+    const fincaInvoiceIds = new Set(invoices.filter(inv => inv.farmId === selectedFincaId).map(inv => inv.id));
 
-    let filtered = creditNotes.filter(note => customerInvoiceIds.has(note.invoiceId)).map(note => {
+    let filtered = creditNotes.filter(note => fincaInvoiceIds.has(note.invoiceId)).map(note => {
       const invoice = invoiceMap.get(note.invoiceId);
-      let consigneeName = 'Desconocido';
+      let farmName = 'Desconocido';
       if (invoice) {
-        if (invoice.consignatarioId) {
-          consigneeName = consignatarioMap.get(invoice.consignatarioId) || 'Consignatario no encontrado';
-        } else {
-          consigneeName = customerMap.get(invoice.customerId) || 'Cliente no encontrado';
-        }
+        farmName = fincaMap.get(invoice.farmId) || 'Finca no encontrada';
       }
-      return { ...note, consigneeName };
+      return { ...note, farmName };
     });
 
     if (dateRange?.from) {
@@ -85,9 +76,8 @@ export function CreditNotesClient() {
       );
     }
     setLocalCreditNotes(filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
-  }, [creditNotes, dateRange, customerMap, invoiceMap, consignatarioMap, selectedCustomerId, invoices]);
+  }, [creditNotes, dateRange, fincaMap, invoiceMap, selectedFincaId, invoices]);
   
-
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
   };
@@ -102,15 +92,15 @@ export function CreditNotesClient() {
     
     try {
       await addCreditNote(formData);
-      toast({ title: t('common.success'), description: t('creditNotes.toast.added') });
+      toast({ title: t('common.success'), description: 'Nota de crédito añadida correctamente.' });
       await refreshData();
       handleCloseDialog();
     } catch (error) {
       console.error("Error submitting form:", error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: t('common.errorSaving'),
-        description: t('creditNotes.toast.error', { error: errorMessage }),
+        description: `No se pudo guardar la nota de crédito: ${errorMessage}.`,
         variant: 'destructive',
         duration: 10000,
       });
@@ -129,13 +119,13 @@ export function CreditNotesClient() {
     try {
       await deleteCreditNote(noteToDelete.id);
       await refreshData();
-      toast({ title: t('common.success'), description: t('creditNotes.toast.deleted') });
+      toast({ title: t('common.success'), description: 'Nota de crédito eliminada correctamente.' });
     } catch (error) {
       console.error("Error deleting note:", error);
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: t('common.errorDeleting'),
-        description: t('creditNotes.toast.deleteError', { error: errorMessage }),
+        description: `No se pudo eliminar la nota de crédito: ${errorMessage}.`,
         variant: 'destructive',
         duration: 10000,
       });
@@ -149,45 +139,44 @@ export function CreditNotesClient() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight font-headline">Notas de Crédito (Cliente)</h2>
-            <p className="text-muted-foreground">{t('creditNotes.description')}</p>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">Notas de Crédito (Finca)</h2>
+            <p className="text-muted-foreground">Gestiona notas de crédito para tus facturas de compra.</p>
           </div>
           <Button onClick={() => handleOpenDialog()}>
-            <Plus className="mr-2 h-4 w-4" /> {t('creditNotes.add')}
+            <Plus className="mr-2 h-4 w-4" /> Nueva Nota de Crédito
           </Button>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={(open) => !open && handleCloseDialog()}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>{t('creditNotes.addTitle')}</DialogTitle>
+              <DialogTitle>Añadir Nueva Nota de Crédito (Finca)</DialogTitle>
             </DialogHeader>
-            <CreditNoteForm 
+            <FarmCreditNoteForm 
               onSubmit={handleFormSubmit}
               onClose={handleCloseDialog}
               isSubmitting={isSubmitting}
               invoices={invoices}
-              customers={customers}
-              consignatarios={consignatarios}
+              fincas={fincas}
             />
           </DialogContent>
         </Dialog>
 
         <Card>
           <CardHeader>
-            <CardTitle>{t('creditNotes.list.title')}</CardTitle>
-            <CardDescription>{t('creditNotes.list.description')}</CardDescription>
+            <CardTitle>Lista de Notas de Crédito</CardTitle>
+            <CardDescription>Una lista de todas tus notas de crédito de fincas.</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-4 flex flex-wrap items-center gap-4">
-              <Select onValueChange={setSelectedCustomerId}>
+              <Select onValueChange={setSelectedFincaId}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
-                  <SelectValue placeholder="Seleccione un cliente..." />
+                  <SelectValue placeholder="Seleccione una finca..." />
                 </SelectTrigger>
                 <SelectContent>
-                  {customers.map(customer => (
-                    <SelectItem key={customer.id} value={customer.id}>
-                      {customer.name}
+                  {fincas.map(finca => (
+                    <SelectItem key={finca.id} value={finca.id}>
+                      {finca.name}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -200,7 +189,7 @@ export function CreditNotesClient() {
                       "w-[280px] justify-start text-left font-normal",
                       !dateRange && "text-muted-foreground"
                     )}
-                    disabled={!selectedCustomerId}
+                    disabled={!selectedFincaId}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                      {dateRange?.from ? (
@@ -233,19 +222,8 @@ export function CreditNotesClient() {
                     <XIcon className="h-4 w-4" />
                 </Button>
               )}
-               <div className="flex-grow" />
-              {localCreditNotes.length > 0 && (
-                <div className="flex gap-2">
-                  <CreditNotesDownloadPdfButton notes={localCreditNotes} />
-                  <CreditNotesDownloadExcelButton notes={localCreditNotes} />
-                   <Button variant="outline" onClick={() => setIsSendDialogOpen(true)}>
-                      <Mail className="mr-2 h-4 w-4" />
-                      Enviar por Correo
-                    </Button>
-                </div>
-              )}
             </div>
-             <CreditNotesView 
+             <FarmCreditNotesView 
               notes={localCreditNotes} 
               onDelete={handleDeleteClick}
             />
@@ -267,15 +245,6 @@ export function CreditNotesClient() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-      
-      <SendReportDialog
-        isOpen={isSendDialogOpen}
-        onClose={() => setIsSendDialogOpen(false)}
-        reportTitle="Reporte de Notas de Crédito"
-        reportDescription="El reporte adjunto contiene un resumen de las notas de crédito para el período seleccionado."
-        attachmentFileName="Reporte-Notas-de-Credito.pdf"
-        elementIdToPrint="credit-notes-to-print"
-      />
     </>
   );
 }
