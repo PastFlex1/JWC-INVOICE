@@ -35,6 +35,8 @@ const paymentPerInvoiceSchema = z.object({
   paymentAmount: z.coerce.number().optional()
 });
 
+let paymentPreviewTriggered = false;
+
 const formSchema = z.object({
   entityId: z.string().min(1, { message: "Por favor seleccione una entidad." }),
   paymentDate: z.date({ required_error: "La fecha es requerida." }),
@@ -44,12 +46,15 @@ const formSchema = z.object({
   invoices: z.record(paymentPerInvoiceSchema)
 }).refine(
     (data) => {
-        if (Object.keys(data.invoices).length === 0) return true;
-        
+        const hasSelectedInvoices = Object.keys(data.invoices).length > 0;
+        if (!hasSelectedInvoices) {
+            // If no invoices are selected, we don't need to validate payment amounts.
+            // But if we are trying to submit, we should show an error.
+             return !paymentPreviewTriggered;
+        }
+
         const hasSomePaymentValue = Object.values(data.invoices).some(inv => inv?.paymentAmount && inv.paymentAmount > 0);
         
-        // This validation will only trigger if a confirmation is attempted.
-        // We handle the preview logic separately to avoid showing this error prematurely.
         if (paymentPreviewTriggered) {
           return hasSomePaymentValue;
         }
@@ -62,8 +67,6 @@ const formSchema = z.object({
     }
 );
 
-// This is a global flag to know when the form submission/preview is happening.
-let paymentPreviewTriggered = false;
 
 type PaymentFormData = z.infer<typeof formSchema>;
 type FormSubmitData = Omit<Payment, 'id' | 'invoiceId' | 'amount'>;
