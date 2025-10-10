@@ -27,7 +27,7 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
         ["DIRECCIÓN:", data.finca.address],
         ["RUC:", data.finca.taxId],
         [],
-        ["FECHA", "FACTURA #", "PROVEEDOR", "CARGOS", "CRÉDITOS/DÉBITOS", "PAGOS", "SALDO"]
+        ["FECHA", "FACTURA #", "CONSIGNATARIO", "CARGOS", "CRÉDITOS/DÉBITOS", "PAGOS", "SALDO"]
       ];
 
       const groupedInvoices = data.invoices.reduce((acc, invoice) => {
@@ -45,7 +45,7 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
           ws_data.push([
             format(parseISO(invoice.flightDate), 'dd/MM/yyyy'),
             invoice.invoiceNumber,
-            data.finca.name,
+            invoice.consigneeName || 'N/A',
             invoice.total,
             invoice.credits - invoice.debits,
             invoice.payments,

@@ -5,7 +5,7 @@ import { useAppData } from '@/context/app-data-context';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import type { Finca, Invoice, CreditNote, DebitNote, BunchItem } from '@/lib/types';
+import type { Finca, Invoice, CreditNote, DebitNote, BunchItem, Customer, Consignatario } from '@/lib/types';
 import { FarmAccountStatementView } from './farm-account-statement-view';
 import FarmAccountStatementDownloadButton from './farm-account-statement-download';
 import FarmAccountStatementExcelButton from './farm-account-statement-download-excel';
@@ -15,7 +15,7 @@ import { es } from 'date-fns/locale';
 
 export type StatementData = {
   finca: Finca;
-  invoices: (Invoice & { total: number; balance: number; credits: number; debits: number; payments: number })[];
+  invoices: (Invoice & { total: number; balance: number; credits: number; debits: number; payments: number; consigneeName?: string; })[];
   totalOutstanding: number;
   totalCredits: number;
   totalDebits: number;
@@ -25,10 +25,13 @@ export type StatementData = {
 };
 
 export function FarmAccountStatementClient() {
-  const { fincas, invoices, creditNotes, debitNotes, payments } = useAppData();
+  const { fincas, invoices, creditNotes, debitNotes, payments, customers, consignatarios } = useAppData();
   const [selectedFincaId, setSelectedFincaId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
+
+  const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
+  const consignatarioMap = useMemo(() => new Map(consignatarios.map(c => [c.id, c.nombreConsignatario])), [consignatarios]);
 
   const availableMonths = useMemo(() => {
     if (!selectedFincaId) return [];
@@ -77,6 +80,9 @@ export function FarmAccountStatementClient() {
       
       const totalCharge = invoiceSubtotal + totalDebits;
       const balance = totalCharge - totalCredits - totalPayments;
+      
+      const consigneeName = invoice.consignatarioId ? consignatarioMap.get(invoice.consignatarioId) : customerMap.get(invoice.customerId);
+
 
       return {
         ...invoice,
@@ -85,6 +91,7 @@ export function FarmAccountStatementClient() {
         debits: totalDebits,
         payments: totalPayments,
         balance,
+        consigneeName,
       };
     });
     
@@ -107,7 +114,7 @@ export function FarmAccountStatementClient() {
       urgentPayment,
       statementDate: latestInvoiceDate,
     };
-  }, [selectedFincaId, selectedMonth, fincas, invoices, creditNotes, debitNotes, payments]);
+  }, [selectedFincaId, selectedMonth, fincas, invoices, creditNotes, debitNotes, payments, customerMap, consignatarioMap]);
 
   return (
     <>
