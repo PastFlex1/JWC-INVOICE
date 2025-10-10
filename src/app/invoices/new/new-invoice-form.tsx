@@ -55,7 +55,7 @@ const bunchItemSchema = z.object({
 const lineItemSchema = z.object({
   id: z.string(),
   boxNumber: z.coerce.number().min(1, 'Must be > 0'),
-  boxType: z.enum(['qb', 'eb', 'hb'], { required_error: 'Select a type.' }),
+  boxType: z.enum(['qb', 'eb', 'hb', 'jhb'], { required_error: 'Select a type.' }),
   numberOfBunches: z.coerce.number().min(0, '# Ramos must be >= 0'),
   bunches: z.array(bunchItemSchema).min(1, 'At least one bunch is required.'),
 }).refine(data => {
@@ -719,7 +719,7 @@ export function NewInvoiceForm() {
                                 <TableHead className="w-24">P. Venta</TableHead>
                                 <TableHead className="w-24">Total Tallos</TableHead>
                                 <TableHead className="w-24">Total</TableHead>
-                                <TableHead className="w-28">Diferencia (%)</TableHead>
+                                <TableHead className="w-24">Diferencia (%)</TableHead>
                                 <TableHead className="w-[100px]">Acciones</TableHead>
                             </TableRow>
                         </TableHeader>
@@ -767,6 +767,7 @@ export function NewInvoiceForm() {
                                                                         <SelectItem value="hb">HB</SelectItem>
                                                                         <SelectItem value="qb">QB</SelectItem>
                                                                         <SelectItem value="eb">EB</SelectItem>
+                                                                        <SelectItem value="jhb">JHB</SelectItem>
                                                                     </SelectContent>
                                                                 </Select>
                                                             )} />
