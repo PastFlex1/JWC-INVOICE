@@ -14,16 +14,17 @@ import { Textarea } from '@/components/ui/textarea';
 import type { CreditNote, Invoice, Consignatario, Customer } from '@/lib/types';
 import { Loader2, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format, toDate } from 'date-fns';
+import { format, toDate, parseISO } from 'date-fns';
 
 const formSchema = z.object({
+  customerId: z.string().min(1, { message: "Please select a customer." }),
   invoiceId: z.string().min(1, { message: "Please select an invoice." }),
   amount: z.coerce.number().positive({ message: "Amount must be a positive number." }),
   reason: z.string().min(5, { message: "Reason must be at least 5 characters." }),
   date: z.date({ required_error: "Date is required." }),
 });
 
-type CreditNoteFormData = Omit<CreditNote, 'id' | 'invoiceNumber' | 'date'> & { date: Date };
+type CreditNoteFormData = Omit<CreditNote, 'id' | 'invoiceNumber' | 'date'> & { customerId: string, date: Date };
 type FormSubmitData = Omit<CreditNote, 'id'>;
 
 
@@ -38,11 +39,13 @@ type CreditNoteFormProps = {
 
 export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices, customers, consignatarios }: CreditNoteFormProps) {
   const [consigneeName, setConsigneeName] = useState<string>('');
+  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
   
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
     defaultValues: {
+      customerId: '',
       invoiceId: '',
       amount: 0,
       reason: '',
@@ -50,7 +53,19 @@ export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices, cust
     },
   });
 
+  const selectedCustomerId = form.watch('customerId');
   const selectedInvoiceId = form.watch('invoiceId');
+
+  useEffect(() => {
+    if (selectedCustomerId) {
+      const customerInvoices = invoices.filter(inv => inv.customerId === selectedCustomerId && (inv.type === 'sale' || inv.type === 'both'));
+      setFilteredInvoices(customerInvoices);
+      form.setValue('invoiceId', '');
+    } else {
+      setFilteredInvoices([]);
+    }
+  }, [selectedCustomerId, invoices, form]);
+
 
   useEffect(() => {
     if (selectedInvoiceId) {
@@ -75,7 +90,9 @@ export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices, cust
     if (!selectedInvoice) return;
 
     const dataToSubmit: FormSubmitData = {
-        ...values,
+        invoiceId: values.invoiceId,
+        amount: values.amount,
+        reason: values.reason,
         invoiceNumber: selectedInvoice.invoiceNumber,
         date: values.date.toISOString(),
     };
@@ -87,20 +104,45 @@ export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices, cust
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
         <FormField
           control={form.control}
+          name="customerId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Cliente</FormLabel>
+               <Select onValueChange={field.onChange} defaultValue={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione un cliente" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {customers.map(customer => (
+                      <SelectItem key={customer.id} value={customer.id}>
+                        {customer.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        
+        <FormField
+          control={form.control}
           name="invoiceId"
           render={({ field }) => (
             <FormItem>
               <FormLabel>Factura a Acreditar</FormLabel>
-               <Select onValueChange={field.onChange} defaultValue={field.value}>
+               <Select onValueChange={field.onChange} value={field.value} disabled={!selectedCustomerId}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccione una factura" />
+                      <SelectValue placeholder={selectedCustomerId ? "Seleccione una factura" : "Seleccione un cliente primero"} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-                    {invoices.map(invoice => (
+                    {filteredInvoices.map(invoice => (
                       <SelectItem key={invoice.id} value={invoice.id}>
-                        {invoice.invoiceNumber}
+                        {invoice.invoiceNumber} ({format(parseISO(invoice.farmDepartureDate), 'dd/MM/yy')})
                       </SelectItem>
                     ))}
                   </SelectContent>
