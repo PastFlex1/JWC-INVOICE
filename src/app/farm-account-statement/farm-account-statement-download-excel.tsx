@@ -27,7 +27,7 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
         ["DIRECCIÓN:", data.finca.address],
         ["RUC:", data.finca.taxId],
         [],
-        ["FECHA", "FACTURA #", "CONSIGNATARIO", "CARGOS", "CRÉDITOS/DÉBITOS", "PAGOS", "SALDO"]
+        ["FECHA", "FACTURA #", "PROVEEDOR", "CONSIGNATARIO", "CARGOS", "CRÉDITOS/DÉBITOS", "PAGOS", "SALDO"]
       ];
 
       const groupedInvoices = data.invoices.reduce((acc, invoice) => {
@@ -45,6 +45,7 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
           ws_data.push([
             format(parseISO(invoice.flightDate), 'dd/MM/yyyy'),
             invoice.invoiceNumber,
+            data.finca.name,
             invoice.consigneeName || 'N/A',
             invoice.total,
             invoice.credits - invoice.debits,
@@ -63,7 +64,7 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
             { total: 0, creditsDebits: 0, payments: 0, balance: 0 }
         );
         ws_data.push([
-            "", "", `TOTAL ${month.toUpperCase()}`,
+            "", "", "", `TOTAL ${month.toUpperCase()}`,
             monthlyTotals.total,
             monthlyTotals.creditsDebits,
             monthlyTotals.payments,
@@ -73,7 +74,7 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
 
       ws_data.push([]);
       ws_data.push([
-        "", "", "TOTAL PENDIENTE",
+        "", "", "", "TOTAL PENDIENTE",
         data.invoices.reduce((acc, inv) => acc + inv.total, 0),
         data.totalCredits - data.totalDebits,
         data.totalPayments,
@@ -83,7 +84,7 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
 
       ws['!cols'] = [
-        { wch: 12 }, { wch: 15 }, { wch: 30 }, { wch: 15 }, 
+        { wch: 12 }, { wch: 15 }, { wch: 30 }, { wch: 30 }, { wch: 15 }, 
         { wch: 15 }, { wch: 15 }, { wch: 15 }
       ];
       

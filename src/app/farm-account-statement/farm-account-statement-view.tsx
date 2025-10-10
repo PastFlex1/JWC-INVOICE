@@ -1,3 +1,4 @@
+
 'use client';
 
 import React from 'react';
@@ -73,9 +74,10 @@ export function FarmAccountStatementView({ data }: FarmAccountStatementViewProps
         </section>
 
         <section>
-          <div className="grid grid-cols-[80px,80px,1fr,100px,100px,100px,100px] font-bold text-center bg-gray-200 border-t border-l border-r border-black text-xs">
+          <div className="grid grid-cols-[80px,80px,1fr,1fr,100px,100px,100px,100px] font-bold text-center bg-gray-200 border-t border-l border-r border-black text-xs">
             <div className="p-1 border-r border-black">FECHA</div>
             <div className="p-1 border-r border-black">FACTURA #</div>
+            <div className="p-1 border-r border-black">PROVEEDOR</div>
             <div className="p-1 border-r border-black">CONSIGNATARIO</div>
             <div className="p-1 border-r border-black">CARGOS</div>
             <div className="p-1 border-r border-black">CRÉDITOS/DÉBITOS</div>
@@ -97,13 +99,14 @@ export function FarmAccountStatementView({ data }: FarmAccountStatementViewProps
               const monthName = format(parseISO(`${month}-02`), "MMMM yyyy", { locale: es });
               return (
               <React.Fragment key={month}>
-                <div className="grid grid-cols-[80px,80px,1fr,100px,100px,100px,100px] bg-gray-100 font-bold">
-                  <div className="p-1 border-b border-black col-span-7">PENDIENTE {monthName.toUpperCase()}</div>
+                <div className="grid grid-cols-[80px,80px,1fr,1fr,100px,100px,100px,100px] bg-gray-100 font-bold">
+                  <div className="p-1 border-b border-black col-span-8">PENDIENTE {monthName.toUpperCase()}</div>
                 </div>
                 {invoices.map(invoice => (
-                   <div key={invoice.id} className="grid grid-cols-[80px,80px,1fr,100px,100px,100px,100px] border-b border-gray-300">
+                   <div key={invoice.id} className="grid grid-cols-[80px,80px,1fr,1fr,100px,100px,100px,100px] border-b border-gray-300">
                     <div className="p-1 text-center">{format(parseISO(invoice.farmDepartureDate), 'dd/MM/yyyy')}</div>
                     <div className="p-1 text-center">{invoice.invoiceNumber}</div>
+                    <div className="p-1">{data.finca.name}</div>
                     <div className="p-1">{invoice.consigneeName}</div>
                     <div className="p-1 text-right">${invoice.total.toFixed(2)}</div>
                     <div className="p-1 text-right">${(invoice.credits - invoice.debits).toFixed(2)}</div>
@@ -111,8 +114,8 @@ export function FarmAccountStatementView({ data }: FarmAccountStatementViewProps
                     <div className="p-1 text-right font-semibold">${invoice.balance.toFixed(2)}</div>
                    </div>
                 ))}
-                 <div className="grid grid-cols-[80px,80px,1fr,100px,100px,100px,100px] font-bold text-xs bg-gray-100 border-b border-black">
-                    <div className="p-1 border-r border-black col-span-3 text-center">TOTAL {monthName.toUpperCase()}</div>
+                 <div className="grid grid-cols-[80px,80px,1fr,1fr,100px,100px,100px,100px] font-bold text-xs bg-gray-100 border-b border-black">
+                    <div className="p-1 border-r border-black col-span-4 text-center">TOTAL {monthName.toUpperCase()}</div>
                     <div className="p-1 border-r border-black text-right">${monthlyTotals.total.toFixed(2)}</div>
                     <div className="p-1 border-r border-black text-right">${monthlyTotals.creditsDebits.toFixed(2)}</div>
                     <div className="p-1 border-r border-black text-right">${monthlyTotals.payments.toFixed(2)}</div>
@@ -122,8 +125,8 @@ export function FarmAccountStatementView({ data }: FarmAccountStatementViewProps
             )})}
           </div>
 
-           <div className="grid grid-cols-[80px,80px,1fr,100px,100px,100px,100px] font-bold text-xs bg-gray-200 border-b border-l border-r border-black">
-              <div className="p-1 border-r border-black col-span-3 text-center">TOTAL PENDIENTE</div>
+           <div className="grid grid-cols-[80px,80px,1fr,1fr,100px,100px,100px,100px] font-bold text-xs bg-gray-200 border-b border-l border-r border-black">
+              <div className="p-1 border-r border-black col-span-4 text-center">TOTAL PENDIENTE</div>
               <div className="p-1 border-r border-black text-right">${data.invoices.reduce((acc, inv) => acc + inv.total, 0).toFixed(2)}</div>
               <div className="p-1 border-r border-black text-right">${(data.totalCredits - data.totalDebits).toFixed(2)}</div>
               <div className="p-1 border-r border-black text-right">${data.totalPayments.toFixed(2)}</div>
