@@ -74,8 +74,8 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setError(null);
     startTransition(async () => {
-      const subject = `Factura ${invoice.invoiceNumber} de JCW Flowers`;
-      const body = `Estimado/a ${customer.name},\n\nAdjunto encontrará su factura.\n\nGracias por su compra.\n\nSaludos cordiales,\nEl equipo de JCW Flowers`;
+      const subject = `Factura ${invoice.invoiceNumber} de jwcf`;
+      const body = `Estimado/a ${customer.name},\n\nAdjunto encontrará su factura.\n\nGracias por su compra.\n\nSaludos cordiales,\nEl equipo de jwcf`;
       
       const invoiceElement = document.getElementById('invoice-to-print');
       if (!invoiceElement) {
