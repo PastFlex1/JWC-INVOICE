@@ -32,14 +32,12 @@ export async function POST(request: Request) {
 
     const signatureHtml = `
       <br><br>
-      <hr>
       <div style="font-family: Arial, sans-serif; font-size: 12px; color: #555; margin-top: 15px;">
         <img src="cid:logo" alt="JCW Flowers Logo" width="150" style="margin-bottom: 10px;" />
-        <p style="margin: 0;"><strong>jwcf</strong></p>
-        <p style="margin: 0;"><em>Para Floristas</em></p>
-        <p style="margin: 0;">jcwf@outlook.es</p>
-        <p style="margin: 0;">+593 096 744 1343</p>
-        <p style="margin: 0;">Pasaje F y Calle Quito, EL QUINCHE - QUITO - ECUADOR</p>
+        <p style="margin: 0;">Best Regards</p>
+        <p style="margin: 0;">Team: JCW FLOWERS</p>
+        <p style="margin: 0;">Team: Alexa JCW FLOWERS</p>
+        <p style="margin: 0;">Email: jcwf@outlook.es</p>
       </div>
     `;
 
