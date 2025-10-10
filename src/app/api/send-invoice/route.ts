@@ -22,12 +22,26 @@ export async function POST(request: Request) {
     if (toEmails.length === 0) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
     }
+    
+    const signatureHtml = `
+      <br><br>
+      <hr>
+      <p style="font-size: 12px; color: #555;">
+        <strong>JCW FLOWERS</strong><br>
+        <em>Para Floristas</em><br>
+        jcwf@outlook.es<br>
+        +593 096 744 1343<br>
+        Pasaje F y Calle Quito, EL QUINCHE - QUITO - ECUADOR
+      </p>
+    `;
+
+    const emailHtml = `<p>${emailBody.replace(/\n/g, '<br>')}</p>${signatureHtml}`;
 
     await resend.emails.send({
       from: 'JCW Flowers <facturacion@puntodeventastore.store>',
       to: toEmails,
       subject: subject,
-      html: `<p>${emailBody.replace(/\n/g, '<br>')}</p>`,
+      html: emailHtml,
       attachments: attachments,
     });
 
