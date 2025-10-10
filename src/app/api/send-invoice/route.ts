@@ -33,7 +33,7 @@ export async function POST(request: Request) {
     const signatureHtml = `
       <br><br>
       <div style="font-family: Arial, sans-serif; font-size: 12px; color: #555; margin-top: 15px;">
-        <img src="cid:logo" alt="JCW Flowers Logo" width="150" style="margin-bottom: 10px;" />
+        <img src="cid:logo.png" alt="JCW Flowers Logo" width="150" style="margin-bottom: 10px;" />
         <p style="margin: 0;">Best Regards</p>
         <p style="margin: 0;">Team: JCW FLOWERS</p>
         <p style="margin: 0;">Team: Alexa JCW FLOWERS</p>
@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         {
             filename: 'logo.png',
             content: logoBase64,
-            cid: 'logo',
+            cid: 'logo.png',
         }
     ];
 
