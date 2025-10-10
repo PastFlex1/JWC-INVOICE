@@ -1,6 +1,8 @@
 
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import * as fs from 'fs';
+import * as path from 'path';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -11,9 +13,9 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { to, subject, body: emailBody, attachments } = body;
+    const { to, subject, body: emailBody, attachments: pdfAttachments } = body;
 
-    if (!to || !subject || !emailBody || !attachments) {
+    if (!to || !subject || !emailBody || !pdfAttachments) {
       return NextResponse.json({ message: 'Missing required fields in request.' }, { status: 400 });
     }
 
@@ -23,26 +25,41 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
     }
     
+    // Path to the logo file in the public directory
+    const logoPath = path.join(process.cwd(), 'public', 'logo.png');
+    const logoBuffer = fs.readFileSync(logoPath);
+    const logoBase64 = logoBuffer.toString('base64');
+
     const signatureHtml = `
       <br><br>
       <hr>
-      <p style="font-size: 12px; color: #555;">
-        <strong>JCW FLOWERS</strong><br>
-        <em>Para Floristas</em><br>
-        jcwf@outlook.es<br>
-        +593 096 744 1343<br>
-        Pasaje F y Calle Quito, EL QUINCHE - QUITO - ECUADOR
-      </p>
+      <div style="font-family: Arial, sans-serif; font-size: 12px; color: #555; margin-top: 15px;">
+        <img src="cid:logo" alt="JCW Flowers Logo" width="150" style="margin-bottom: 10px;" />
+        <p style="margin: 0;"><strong>jwcf</strong></p>
+        <p style="margin: 0;"><em>Para Floristas</em></p>
+        <p style="margin: 0;">jcwf@outlook.es</p>
+        <p style="margin: 0;">+593 096 744 1343</p>
+        <p style="margin: 0;">Pasaje F y Calle Quito, EL QUINCHE - QUITO - ECUADOR</p>
+      </div>
     `;
 
-    const emailHtml = `<p>${emailBody.replace(/\n/g, '<br>')}</p>${signatureHtml}`;
+    const emailHtml = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${emailBody.replace(/\n/g, '<br>')}</div>${signatureHtml}`;
+
+    const allAttachments = [
+        ...pdfAttachments,
+        {
+            filename: 'logo.png',
+            content: logoBase64,
+            cid: 'logo',
+        }
+    ];
 
     await resend.emails.send({
-      from: 'JCW Flowers <facturacion@puntodeventastore.store>',
+      from: 'jwcf <facturacion@puntodeventastore.store>',
       to: toEmails,
       subject: subject,
       html: emailHtml,
-      attachments: attachments,
+      attachments: allAttachments,
     });
 
     return NextResponse.json({ message: 'Email sent successfully!' }, { status: 200 });
