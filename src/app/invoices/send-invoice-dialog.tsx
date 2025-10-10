@@ -59,13 +59,13 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
   });
 
   useEffect(() => {
-    if (customer && invoice && isOpen) {
+    if (customer && isOpen) {
       form.reset({
-        to: customer.email,
+        to: customer.email || '',
       });
       setError(null);
     }
-  }, [customer, invoice, isOpen, form]);
+  }, [customer, isOpen, form]);
   
   if (!invoice || !customer) {
     return null;
