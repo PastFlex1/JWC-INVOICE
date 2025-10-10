@@ -31,10 +31,15 @@ function useDebounce<T>(value: T, delay: number): T {
 
 const ITEMS_PER_PAGE = 15;
 
-type AugmentedPayment = Payment & {
-    invoiceNumber: string;
+type AggregatedPayment = {
+    id: string;
+    paymentDate: string;
     entityName: string;
-    status: Invoice['status'];
+    amount: number;
+    paymentMethod: Payment['paymentMethod'];
+    reference?: string;
+    invoiceNumbers: string[];
+    notes?: string;
 };
 
 export function ViewPaymentsClient() {
@@ -49,29 +54,53 @@ export function ViewPaymentsClient() {
   const fincaMap = useMemo(() => new Map(fincas.map(f => [f.id, f.name])), [fincas]);
   const invoiceMap = useMemo(() => new Map(invoices.map(i => [i.id, i])), [invoices]);
 
-  const augmentedPayments = useMemo(() => {
-      return payments.map(p => {
+  const aggregatedPayments = useMemo(() => {
+      const groupedPayments: Record<string, AggregatedPayment> = {};
+
+      payments.forEach(p => {
           const invoice = invoiceMap.get(p.invoiceId);
-          let entityName = "Desconocido";
-          if(invoice){
-            if(invoice.type === 'purchase' || invoice.type === 'both'){
-                entityName = fincaMap.get(invoice.farmId) || "Finca desconocida";
-            } else { // 'sale'
-                entityName = customerMap.get(invoice.customerId) || "Cliente desconocido";
-            }
+          if (!invoice) return;
+
+          let entityId: string | null = null;
+          let entityName: string | null = null;
+          
+          if (invoice.type === 'purchase' || invoice.type === 'both') {
+              entityId = invoice.farmId;
+              entityName = fincaMap.get(entityId) || "Finca desconocida";
+          } else { // 'sale'
+              entityId = invoice.customerId;
+              entityName = customerMap.get(entityId) || "Cliente desconocido";
           }
 
-          return {
-              ...p,
-              invoiceNumber: invoice?.invoiceNumber || "N/A",
-              entityName: entityName,
-              status: invoice?.status || 'Pending'
-          };
+          if (!entityId || !entityName) return;
+
+          const paymentDateStr = format(parseISO(p.paymentDate), 'yyyy-MM-dd');
+          const groupKey = `${paymentDateStr}-${entityId}-${p.paymentMethod}-${p.reference || ''}`;
+
+          if (!groupedPayments[groupKey]) {
+              groupedPayments[groupKey] = {
+                  id: groupKey,
+                  paymentDate: p.paymentDate,
+                  entityName: entityName,
+                  amount: 0,
+                  paymentMethod: p.paymentMethod,
+                  reference: p.reference,
+                  invoiceNumbers: [],
+                  notes: p.notes,
+              };
+          }
+
+          groupedPayments[groupKey].amount += p.amount;
+          if (!groupedPayments[groupKey].invoiceNumbers.includes(invoice.invoiceNumber)) {
+            groupedPayments[groupKey].invoiceNumbers.push(invoice.invoiceNumber);
+          }
       });
-  }, [payments, invoices, customers, fincas, invoiceMap, customerMap, fincaMap]);
+
+      return Object.values(groupedPayments).sort((a,b) => parseISO(b.paymentDate).getTime() - parseISO(a.paymentDate).getTime());
+  }, [payments, invoices, customerMap, fincaMap, invoiceMap]);
 
   const filteredPayments = useMemo(() => {
-    let filtered = augmentedPayments;
+    let filtered = aggregatedPayments;
 
     if (dateRange?.from) {
       const range = {
@@ -84,10 +113,15 @@ export function ViewPaymentsClient() {
     return filtered.filter(payment => {
         const lowerCaseSearch = debouncedSearchTerm.toLowerCase();
         if (!lowerCaseSearch) return true;
-        const searchFields = [payment.invoiceNumber, payment.entityName, payment.paymentMethod, payment.reference || '', payment.status];
+        const searchFields = [
+            payment.entityName, 
+            payment.paymentMethod, 
+            payment.reference || '',
+            ...payment.invoiceNumbers
+        ];
         return searchFields.some(field => field.toLowerCase().includes(lowerCaseSearch));
     });
-  }, [augmentedPayments, debouncedSearchTerm, dateRange]);
+  }, [aggregatedPayments, debouncedSearchTerm, dateRange]);
 
 
   const totalPages = Math.ceil(filteredPayments.length / ITEMS_PER_PAGE);
@@ -110,7 +144,7 @@ export function ViewPaymentsClient() {
         <Card>
             <CardHeader>
                 <CardTitle>Pagos Registrados</CardTitle>
-                <CardDescription>Una lista de todos los pagos de clientes y a proveedores.</CardDescription>
+                <CardDescription>Una lista de todos los pagos de clientes y a proveedores, agrupados por día y entidad.</CardDescription>
             </CardHeader>
             <CardContent>
                 <div className="mb-4 flex flex-wrap gap-4">
@@ -169,28 +203,26 @@ export function ViewPaymentsClient() {
                     <TableHeader>
                     <TableRow>
                         <TableHead>Fecha</TableHead>
-                        <TableHead>Factura #</TableHead>
                         <TableHead>Cliente/Proveedor</TableHead>
-                        <TableHead>Monto</TableHead>
+                        <TableHead>Monto Total</TableHead>
+                        <TableHead>Facturas Pagadas</TableHead>
                         <TableHead>Método</TableHead>
                         <TableHead>Banco</TableHead>
-                        <TableHead>Estado</TableHead>
                     </TableRow>
                     </TableHeader>
                     <TableBody>
                     {paginatedPayments.map((payment) => (
                         <TableRow key={payment.id}>
                             <TableCell>{format(parseISO(payment.paymentDate), 'PPP')}</TableCell>
-                            <TableCell className="font-medium">{payment.invoiceNumber}</TableCell>
-                            <TableCell>{payment.entityName}</TableCell>
-                            <TableCell>${payment.amount.toFixed(2)}</TableCell>
-                            <TableCell>{payment.paymentMethod}</TableCell>
-                            <TableCell>{payment.reference}</TableCell>
-                             <TableCell>
-                                <Badge variant={payment.status === 'Paid' ? 'secondary' : 'destructive'}>
-                                {payment.status}
+                            <TableCell className="font-medium">{payment.entityName}</TableCell>
+                            <TableCell className="font-bold">${payment.amount.toFixed(2)}</TableCell>
+                            <TableCell>
+                                <Badge variant="secondary">
+                                    Pago a {payment.invoiceNumbers.length} factura(s)
                                 </Badge>
                             </TableCell>
+                            <TableCell>{payment.paymentMethod}</TableCell>
+                            <TableCell>{payment.reference}</TableCell>
                         </TableRow>
                     ))}
                     </TableBody>
