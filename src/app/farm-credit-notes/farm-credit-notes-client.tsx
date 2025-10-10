@@ -50,14 +50,19 @@ export function FarmCreditNotesClient() {
   const invoiceMap = useMemo(() => new Map(invoices.map(i => [i.id, i])), [invoices]);
 
   useEffect(() => {
-    if (!selectedFincaId) {
-      setLocalCreditNotes([]);
-      return;
+    let notesToDisplay = creditNotes.filter(note => {
+        const invoice = invoiceMap.get(note.invoiceId);
+        return invoice && (invoice.type === 'purchase' || invoice.type === 'both');
+    });
+
+    if (selectedFincaId) {
+        notesToDisplay = notesToDisplay.filter(note => {
+            const invoice = invoiceMap.get(note.invoiceId);
+            return invoice?.farmId === selectedFincaId;
+        });
     }
 
-    const fincaInvoiceIds = new Set(invoices.filter(inv => inv.farmId === selectedFincaId).map(inv => inv.id));
-
-    let filtered = creditNotes.filter(note => fincaInvoiceIds.has(note.invoiceId)).map(note => {
+    let processedNotes = notesToDisplay.map(note => {
       const invoice = invoiceMap.get(note.invoiceId);
       let farmName = 'Desconocido';
       if (invoice) {
@@ -71,11 +76,11 @@ export function FarmCreditNotesClient() {
         start: startOfDay(dateRange.from),
         end: dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from),
       };
-      filtered = filtered.filter(note => 
+      processedNotes = processedNotes.filter(note => 
         isWithinInterval(parseISO(note.date), range)
       );
     }
-    setLocalCreditNotes(filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+    setLocalCreditNotes(processedNotes.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
   }, [creditNotes, dateRange, fincaMap, invoiceMap, selectedFincaId, invoices]);
   
   const handleOpenDialog = () => {
@@ -169,11 +174,12 @@ export function FarmCreditNotesClient() {
           </CardHeader>
           <CardContent>
             <div className="mb-4 flex flex-wrap items-center gap-4">
-              <Select onValueChange={setSelectedFincaId}>
+              <Select onValueChange={(value) => setSelectedFincaId(value === 'all' ? null : value)}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
-                  <SelectValue placeholder="Seleccione una finca..." />
+                  <SelectValue placeholder="Filtrar por finca..." />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="all">Todas las Fincas</SelectItem>
                   {fincas.map(finca => (
                     <SelectItem key={finca.id} value={finca.id}>
                       {finca.name}
@@ -189,7 +195,6 @@ export function FarmCreditNotesClient() {
                       "w-[280px] justify-start text-left font-normal",
                       !dateRange && "text-muted-foreground"
                     )}
-                    disabled={!selectedFincaId}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                      {dateRange?.from ? (

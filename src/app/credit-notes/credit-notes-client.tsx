@@ -55,24 +55,24 @@ export function CreditNotesClient() {
 
 
   useEffect(() => {
-    if (!selectedCustomerId) {
-      setLocalCreditNotes([]);
-      return;
+    let notesToDisplay = creditNotes;
+
+    if (selectedCustomerId) {
+        const customerInvoiceIds = new Set(invoices.filter(inv => inv.customerId === selectedCustomerId).map(inv => inv.id));
+        notesToDisplay = creditNotes.filter(note => customerInvoiceIds.has(note.invoiceId));
     }
 
-    const customerInvoiceIds = new Set(invoices.filter(inv => inv.customerId === selectedCustomerId).map(inv => inv.id));
-
-    let filtered = creditNotes.filter(note => customerInvoiceIds.has(note.invoiceId)).map(note => {
-      const invoice = invoiceMap.get(note.invoiceId);
-      let consigneeName = 'Desconocido';
-      if (invoice) {
-        if (invoice.consignatarioId) {
-          consigneeName = consignatarioMap.get(invoice.consignatarioId) || 'Consignatario no encontrado';
-        } else {
-          consigneeName = customerMap.get(invoice.customerId) || 'Cliente no encontrado';
+    let processedNotes = notesToDisplay.map(note => {
+        const invoice = invoiceMap.get(note.invoiceId);
+        let consigneeName = 'Desconocido';
+        if (invoice) {
+            if (invoice.consignatarioId) {
+            consigneeName = consignatarioMap.get(invoice.consignatarioId) || 'Consignatario no encontrado';
+            } else {
+            consigneeName = customerMap.get(invoice.customerId) || 'Cliente no encontrado';
+            }
         }
-      }
-      return { ...note, consigneeName };
+        return { ...note, consigneeName };
     });
 
     if (dateRange?.from) {
@@ -80,11 +80,11 @@ export function CreditNotesClient() {
         start: startOfDay(dateRange.from),
         end: dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from),
       };
-      filtered = filtered.filter(note => 
+      processedNotes = processedNotes.filter(note => 
         isWithinInterval(parseISO(note.date), range)
       );
     }
-    setLocalCreditNotes(filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+    setLocalCreditNotes(processedNotes.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
   }, [creditNotes, dateRange, customerMap, invoiceMap, consignatarioMap, selectedCustomerId, invoices]);
   
 
@@ -180,11 +180,12 @@ export function CreditNotesClient() {
           </CardHeader>
           <CardContent>
             <div className="mb-4 flex flex-wrap items-center gap-4">
-              <Select onValueChange={setSelectedCustomerId}>
+              <Select onValueChange={(value) => setSelectedCustomerId(value === 'all' ? null : value)}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
-                  <SelectValue placeholder="Seleccione un cliente..." />
+                  <SelectValue placeholder="Filtrar por cliente..." />
                 </SelectTrigger>
                 <SelectContent>
+                   <SelectItem value="all">Todos los Clientes</SelectItem>
                   {customers.map(customer => (
                     <SelectItem key={customer.id} value={customer.id}>
                       {customer.name}
@@ -200,7 +201,6 @@ export function CreditNotesClient() {
                       "w-[280px] justify-start text-left font-normal",
                       !dateRange && "text-muted-foreground"
                     )}
-                    disabled={!selectedCustomerId}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                      {dateRange?.from ? (

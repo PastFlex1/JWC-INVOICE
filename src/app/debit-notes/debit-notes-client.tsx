@@ -54,14 +54,14 @@ export function DebitNotesClient() {
   const invoiceMap = useMemo(() => new Map(invoices.map(i => [i.id, i])), [invoices]);
 
   useEffect(() => {
-    if (!selectedCustomerId) {
-      setLocalDebitNotes([]);
-      return;
+    let notesToDisplay = debitNotes;
+
+    if (selectedCustomerId) {
+        const customerInvoiceIds = new Set(invoices.filter(inv => inv.customerId === selectedCustomerId).map(inv => inv.id));
+        notesToDisplay = debitNotes.filter(note => customerInvoiceIds.has(note.invoiceId));
     }
 
-    const customerInvoiceIds = new Set(invoices.filter(inv => inv.customerId === selectedCustomerId).map(inv => inv.id));
-    
-    let filtered = debitNotes.filter(note => customerInvoiceIds.has(note.invoiceId)).map(note => {
+    let processedNotes = notesToDisplay.map(note => {
         const invoice = invoiceMap.get(note.invoiceId);
         let consigneeName = 'Desconocido';
         if (invoice) {
@@ -79,11 +79,11 @@ export function DebitNotesClient() {
         start: startOfDay(dateRange.from),
         end: dateRange.to ? endOfDay(dateRange.to) : endOfDay(dateRange.from),
       };
-      filtered = filtered.filter(note => 
+      processedNotes = processedNotes.filter(note => 
         isWithinInterval(parseISO(note.date), range)
       );
     }
-    setLocalDebitNotes(filtered.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
+    setLocalDebitNotes(processedNotes.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()));
   }, [debitNotes, dateRange, customerMap, invoiceMap, consignatarioMap, selectedCustomerId, invoices]);
 
   const handleOpenDialog = () => {
@@ -178,11 +178,12 @@ export function DebitNotesClient() {
           </CardHeader>
           <CardContent>
             <div className="mb-4 flex flex-wrap items-center gap-4">
-               <Select onValueChange={setSelectedCustomerId}>
+               <Select onValueChange={(value) => setSelectedCustomerId(value === 'all' ? null : value)}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
-                  <SelectValue placeholder="Seleccione un cliente..." />
+                  <SelectValue placeholder="Filtrar por cliente..." />
                 </SelectTrigger>
                 <SelectContent>
+                  <SelectItem value="all">Todos los Clientes</SelectItem>
                   {customers.map(customer => (
                     <SelectItem key={customer.id} value={customer.id}>
                       {customer.name}
@@ -198,7 +199,6 @@ export function DebitNotesClient() {
                       "w-[280px] justify-start text-left font-normal",
                       !dateRange && "text-muted-foreground"
                     )}
-                    disabled={!selectedCustomerId}
                   >
                     <CalendarIcon className="mr-2 h-4 w-4" />
                      {dateRange?.from ? (
