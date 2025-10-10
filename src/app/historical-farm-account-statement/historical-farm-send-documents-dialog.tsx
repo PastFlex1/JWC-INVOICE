@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -110,7 +111,7 @@ export default function HistoricalSendFarmDocumentsDialog({ finca, isOpen, onClo
     setError(null);
 
     const subject = `Estado de Cuenta Histórico para ${finca.name}`;
-    const body = `Estimado/a proveedor ${finca.name},\n\nAdjunto encontrará su estado de cuenta histórico solicitado.\n\nGracias,\nEl equipo de JCW Flowers`;
+    const body = `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
     
     try {
         const statementPdfBase64 = await generatePdfForElement('historical-farm-statement-to-print');

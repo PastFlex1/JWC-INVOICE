@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -111,7 +112,7 @@ export default function SendDocumentsDialog({ customer, invoices, isOpen, onClos
     setError(null);
 
     const subject = `Documentos para ${customer.name}`;
-    const body = `Estimado/a ${customer.name},\n\nAdjunto encontrará los documentos solicitados.\n\nGracias,\nEl equipo de JCW Flowers`;
+    const body = `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
     
     try {
         const statementPdfBase64 = await generatePdfForElement('statement-to-print');

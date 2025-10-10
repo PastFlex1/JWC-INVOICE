@@ -113,7 +113,7 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
     setError(null);
 
     const subject = `Estado de Cuenta para ${finca.name}`;
-    const body = `Estimado/a proveedor ${finca.name},\n\nAdjunto encontrará su estado de cuenta solicitado.\n\nGracias,\nEl equipo de JCW Flowers`;
+    const body = `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
     
     try {
         const statementPdfBase64 = await generatePdfForElement('farm-statement-to-print');

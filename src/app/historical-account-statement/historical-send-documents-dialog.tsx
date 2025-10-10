@@ -112,7 +112,7 @@ export default function HistoricalSendDocumentsDialog({ customer, invoices, isOp
     setError(null);
 
     const subject = `Estado de Cuenta Histórico para ${customer.name}`;
-    const body = `Estimado/a ${customer.name},\n\nAdjunto encontrará el estado de cuenta histórico solicitado.\n\nGracias,\nEl equipo de JCW Flowers`;
+    const body = `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
     
     try {
         const statementPdfBase64 = await generatePdfForElement('historical-statement-to-print');
