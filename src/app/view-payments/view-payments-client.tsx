@@ -44,6 +44,8 @@ const ITEMS_PER_PAGE = 15;
 type PaymentDetail = {
     invoiceNumber: string;
     amount: number;
+    customerName: string;
+    consigneeName: string;
 };
 
 type AggregatedPayment = {
@@ -58,7 +60,7 @@ type AggregatedPayment = {
 };
 
 export function ViewPaymentsClient() {
-  const { payments, invoices, customers, fincas } = useAppData();
+  const { payments, invoices, customers, fincas, consignatarios } = useAppData();
   const [searchTerm, setSearchTerm] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -68,6 +70,7 @@ export function ViewPaymentsClient() {
 
   const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
   const fincaMap = useMemo(() => new Map(fincas.map(f => [f.id, f.name])), [fincas]);
+  const consignatarioMap = useMemo(() => new Map(consignatarios.map(c => [c.id, c.nombreConsignatario])), [consignatarios]);
   const invoiceMap = useMemo(() => new Map(invoices.map(i => [i.id, i])), [invoices]);
 
   const aggregatedPayments = useMemo(() => {
@@ -80,10 +83,11 @@ export function ViewPaymentsClient() {
           let entityId: string | null = null;
           let entityName: string | null = null;
           
-          if (invoice.type === 'purchase' || invoice.type === 'both') {
+          // Determine the primary entity (customer or farm) for grouping
+          if (invoice.type === 'purchase') {
               entityId = invoice.farmId;
               entityName = fincaMap.get(entityId) || "Finca desconocida";
-          } else { // 'sale'
+          } else { // 'sale' or 'both'
               entityId = invoice.customerId;
               entityName = customerMap.get(entityId) || "Cliente desconocido";
           }
@@ -106,15 +110,20 @@ export function ViewPaymentsClient() {
               };
           }
 
+          const customerName = customerMap.get(invoice.customerId) || 'Cliente Desconocido';
+          const consigneeName = invoice.consignatarioId ? (consignatarioMap.get(invoice.consignatarioId) || 'Consignatario Desconocido') : customerName;
+
           groupedPayments[groupKey].amount += p.amount;
           groupedPayments[groupKey].details.push({ 
             invoiceNumber: invoice.invoiceNumber, 
-            amount: p.amount 
+            amount: p.amount,
+            customerName: customerName,
+            consigneeName: consigneeName
           });
       });
 
       return Object.values(groupedPayments).sort((a,b) => parseISO(b.paymentDate).getTime() - parseISO(a.paymentDate).getTime());
-  }, [payments, invoices, customerMap, fincaMap, invoiceMap]);
+  }, [payments, invoices, customerMap, fincaMap, invoiceMap, consignatarioMap]);
 
   const filteredPayments = useMemo(() => {
     let filtered = aggregatedPayments;
@@ -283,18 +292,20 @@ export function ViewPaymentsClient() {
         </div>
 
         <AlertDialog open={!!selectedPayment} onOpenChange={() => setSelectedPayment(null)}>
-            <AlertDialogContent>
+            <AlertDialogContent className="sm:max-w-3xl">
                 <AlertDialogHeader>
                     <AlertDialogTitle>Detalle del Pago</AlertDialogTitle>
                     <AlertDialogDescription>
                         Desglose del pago de ${selectedPayment?.amount.toFixed(2)} a {selectedPayment?.entityName} en {selectedPayment ? format(parseISO(selectedPayment.paymentDate), 'PPP') : ''}.
                     </AlertDialogDescription>
                 </AlertDialogHeader>
-                <div className="max-h-60 overflow-y-auto">
+                <div className="max-h-96 overflow-y-auto">
                     <Table>
                         <TableHeader>
                         <TableRow>
                             <TableHead>N° Factura</TableHead>
+                            <TableHead>Cliente</TableHead>
+                            <TableHead>Consignatario</TableHead>
                             <TableHead className="text-right">Monto Aplicado</TableHead>
                         </TableRow>
                         </TableHeader>
@@ -302,6 +313,8 @@ export function ViewPaymentsClient() {
                         {selectedPayment?.details.map((detail, index) => (
                             <TableRow key={index}>
                             <TableCell>{detail.invoiceNumber}</TableCell>
+                            <TableCell>{detail.customerName}</TableCell>
+                            <TableCell>{detail.consigneeName}</TableCell>
                             <TableCell className="text-right">${detail.amount.toFixed(2)}</TableCell>
                             </TableRow>
                         ))}
