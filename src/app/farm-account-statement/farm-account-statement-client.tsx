@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -27,6 +28,7 @@ export type StatementData = {
 export function FarmAccountStatementClient() {
   const { fincas, invoices, creditNotes, debitNotes, payments, customers, consignatarios } = useAppData();
   const [selectedFincaId, setSelectedFincaId] = useState<string | null>(null);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
 
@@ -35,14 +37,25 @@ export function FarmAccountStatementClient() {
 
   const availableMonths = useMemo(() => {
     if (!selectedFincaId) return [];
-    const fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both'));
+    let fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both'));
+
+    if (selectedCustomerId) {
+      fincaInvoices = fincaInvoices.filter(inv => inv.customerId === selectedCustomerId);
+    }
+    
     const months = new Set(fincaInvoices.map(inv => format(parseISO(inv.farmDepartureDate), 'yyyy-MM')));
     return Array.from(months).sort((a, b) => b.localeCompare(a));
-  }, [selectedFincaId, invoices]);
+  }, [selectedFincaId, selectedCustomerId, invoices]);
 
   useEffect(() => {
     setSelectedMonth('all');
+    setSelectedCustomerId(null);
   }, [selectedFincaId]);
+
+  useEffect(() => {
+    setSelectedMonth('all');
+  }, [selectedCustomerId]);
+
 
   const statementData = useMemo((): StatementData | null => {
     if (!selectedFincaId) return null;
@@ -51,6 +64,10 @@ export function FarmAccountStatementClient() {
     if (!finca) return null;
 
     let fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both') && inv.status !== 'Paid');
+    
+    if (selectedCustomerId) {
+      fincaInvoices = fincaInvoices.filter(inv => inv.customerId === selectedCustomerId);
+    }
 
     if (selectedMonth !== 'all') {
       fincaInvoices = fincaInvoices.filter(inv => format(parseISO(inv.farmDepartureDate), 'yyyy-MM') === selectedMonth);
@@ -114,7 +131,7 @@ export function FarmAccountStatementClient() {
       urgentPayment,
       statementDate: latestInvoiceDate,
     };
-  }, [selectedFincaId, selectedMonth, fincas, invoices, creditNotes, debitNotes, payments, customerMap, consignatarioMap]);
+  }, [selectedFincaId, selectedCustomerId, selectedMonth, fincas, invoices, creditNotes, debitNotes, payments, customerMap, consignatarioMap]);
 
   return (
     <>
@@ -151,6 +168,23 @@ export function FarmAccountStatementClient() {
                 ))}
               </SelectContent>
             </Select>
+
+            {selectedFincaId && (
+              <Select onValueChange={(value) => setSelectedCustomerId(value === 'all' ? null : value)}>
+                <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
+                  <SelectValue placeholder="Filtrar por cliente..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los Clientes</SelectItem>
+                  {customers.map(customer => (
+                    <SelectItem key={customer.id} value={customer.id}>
+                      {customer.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
             {selectedFincaId && availableMonths.length > 0 && (
               <Select onValueChange={setSelectedMonth} value={selectedMonth}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[200px]">
