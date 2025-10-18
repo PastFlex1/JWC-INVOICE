@@ -94,6 +94,7 @@ export function DebitNoteForm({ onSubmit, onClose, isSubmitting, invoices, custo
         reason: values.reason,
         invoiceNumber: selectedInvoice.invoiceNumber,
         date: values.date.toISOString(),
+        type: 'sale',
     };
     onSubmit(dataToSubmit);
   }

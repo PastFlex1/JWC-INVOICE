@@ -33,7 +33,7 @@ export interface BunchItem {
 export interface LineItem {
   id: string;
   boxNumber: number;
-  boxType: 'qb' | 'eb' | 'hb';
+  boxType: 'qb' | 'eb' | 'hb' | 'jhb';
   numberOfBunches: number;
   bunches: BunchItem[];
 }
@@ -136,6 +136,7 @@ export interface CreditNote {
   amount: number;
   reason: string;
   date: string; // ISO string
+  type: 'sale' | 'purchase';
 }
 
 export interface DebitNote {
@@ -145,6 +146,7 @@ export interface DebitNote {
   amount: number;
   reason: string;
   date: string; // ISO string
+  type: 'sale' | 'purchase';
 }
 
 export interface Payment {
@@ -153,6 +155,7 @@ export interface Payment {
   amount: number;
   paymentDate: string; // ISO string
   paymentMethod: 'Efectivo' | 'Transferencia' | 'Cheque' | 'Tarjeta de Crédito' | 'Tarjeta de Débito' | 'Transferencia Internacional';
+  type: 'sale' | 'purchase';
   reference?: string;
   notes?: string;
 }

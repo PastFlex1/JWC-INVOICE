@@ -67,6 +67,7 @@ export function FarmDebitNoteForm({ onSubmit, onClose, isSubmitting, invoices, f
         ...values,
         invoiceNumber: selectedInvoice.invoiceNumber,
         date: values.date.toISOString(),
+        type: 'purchase',
     };
     onSubmit(dataToSubmit);
   }

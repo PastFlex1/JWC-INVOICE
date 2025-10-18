@@ -95,6 +95,7 @@ export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices, cust
         reason: values.reason,
         invoiceNumber: selectedInvoice.invoiceNumber,
         date: values.date.toISOString(),
+        type: 'sale',
     };
     onSubmit(dataToSubmit);
   }

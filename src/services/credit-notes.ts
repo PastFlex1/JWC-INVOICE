@@ -29,6 +29,7 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData>): CreditNot
     amount: data.amount,
     reason: data.reason,
     date: date,
+    type: data.type || 'sale',
   };
 };
 

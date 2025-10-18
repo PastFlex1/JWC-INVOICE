@@ -126,9 +126,9 @@ export function PaymentForm({
               }, 0);
             }, 0);
 
-            const credits = creditNotes.filter(cn => cn.invoiceId === invoice.id).reduce((sum, note) => sum + note.amount, 0);
-            const debits = debitNotes.filter(dn => dn.invoiceId === invoice.id).reduce((sum, note) => sum + note.amount, 0);
-            const paid = payments.filter(p => p.invoiceId === invoice.id).reduce((sum, payment) => sum + payment.amount, 0);
+            const credits = creditNotes.filter(cn => cn.invoiceId === invoice.id && cn.type === paymentType).reduce((sum, note) => sum + note.amount, 0);
+            const debits = debitNotes.filter(dn => dn.invoiceId === invoice.id && dn.type === paymentType).reduce((sum, note) => sum + note.amount, 0);
+            const paid = payments.filter(p => p.invoiceId === invoice.id && p.type === paymentType).reduce((sum, payment) => sum + payment.amount, 0);
             
             const total = subtotal + debits - credits;
             const balance = total - paid;
@@ -221,6 +221,7 @@ export function PaymentForm({
 
     const finalPaymentDetails: FormSubmitData = {
       ...paymentDetails,
+      type: paymentType,
       paymentDate: paymentDetails.paymentDate.toISOString(),
     };
 

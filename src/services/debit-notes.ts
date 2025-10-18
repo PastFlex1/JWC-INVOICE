@@ -30,6 +30,7 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData>): DebitNote
     amount: data.amount,
     reason: data.reason,
     date: date,
+    type: data.type || 'sale',
   };
 };
 

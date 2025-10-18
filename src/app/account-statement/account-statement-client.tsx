@@ -77,9 +77,9 @@ export function AccountStatementClient() {
         }, 0);
       }, 0);
 
-      const creditsForInvoice = creditNotes.filter(cn => cn.invoiceId === invoice.id);
-      const debitsForInvoice = debitNotes.filter(dn => dn.invoiceId === invoice.id);
-      const paymentsForInvoice = payments.filter(p => p.invoiceId === invoice.id);
+      const creditsForInvoice = creditNotes.filter(cn => cn.invoiceId === invoice.id && cn.type === 'sale');
+      const debitsForInvoice = debitNotes.filter(dn => dn.invoiceId === invoice.id && dn.type === 'sale');
+      const paymentsForInvoice = payments.filter(p => p.invoiceId === invoice.id && p.type === 'sale');
 
       const totalCredits = creditsForInvoice.reduce((acc, note) => acc + note.amount, 0);
       const totalDebits = debitsForInvoice.reduce((acc, note) => acc + note.amount, 0);

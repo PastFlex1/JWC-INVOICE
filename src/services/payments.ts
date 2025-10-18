@@ -31,6 +31,7 @@ const paymentFromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData>): Pa
     paymentMethod: data.paymentMethod,
     reference: data.reference,
     notes: data.notes,
+    type: data.type || 'sale',
   };
 };
 
