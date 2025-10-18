@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Textarea } from '@/components/ui/textarea';
-import type { DebitNote, Invoice, Consignatario, Customer } from '@/lib/types';
+import type { DebitNote, Invoice, Consignatario, Customer, BunchItem } from '@/lib/types';
 import { Loader2, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { format, toDate, parseISO } from 'date-fns';
@@ -27,6 +27,7 @@ const formSchema = z.object({
 type DebitNoteFormData = Omit<DebitNote, 'id' | 'invoiceNumber' | 'date'> & { customerId: string, date: Date };
 type FormSubmitData = Omit<DebitNote, 'id'>;
 
+type InvoiceWithTotal = Invoice & { total: number };
 
 type DebitNoteFormProps = {
   onSubmit: (data: FormSubmitData) => void;
@@ -39,7 +40,7 @@ type DebitNoteFormProps = {
 
 export function DebitNoteForm({ onSubmit, onClose, isSubmitting, invoices, customers, consignatarios }: DebitNoteFormProps) {
   const [consigneeName, setConsigneeName] = useState<string>('');
-  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
+  const [filteredInvoices, setFilteredInvoices] = useState<InvoiceWithTotal[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -58,7 +59,18 @@ export function DebitNoteForm({ onSubmit, onClose, isSubmitting, invoices, custo
 
   useEffect(() => {
     if (selectedCustomerId) {
-      const customerInvoices = invoices.filter(inv => inv.customerId === selectedCustomerId && (inv.type === 'sale' || inv.type === 'both'));
+      const customerInvoices = invoices
+        .filter(inv => inv.customerId === selectedCustomerId && (inv.type === 'sale' || inv.type === 'both'))
+        .map(inv => {
+          const total = inv.items.reduce((acc, item) => {
+            if (!item.bunches) return acc;
+            return acc + item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
+              const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
+              return bunchAcc + (stems * bunch.salePrice);
+            }, 0);
+          }, 0);
+          return { ...inv, total };
+        });
       setFilteredInvoices(customerInvoices);
       form.setValue('invoiceId', '');
     } else {
@@ -142,7 +154,7 @@ export function DebitNoteForm({ onSubmit, onClose, isSubmitting, invoices, custo
                   <SelectContent>
                     {filteredInvoices.map(invoice => (
                       <SelectItem key={invoice.id} value={invoice.id}>
-                        {invoice.invoiceNumber} ({format(parseISO(invoice.farmDepartureDate), 'dd/MM/yy')})
+                        {invoice.invoiceNumber} ({format(parseISO(invoice.farmDepartureDate), 'dd/MM/yy')}) - ${invoice.total.toFixed(2)}
                       </SelectItem>
                     ))}
                   </SelectContent>

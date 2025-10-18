@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -11,10 +11,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Textarea } from '@/components/ui/textarea';
-import type { DebitNote, Invoice, Finca } from '@/lib/types';
+import type { DebitNote, Invoice, Finca, BunchItem } from '@/lib/types';
 import { Loader2, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format, toDate } from 'date-fns';
+import { format, toDate, parseISO } from 'date-fns';
 
 const formSchema = z.object({
   invoiceId: z.string().min(1, { message: "Please select an invoice." }),
@@ -26,6 +26,8 @@ const formSchema = z.object({
 type DebitNoteFormData = Omit<DebitNote, 'id' | 'invoiceNumber' | 'date'> & { date: Date };
 type FormSubmitData = Omit<DebitNote, 'id'>;
 
+type InvoiceWithTotal = Invoice & { total: number };
+
 type FarmDebitNoteFormProps = {
   onSubmit: (data: FormSubmitData) => void;
   onClose: () => void;
@@ -36,7 +38,7 @@ type FarmDebitNoteFormProps = {
 
 export function FarmDebitNoteForm({ onSubmit, onClose, isSubmitting, invoices, fincas }: FarmDebitNoteFormProps) {
   const [selectedFincaId, setSelectedFincaId] = useState<string>('');
-  const [filteredInvoices, setFilteredInvoices] = useState<Invoice[]>([]);
+  const [filteredInvoices, setFilteredInvoices] = useState<InvoiceWithTotal[]>([]);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -51,7 +53,18 @@ export function FarmDebitNoteForm({ onSubmit, onClose, isSubmitting, invoices, f
 
   useEffect(() => {
     if (selectedFincaId) {
-      const fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both'));
+      const fincaInvoices = invoices
+        .filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both'))
+        .map(inv => {
+          const total = inv.items.reduce((acc, item) => {
+            if (!item.bunches) return acc;
+            return acc + item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
+              const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
+              return bunchAcc + (stems * bunch.purchasePrice);
+            }, 0);
+          }, 0);
+          return { ...inv, total };
+        });
       setFilteredInvoices(fincaInvoices);
       form.setValue('invoiceId', '');
     } else {
@@ -107,7 +120,7 @@ export function FarmDebitNoteForm({ onSubmit, onClose, isSubmitting, invoices, f
                   <SelectContent>
                     {filteredInvoices.map(invoice => (
                       <SelectItem key={invoice.id} value={invoice.id}>
-                        {invoice.invoiceNumber}
+                        {invoice.invoiceNumber} ({format(parseISO(invoice.farmDepartureDate), 'dd/MM/yy')}) - ${invoice.total.toFixed(2)}
                       </SelectItem>
                     ))}
                   </SelectContent>
