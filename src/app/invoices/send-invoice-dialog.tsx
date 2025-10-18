@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -75,7 +76,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
     setError(null);
     startTransition(async () => {
       const subject = `Factura ${invoice.invoiceNumber} de jwcf`;
-      const body = `Estimado/a ${customer.name},\n\nAdjunto encontrará su factura.\n\nGracias por su compra.\n\nSaludos cordiales,\nEl equipo de jwcf`;
+      const body = `Dear Client,\nAttached you will find your invoice\nThanks for prefer us product`;
       
       const invoiceElement = document.getElementById('invoice-to-print');
       if (!invoiceElement) {
