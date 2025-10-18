@@ -318,6 +318,7 @@ export function PaymentForm({
                                         />
                                         </TableHead>
                                         <TableHead>N° Factura</TableHead>
+                                        <TableHead>Consignatario</TableHead>
                                         <TableHead>Fecha</TableHead>
                                         <TableHead>Valor</TableHead>
                                         <TableHead>Pagos Previos</TableHead>
@@ -337,6 +338,7 @@ export function PaymentForm({
                                                 />
                                             </TableCell>
                                             <TableCell>{invoice.invoiceNumber}</TableCell>
+                                            <TableCell>{invoice.consigneeName}</TableCell>
                                             <TableCell>{format(new Date(invoice.flightDate), 'dd/MM/yyyy')}</TableCell>
                                             <TableCell>${invoice.total.toFixed(2)}</TableCell>
                                             <TableCell>${invoice.payments.toFixed(2)}</TableCell>
