@@ -182,7 +182,8 @@ export function NewInvoiceForm() {
   const watchedItems = form.watch('items');
 
   const totals = useMemo(() => {
-    return watchedItems.reduce((acc, item) => {
+    const currentItems = form.getValues().items;
+    return currentItems.reduce((acc, item) => {
         acc.totalBunches += item.numberOfBunches || 0;
         item.bunches.forEach(bunch => {
             acc.totalBunchesPerBox += bunch.bunchesPerBox || 0;
@@ -197,7 +198,7 @@ export function NewInvoiceForm() {
         totalStems: 0,
         totalValue: 0
     });
-  }, [watchedItems]);
+  }, [watchedItems, form]);
 
   let rowCounter = 0;
 
