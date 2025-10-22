@@ -182,23 +182,59 @@ export function NewInvoiceForm() {
   const watchedItems = form.watch('items');
 
   const totals = useMemo(() => {
-    const currentItems = watchedItems;
-    return currentItems.reduce((acc, item) => {
+    const currentItems = form.getValues().items;
+    const result = currentItems.reduce((acc, item) => {
+        acc.totalBoxes += 1;
         acc.totalBunches += Number(item.numberOfBunches) || 0;
+        
         item.bunches.forEach(bunch => {
+            acc.totalStemsPerBunch += Number(bunch.stemsPerBunch) || 0;
             acc.totalBunchesPerBox += Number(bunch.bunchesPerBox) || 0;
             const totalStems = (Number(bunch.stemsPerBunch) || 0) * (Number(bunch.bunchesPerBox) || 0);
             acc.totalStems += totalStems;
+
+            acc.totalPurchasePrice += Number(bunch.purchasePrice) || 0;
+            acc.totalSalePrice += Number(bunch.salePrice) || 0;
+            acc.bunchCount += 1;
+
+            if ((Number(bunch.purchasePrice) || 0) > 0) {
+                acc.totalDifference += ((Number(bunch.salePrice) - Number(bunch.purchasePrice)) / Number(bunch.purchasePrice)) * 100;
+                acc.differenceCount += 1;
+            } else if ((Number(bunch.salePrice) || 0) > 0) {
+                acc.totalDifference += Infinity;
+                acc.differenceCount += 1;
+            }
+
             acc.totalValue += totalStems * (Number(bunch.salePrice) || 0);
         });
         return acc;
     }, {
+        totalBoxes: 0,
         totalBunches: 0,
+        totalStemsPerBunch: 0,
         totalBunchesPerBox: 0,
         totalStems: 0,
-        totalValue: 0
+        totalPurchasePrice: 0,
+        totalSalePrice: 0,
+        totalValue: 0,
+        bunchCount: 0,
+        totalDifference: 0,
+        differenceCount: 0
     });
-  }, [watchedItems]);
+
+    const averagePurchasePrice = result.bunchCount > 0 ? result.totalPurchasePrice / result.bunchCount : 0;
+    const averageSalePrice = result.bunchCount > 0 ? result.totalSalePrice / result.bunchCount : 0;
+    const averageDifference = result.differenceCount > 0 
+        ? (isFinite(result.totalDifference) ? result.totalDifference / result.differenceCount : Infinity)
+        : 0;
+
+    return {
+        ...result,
+        averagePurchasePrice,
+        averageSalePrice,
+        averageDifference,
+    };
+  }, [watchedItems, form]);
 
   let rowCounter = 0;
 
@@ -870,16 +906,22 @@ export function NewInvoiceForm() {
                                 </React.Fragment>
                             ))}
                         </TableBody>
-                        <TableFooter>
+                         <TableFooter>
                             <TableRow>
-                                <TableCell colSpan={3} className="font-bold">Totales</TableCell>
+                                <TableCell colSpan={2} className="font-bold">Totales</TableCell>
+                                <TableCell className="font-bold">{totals.totalBoxes}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBunches}</TableCell>
-                                <TableCell colSpan={5}></TableCell>
+                                <TableCell colSpan={4}></TableCell>
+                                <TableCell className="font-bold">{totals.totalStemsPerBunch}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBunchesPerBox}</TableCell>
-                                <TableCell colSpan={2}></TableCell>
+                                <TableCell className="font-bold">${totals.averagePurchasePrice.toFixed(2)}</TableCell>
+                                <TableCell className="font-bold">${totals.averageSalePrice.toFixed(2)}</TableCell>
                                 <TableCell className="font-bold">{totals.totalStems}</TableCell>
                                 <TableCell className="font-bold">${totals.totalValue.toFixed(2)}</TableCell>
-                                <TableCell colSpan={2}></TableCell>
+                                <TableCell className="font-bold">
+                                    {isFinite(totals.averageDifference) ? `${totals.averageDifference.toFixed(2)} %` : '∞ %'}
+                                </TableCell>
+                                <TableCell></TableCell>
                             </TableRow>
                         </TableFooter>
                     </Table>
