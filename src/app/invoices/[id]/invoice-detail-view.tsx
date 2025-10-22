@@ -109,7 +109,7 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
                     <div className="w-full text-[10px] border border-gray-400">
                         <div className="flex">
                             <div className="w-1/3 border-r border-gray-400 p-1 font-bold">DATE:</div>
-                            <div className="w-2/3 p-1 text-center">{format(parseISO(invoice.farmDepartureDate), 'MM/dd/yyyy')}</div>
+                            <div className="w-2/3 p-1 text-center">{format(parseISO(invoice.farmDepartureDate), 'dd/MM/yyyy')}</div>
                         </div>
                         <div className="flex border-t border-gray-400">
                             <div className="w-1/3 border-r border-gray-400 p-1 font-bold">No.</div>

@@ -57,7 +57,7 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
       const ws_data: (string | number)[][] = [
         ["INVOICE"],
         [],
-        ["DATE:", format(parseISO(invoice.farmDepartureDate), 'MM/dd/yyyy'), "", "No.", invoice.invoiceNumber],
+        ["DATE:", format(parseISO(invoice.farmDepartureDate), 'dd/MM/yyyy'), "", "No.", invoice.invoiceNumber],
         ["AWB:", invoice.masterAWB],
         ["HAWB:", invoice.houseAWB],
         [],
