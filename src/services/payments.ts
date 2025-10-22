@@ -126,43 +126,35 @@ export async function addPayment(paymentData: Omit<Payment, 'id'>): Promise<stri
 export async function addBulkPayment(
   paymentData: Omit<Payment, 'id' | 'invoiceId' | 'amount'>, 
   invoicesToPay: { invoiceId: string; balance: number; amountToPay: number; type: 'sale' | 'purchase' | 'both', flightDate: string }[],
-  totalAmount: number
 ): Promise<void> {
   if (!db) throw new Error("Firebase is not configured. Check your .env file.");
 
   const batch = writeBatch(db);
-  let remainingAmountToDistribute = totalAmount;
 
-  const sortedInvoices = invoicesToPay.sort((a, b) => new Date(a.flightDate).getTime() - new Date(b.flightDate).getTime());
+  for (const invoice of invoicesToPay) {
+    if (invoice.amountToPay <= 0) continue;
 
-  for (const { invoiceId, balance, flightDate } of sortedInvoices) {
-    if (remainingAmountToDistribute <= 0) continue;
-
-    const amountForThisInvoice = Math.min(remainingAmountToDistribute, balance);
-    
     const newPaymentRef = doc(collection(db, 'payments'));
     const newPaymentData = {
       ...paymentData,
-      invoiceId: invoiceId,
-      amount: amountForThisInvoice,
+      invoiceId: invoice.invoiceId,
+      amount: invoice.amountToPay,
       paymentDate: new Date(paymentData.paymentDate),
     };
     batch.set(newPaymentRef, newPaymentData);
 
-    const newBalance = balance - amountForThisInvoice;
+    const newBalance = invoice.balance - invoice.amountToPay;
     let newStatus: 'Paid' | 'Pending' | 'Overdue';
     if (newBalance <= 0.01) {
         newStatus = 'Paid';
     } else {
-       const dueDate = new Date(flightDate);
-       dueDate.setDate(dueDate.getDate() + 30);
+       const dueDate = new Date(invoice.flightDate);
+       dueDate.setDate(dueDate.getDate() + 30); // Assuming 30 days payment term
        newStatus = new Date() > dueDate ? 'Overdue' : 'Pending';
     }
 
-    const invoiceRef = doc(db, 'invoices', invoiceId);
+    const invoiceRef = doc(db, 'invoices', invoice.invoiceId);
     batch.update(invoiceRef, { status: newStatus });
-    
-    remainingAmountToDistribute -= amountForThisInvoice;
   }
 
   await batch.commit();

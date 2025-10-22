@@ -70,7 +70,7 @@ type PaymentFormData = z.infer<typeof formSchema>;
 type FormSubmitData = Omit<Payment, 'id' | 'invoiceId' | 'amount'>;
 
 type PaymentFormProps = {
-  onSubmit: (paymentDetails: FormSubmitData, selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', flightDate: string, amountToPay: number }[], totalAmount: number) => Promise<boolean>;
+  onSubmit: (paymentDetails: FormSubmitData, selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', flightDate: string, amountToPay: number }[]) => Promise<boolean>;
   isSubmitting: boolean;
   customers: Customer[];
   fincas: Finca[];
@@ -217,8 +217,6 @@ export function PaymentForm({
           };
       });
 
-    const totalAmount = invoicesToPay.reduce((sum, inv) => sum + inv.amountToPay, 0);
-
     const finalPaymentDetails: FormSubmitData = {
       type: paymentType,
       paymentDate: paymentDetails.paymentDate.toISOString(),
@@ -227,7 +225,7 @@ export function PaymentForm({
       notes: paymentDetails.notes,
     };
 
-    const success = await onSubmit(finalPaymentDetails, invoicesToPay, totalAmount);
+    const success = await onSubmit(finalPaymentDetails, invoicesToPay);
 
     if (success) {
         form.reset({
@@ -244,6 +242,14 @@ export function PaymentForm({
   const handleSelectAll = (checked: boolean) => {
     const updatedInvoices = paymentInvoices.map(inv => ({...inv, isSelected: checked}));
     replace(updatedInvoices);
+    form.trigger("paymentInvoices");
+  };
+
+  const handleSingleSelect = (checked: boolean, index: number) => {
+    const updatedInvoices = [...paymentInvoices];
+    updatedInvoices[index].isSelected = checked;
+    replace(updatedInvoices);
+    form.trigger("paymentInvoices");
   };
   
   const entities = paymentType === 'purchase' ? fincas : customers;
@@ -319,7 +325,7 @@ export function PaymentForm({
                                                     render={({ field: checkboxField }) => (
                                                         <Checkbox
                                                             checked={checkboxField.value}
-                                                            onCheckedChange={checkboxField.onChange}
+                                                            onCheckedChange={(checked) => handleSingleSelect(checked === true, index)}
                                                         />
                                                     )}
                                                 />
@@ -419,7 +425,7 @@ export function PaymentForm({
                         <FormItem>
                         <FormLabel>Referencia / Banco</FormLabel>
                         <FormControl>
-                            <Input placeholder="Ej: Banco Pichincha" {...field} />
+                            <Input placeholder="Ej: Banco Pichincha" {...field} value={field.value || ''}/>
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -433,7 +439,7 @@ export function PaymentForm({
                     <FormItem>
                         <FormLabel>Notas Adicionales</FormLabel>
                         <FormControl>
-                        <Textarea placeholder="Ej: Pago masivo de facturas de Septiembre" {...field} />
+                        <Textarea placeholder="Ej: Pago masivo de facturas de Septiembre" {...field} value={field.value || ''}/>
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -473,6 +479,12 @@ export function PaymentForm({
                             <TableCell className="text-right">${p.amountToApply.toFixed(2)}</TableCell>
                         </TableRow>
                     ))}
+                     <TableRow className="font-bold bg-muted/50">
+                        <TableCell>Total</TableCell>
+                        <TableCell className="text-right">
+                           ${(paymentPreview?.reduce((acc, p) => acc + p.amountToApply, 0) || 0).toFixed(2)}
+                        </TableCell>
+                    </TableRow>
                 </TableBody>
             </Table>
           </div>

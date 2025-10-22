@@ -15,12 +15,11 @@ export function RecordPurchasePaymentClient() {
 
   const handleAddBulkPayment = async (
     paymentDetails: Omit<Payment, 'id' | 'invoiceId' | 'amount'>,
-    selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', flightDate: string }[],
-    totalAmount: number
+    selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', flightDate: string, amountToPay: number }[]
   ) => {
     setIsSubmitting(true);
     try {
-      await addBulkPayment(paymentDetails, selectedInvoices, totalAmount);
+      await addBulkPayment(paymentDetails, selectedInvoices);
       toast({
         title: "Éxito",
         description: "El pago de la compra ha sido registrado y la(s) factura(s) actualizada(s).",

@@ -15,12 +15,11 @@ export function PaymentClient() {
 
   const handleAddBulkPayment = async (
     paymentDetails: Omit<Payment, 'id' | 'invoiceId' | 'amount'>,
-    selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', flightDate: string }[],
-    totalAmount: number
+    selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', flightDate: string, amountToPay: number }[]
   ) => {
     setIsSubmitting(true);
     try {
-      await addBulkPayment(paymentDetails, selectedInvoices, totalAmount);
+      await addBulkPayment(paymentDetails, selectedInvoices);
       toast({
         title: "Éxito",
         description: "El pago ha sido registrado y las facturas actualizadas.",
