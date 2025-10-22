@@ -345,6 +345,7 @@ export function PaymentForm({
                                                             placeholder="0.00"
                                                             disabled={!paymentInvoices[index]?.isSelected}
                                                             {...inputField}
+                                                            onBlur={() => form.trigger("paymentInvoices")}
                                                             onChange={(e) => {
                                                                 const value = parseFloat(e.target.value);
                                                                 const validatedValue = isNaN(value) ? 0 : Math.min(value, field.balance);
