@@ -44,7 +44,7 @@ const bunchItemSchema = z.object({
   product: z.string().min(1, 'Product name is required'),
   variety: z.string().min(1, 'Variety is required.'),
   color: z.string().min(1, 'Color is required.'),
-  length: z.coerce.number().positive('Must be > 0'),
+  length: z.string().min(1, 'Length is required.'),
   stemsPerBunch: z.coerce.number().positive('Must be > 0'),
   bunchesPerBox: z.coerce.number().min(0, 'Must be >= 0'),
   purchasePrice: z.coerce.number().min(0, 'Must be >= 0'),
@@ -308,7 +308,7 @@ export function NewInvoiceForm() {
             product: '',
             variety: '',
             color: '',
-            length: 70,
+            length: '70',
             stemsPerBunch: 25,
             bunchesPerBox: 1,
             purchasePrice: 0,
@@ -325,7 +325,7 @@ export function NewInvoiceForm() {
         product: '',
         variety: '',
         color: '',
-        length: 70,
+        length: '70',
         stemsPerBunch: 25,
         bunchesPerBox: 0,
         purchasePrice: 0,
@@ -870,7 +870,7 @@ export function NewInvoiceForm() {
                                                         <SelectContent>{colors.map(c => <SelectItem key={c.productoId} value={c.color}>{c.color}</SelectItem>)}</SelectContent>
                                                     </Select>
                                                 )}/></TableCell>
-                                                <TableCell><FormField control={form.control} name={`${bunchPath}.length`} render={({ field }) => <Input type="number" {...field} value={field.value ?? 0} className="w-24 py-2"/>}/></TableCell>
+                                                <TableCell><FormField control={form.control} name={`${bunchPath}.length`} render={({ field }) => <Input type="text" {...field} value={field.value ?? ''} className="w-24 py-2"/>}/></TableCell>
                                                 <TableCell><FormField control={form.control} name={`${bunchPath}.stemsPerBunch`} render={({ field }) => <Input type="number" {...field} value={field.value ?? 0} className="w-24 py-2"/>}/></TableCell>
                                                 <TableCell>
                                                     <FormField 

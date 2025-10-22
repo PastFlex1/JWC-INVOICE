@@ -23,7 +23,7 @@ export interface BunchItem {
   product: string; 
   color: string;
   variety: string; 
-  length: number;
+  length: string;
   stemsPerBunch: number;
   bunchesPerBox: number;
   purchasePrice: number;
