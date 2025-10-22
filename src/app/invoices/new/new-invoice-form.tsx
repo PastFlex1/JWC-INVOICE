@@ -59,8 +59,8 @@ const lineItemSchema = z.object({
   numberOfBunches: z.coerce.number().min(0, '# Ramos must be >= 0'),
   bunches: z.array(bunchItemSchema).min(1, 'At least one bunch is required.'),
 }).refine(data => {
-    const totalBunchesInBox = data.bunches.reduce((acc, bunch) => acc + (bunch.bunchesPerBox || 0), 0);
-    return totalBunchesInBox === data.numberOfBunches;
+    const totalBunchesInBox = data.bunches.reduce((acc, bunch) => acc + (Number(bunch.bunchesPerBox) || 0), 0);
+    return totalBunchesInBox === (Number(data.numberOfBunches) || 0);
 }, {
     message: "La suma de 'Ramos/Caja' debe ser igual al total de # Ramos.",
     path: ['numberOfBunches'],
@@ -182,14 +182,14 @@ export function NewInvoiceForm() {
   const watchedItems = form.watch('items');
 
   const totals = useMemo(() => {
-    const currentItems = form.getValues().items;
+    const currentItems = watchedItems;
     return currentItems.reduce((acc, item) => {
-        acc.totalBunches += item.numberOfBunches || 0;
+        acc.totalBunches += Number(item.numberOfBunches) || 0;
         item.bunches.forEach(bunch => {
-            acc.totalBunchesPerBox += bunch.bunchesPerBox || 0;
-            const totalStems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0);
+            acc.totalBunchesPerBox += Number(bunch.bunchesPerBox) || 0;
+            const totalStems = (Number(bunch.stemsPerBunch) || 0) * (Number(bunch.bunchesPerBox) || 0);
             acc.totalStems += totalStems;
-            acc.totalValue += totalStems * (bunch.salePrice || 0);
+            acc.totalValue += totalStems * (Number(bunch.salePrice) || 0);
         });
         return acc;
     }, {
@@ -198,7 +198,7 @@ export function NewInvoiceForm() {
         totalStems: 0,
         totalValue: 0
     });
-  }, [watchedItems, form]);
+  }, [watchedItems]);
 
   let rowCounter = 0;
 
@@ -833,7 +833,20 @@ export function NewInvoiceForm() {
                                                 )}/></TableCell>
                                                 <TableCell><FormField control={form.control} name={`${bunchPath}.length`} render={({ field }) => <Input type="number" {...field} value={field.value ?? 0} className="w-24 py-2"/>}/></TableCell>
                                                 <TableCell><FormField control={form.control} name={`${bunchPath}.stemsPerBunch`} render={({ field }) => <Input type="number" {...field} value={field.value ?? 0} className="w-24 py-2"/>}/></TableCell>
-                                                <TableCell><FormField control={form.control} name={`${bunchPath}.bunchesPerBox`} render={({ field }) => <Input type="number" {...field} onBlur={() => form.trigger(`items.${lineItemIndex}.numberOfBunches`)} value={field.value ?? 0} className="w-24 py-2"/>}/></TableCell>
+                                                <TableCell>
+                                                    <FormField 
+                                                        control={form.control} 
+                                                        name={`${bunchPath}.bunchesPerBox`} 
+                                                        render={({ field }) => (
+                                                            <Input 
+                                                                type="number" {...field} 
+                                                                onBlur={() => form.trigger(`items.${lineItemIndex}.numberOfBunches`)} 
+                                                                value={field.value ?? 0} 
+                                                                className="w-24 py-2"
+                                                            />
+                                                        )}
+                                                    />
+                                                </TableCell>
                                                 <TableCell><FormField control={form.control} name={`${bunchPath}.purchasePrice`} render={({ field }) => <Input type="number" step="0.01" {...field} value={field.value ?? 0} className="w-24 py-2"/>}/></TableCell>
                                                 <TableCell><FormField control={form.control} name={`${bunchPath}.salePrice`} render={({ field }) => <Input type="number" step="0.01" {...field} value={field.value ?? 0} className="w-24 py-2"/>}/></TableCell>
                                                 <TableCell><Input readOnly disabled value={totalStems} className="w-24 bg-muted/50 py-2" /></TableCell>
