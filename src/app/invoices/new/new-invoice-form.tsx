@@ -13,7 +13,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
@@ -178,6 +178,26 @@ export function NewInvoiceForm() {
     control: form.control,
     name: 'items',
   });
+
+  const watchedItems = form.watch('items');
+
+  const totals = useMemo(() => {
+    return watchedItems.reduce((acc, item) => {
+        acc.totalBunches += item.numberOfBunches || 0;
+        item.bunches.forEach(bunch => {
+            acc.totalBunchesPerBox += bunch.bunchesPerBox || 0;
+            const totalStems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0);
+            acc.totalStems += totalStems;
+            acc.totalValue += totalStems * (bunch.salePrice || 0);
+        });
+        return acc;
+    }, {
+        totalBunches: 0,
+        totalBunchesPerBox: 0,
+        totalStems: 0,
+        totalValue: 0
+    });
+  }, [watchedItems]);
 
   let rowCounter = 0;
 
@@ -735,9 +755,8 @@ export function NewInvoiceForm() {
                                         const purchasePrice = form.watch(`${bunchPath}.purchasePrice`) || 0;
                                         const stemsPerBunch = form.watch(`${bunchPath}.stemsPerBunch`) || 0;
                                         const bunchesPerBox = form.watch(`${bunchPath}.bunchesPerBox`) || 0;
-                                        const boxNumber = form.watch(`${lineItemPath}.boxNumber`) || 0;
 
-                                        const totalStems = stemsPerBunch * bunchesPerBox * boxNumber;
+                                        const totalStems = stemsPerBunch * bunchesPerBox;
                                         const totalValue = (totalStems * salePrice).toFixed(2);
                                         
                                         let differencePercent = '0 %';
@@ -837,6 +856,18 @@ export function NewInvoiceForm() {
                                 </React.Fragment>
                             ))}
                         </TableBody>
+                        <TableFooter>
+                            <TableRow>
+                                <TableCell colSpan={3} className="font-bold">Totales</TableCell>
+                                <TableCell className="font-bold">{totals.totalBunches}</TableCell>
+                                <TableCell colSpan={5}></TableCell>
+                                <TableCell className="font-bold">{totals.totalBunchesPerBox}</TableCell>
+                                <TableCell colSpan={2}></TableCell>
+                                <TableCell className="font-bold">{totals.totalStems}</TableCell>
+                                <TableCell className="font-bold">${totals.totalValue.toFixed(2)}</TableCell>
+                                <TableCell colSpan={2}></TableCell>
+                            </TableRow>
+                        </TableFooter>
                     </Table>
                 </div>
                 <FormMessage>{form.formState.errors.items?.message || form.formState.errors.items?.root?.message}</FormMessage>
