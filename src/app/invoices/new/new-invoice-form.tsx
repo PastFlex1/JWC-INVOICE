@@ -186,7 +186,7 @@ export function NewInvoiceForm() {
     const currentItems = form.getValues().items;
     const result = currentItems.reduce((acc, item) => {
         acc.totalBoxTypeValue += boxTypeValues[item.boxType] || 0;
-        acc.totalBoxes += 1;
+        acc.totalBoxes += Number(item.boxNumber) || 0;
         acc.totalBunches += Number(item.numberOfBunches) || 0;
         
         item.bunches.forEach(bunch => {
