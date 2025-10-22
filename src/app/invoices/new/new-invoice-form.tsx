@@ -182,8 +182,10 @@ export function NewInvoiceForm() {
   const watchedItems = form.watch('items');
 
   const totals = useMemo(() => {
+    const boxTypeValues = { eb: 0.13, qb: 0.25, hb: 0.50, jhb: 0.50 };
     const currentItems = form.getValues().items;
     const result = currentItems.reduce((acc, item) => {
+        acc.totalBoxTypeValue += boxTypeValues[item.boxType] || 0;
         acc.totalBoxes += 1;
         acc.totalBunches += Number(item.numberOfBunches) || 0;
         
@@ -209,6 +211,7 @@ export function NewInvoiceForm() {
         });
         return acc;
     }, {
+        totalBoxTypeValue: 0,
         totalBoxes: 0,
         totalBunches: 0,
         totalStemsPerBunch: 0,
@@ -909,9 +912,10 @@ export function NewInvoiceForm() {
                          <TableFooter>
                             <TableRow>
                                 <TableCell colSpan={2} className="font-bold">Totales</TableCell>
+                                <TableCell className="font-bold">{totals.totalBoxTypeValue.toFixed(2)}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBoxes}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBunches}</TableCell>
-                                <TableCell colSpan={4}></TableCell>
+                                <TableCell colSpan={3}></TableCell>
                                 <TableCell className="font-bold">{totals.totalStemsPerBunch}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBunchesPerBox}</TableCell>
                                 <TableCell className="font-bold">${totals.averagePurchasePrice.toFixed(2)}</TableCell>
