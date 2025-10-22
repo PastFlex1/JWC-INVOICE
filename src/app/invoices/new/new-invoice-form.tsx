@@ -911,11 +911,11 @@ export function NewInvoiceForm() {
                         </TableBody>
                          <TableFooter>
                             <TableRow>
-                                <TableCell colSpan={2} className="font-bold">Totales</TableCell>
-                                <TableCell className="font-bold">{totals.totalBoxTypeValue.toFixed(2)}</TableCell>
+                                <TableCell colSpan={1} className="font-bold">Totales</TableCell>
                                 <TableCell className="font-bold">{totals.totalBoxes}</TableCell>
+                                <TableCell className="font-bold">{totals.totalBoxTypeValue.toFixed(2)}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBunches}</TableCell>
-                                <TableCell colSpan={3}></TableCell>
+                                <TableCell colSpan={4}></TableCell>
                                 <TableCell className="font-bold">{totals.totalStemsPerBunch}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBunchesPerBox}</TableCell>
                                 <TableCell className="font-bold">${totals.averagePurchasePrice.toFixed(2)}</TableCell>
