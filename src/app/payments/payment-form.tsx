@@ -49,7 +49,6 @@ const paymentInvoiceSchema = z.object({
 const formSchema = z.object({
   entityId: z.string().min(1, { message: "Por favor seleccione una entidad." }),
   paymentInvoices: z.array(paymentInvoiceSchema),
-  totalAmount: z.coerce.number().gt(0, { message: "El monto total debe ser mayor que cero." }),
   paymentDate: z.date({ required_error: "La fecha es requerida." }),
   paymentMethod: z.enum(['Efectivo', 'Transferencia', 'Cheque', 'Tarjeta de Crédito', 'Tarjeta de Débito', 'Transferencia Internacional']),
   reference: z.string().optional(),
@@ -58,10 +57,11 @@ const formSchema = z.object({
     message: "Debe seleccionar al menos una factura.",
     path: ["paymentInvoices"],
 }).refine(data => {
-    const selectedAndPaidInvoices = data.paymentInvoices.filter(inv => inv.isSelected && (inv.amountToPay || 0) > 0);
-    return selectedAndPaidInvoices.length > 0;
+    const selectedInvoices = data.paymentInvoices.filter(inv => inv.isSelected);
+    const totalAmount = selectedInvoices.reduce((acc, inv) => acc + (inv.amountToPay || 0), 0);
+    return totalAmount > 0;
 }, {
-    message: "Debe ingresar un monto de abono para al menos una factura seleccionada.",
+    message: "El monto total a pagar (la suma de los abonos) debe ser mayor que cero.",
     path: ["paymentInvoices"],
 });
 
@@ -105,7 +105,6 @@ export function PaymentForm({
     defaultValues: {
       entityId: '',
       paymentInvoices: [],
-      totalAmount: 0,
       paymentDate: new Date(),
       paymentMethod: 'Transferencia',
       reference: '',
@@ -185,16 +184,6 @@ export function PaymentForm({
     }
   }, [selectedEntityId, paymentType, invoices, creditNotes, debitNotes, payments, consignatarios, customers, fincas, form, consignatarioMap, customerMap, replace]);
 
-  useEffect(() => {
-    const total = paymentInvoices.reduce((acc, current) => {
-        if (current.isSelected && current.amountToPay) {
-            return acc + current.amountToPay;
-        }
-        return acc;
-    }, 0);
-    form.setValue('totalAmount', total);
-  }, [paymentInvoices, form]);
-
 
   const handlePreview = () => {
     form.trigger().then(isValid => {
@@ -212,7 +201,7 @@ export function PaymentForm({
   };
 
   async function handleSubmit(values: PaymentFormData) {
-    const { entityId, totalAmount, ...paymentDetails } = values;
+    const { entityId, ...paymentDetails } = values;
     
     const invoicesToPay = values.paymentInvoices
       .filter(inv => inv.isSelected && (inv.amountToPay || 0) > 0)
@@ -228,6 +217,8 @@ export function PaymentForm({
           };
       });
 
+    const totalAmount = invoicesToPay.reduce((sum, inv) => sum + inv.amountToPay, 0);
+
     const finalPaymentDetails: FormSubmitData = {
       type: paymentType,
       paymentDate: paymentDetails.paymentDate.toISOString(),
@@ -242,7 +233,6 @@ export function PaymentForm({
         form.reset({
             ...form.getValues(),
             paymentInvoices: [],
-            totalAmount: 0,
             paymentDate: new Date(),
             reference: '',
             notes: '',
@@ -376,20 +366,6 @@ export function PaymentForm({
           {paymentInvoices.some(inv => inv.isSelected) && (
              <div className="space-y-4 border p-4 rounded-md">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                     <FormField
-                        control={form.control}
-                        name="totalAmount"
-                        render={({ field }) => (
-                            <FormItem>
-                            <FormLabel>Monto Total a Pagar</FormLabel>
-                            <FormControl>
-                                <Input type="number" {...field} readOnly className="bg-muted font-bold" />
-                            </FormControl>
-                            <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-
                     <FormField control={form.control} name="paymentDate" render={({ field }) => (
                         <FormItem className="flex flex-col">
                         <FormLabel>Fecha de Pago</FormLabel>
@@ -409,9 +385,6 @@ export function PaymentForm({
                         <FormMessage />
                         </FormItem>
                     )}/>
-                </div>
-                
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField
                     control={form.control}
                     name="paymentMethod"
@@ -437,7 +410,9 @@ export function PaymentForm({
                         </FormItem>
                     )}
                     />
-                    <FormField
+                </div>
+                
+                <FormField
                     control={form.control}
                     name="reference"
                     render={({ field }) => (
@@ -449,8 +424,7 @@ export function PaymentForm({
                         <FormMessage />
                         </FormItem>
                     )}
-                    />
-                </div>
+                />
                 
                 <FormField
                     control={form.control}
@@ -481,7 +455,7 @@ export function PaymentForm({
           <AlertDialogHeader>
             <AlertDialogTitle>Confirmar Distribución de Pago</AlertDialogTitle>
             <AlertDialogDescription>
-                El monto total de ${form.getValues('totalAmount').toFixed(2)} se aplicará a las facturas seleccionadas de la siguiente manera. ¿Desea continuar?
+                El monto total se aplicará a las facturas seleccionadas de la siguiente manera. ¿Desea continuar?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="max-h-60 overflow-y-auto">
