@@ -71,7 +71,7 @@ export function CreditNoteForm({ onSubmit, onClose, isSubmitting, invoices, cust
           }, 0);
           return { ...inv, total };
         })
-        .sort((a, b) => new Date(b.farmDepartureDate).getTime() - new Date(a.farmDepartureDate).getTime());
+        .sort((a, b) => new Date(a.farmDepartureDate).getTime() - new Date(b.farmDepartureDate).getTime());
       setFilteredInvoices(customerInvoices);
       form.setValue('invoiceId', '');
     } else {

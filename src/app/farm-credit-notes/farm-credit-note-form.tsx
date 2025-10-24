@@ -65,7 +65,7 @@ export function FarmCreditNoteForm({ onSubmit, onClose, isSubmitting, invoices, 
           }, 0);
           return { ...inv, total };
         })
-        .sort((a, b) => new Date(b.farmDepartureDate).getTime() - new Date(a.farmDepartureDate).getTime());
+        .sort((a, b) => new Date(a.farmDepartureDate).getTime() - new Date(b.farmDepartureDate).getTime());
       setFilteredInvoices(fincaInvoices);
       form.setValue('invoiceId', '');
     } else {
