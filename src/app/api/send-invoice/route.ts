@@ -24,40 +24,25 @@ export async function POST(request: Request) {
     if (toEmails.length === 0) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
     }
-    
-    // Path to the logo file in the public directory
-    const logoPath = path.join(process.cwd(), 'public', 'logo.png');
-    const logoBuffer = fs.readFileSync(logoPath);
-    const logoBase64 = logoBuffer.toString('base64');
 
     const signatureHtml = `
       <br><br>
       <div style="font-family: Arial, sans-serif; font-size: 12px; color: #555; margin-top: 15px;">
-        <img src="cid:logo.png" alt="JCW Flowers Logo" width="150" style="margin-bottom: 10px;" />
         <p style="margin: 0;">Best Regards</p>
         <p style="margin: 0;">Team: JCW FLOWERS</p>
-        <p style="margin: 0;">Team: Alexa JCW FLOWERS</p>
+        <p style="margin: 0;">Teams: Alexa JCW FLOWERS</p>
         <p style="margin: 0;">Email: jcwf@outlook.es</p>
       </div>
     `;
 
     const emailHtml = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${emailBody.replace(/\n/g, '<br>')}</div>${signatureHtml}`;
 
-    const allAttachments = [
-        ...pdfAttachments,
-        {
-            filename: 'logo.png',
-            content: logoBase64,
-            cid: 'logo.png',
-        }
-    ];
-
     await resend.emails.send({
       from: 'jwcf <facturacion@puntodeventastore.store>',
       to: toEmails,
       subject: subject,
       html: emailHtml,
-      attachments: allAttachments,
+      attachments: pdfAttachments,
     });
 
     return NextResponse.json({ message: 'Email sent successfully!' }, { status: 200 });
