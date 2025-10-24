@@ -167,6 +167,7 @@ export function NewInvoiceForm() {
 
 
   const farmDepartureDate = form.watch('farmDepartureDate');
+  const watchedItems = form.watch('items');
 
   useEffect(() => {
     if (farmDepartureDate && form.formState.dirtyFields.farmDepartureDate) {
@@ -180,14 +181,12 @@ export function NewInvoiceForm() {
     name: 'items',
   });
 
-  const watchedItems = form.watch('items');
-
   const totals = useMemo(() => {
     const boxTypeValues = { eb: 0.13, qb: 0.25, hb: 0.50, jhb: 0.50 };
-    const currentItems = form.getValues().items;
+    const currentItems = watchedItems || [];
     const result = currentItems.reduce((acc, item) => {
         acc.totalBoxTypeValue += boxTypeValues[item.boxType] || 0;
-        acc.totalBoxes += Number(item.boxNumber) || 0;
+        acc.totalBoxes += 1;
         acc.totalBunches += Number(item.numberOfBunches) || 0;
         
         item.bunches.forEach(bunch => {
@@ -238,7 +237,7 @@ export function NewInvoiceForm() {
         averageSalePrice,
         averageDifference,
     };
-  }, [watchedItems, form]);
+  }, [watchedItems]);
 
   let rowCounter = 0;
 
@@ -408,12 +407,14 @@ export function NewInvoiceForm() {
           description: "La factura ha sido actualizada correctamente.",
         });
       } else {
-        await addInvoice(invoiceData);
+        await addInvoice(invoiceData as Omit<Invoice, 'id' | 'saleStatus' | 'purchaseStatus'>);
         toast({
           title: t('invoices.new.toast.successTitle'),
           description: t('invoices.new.toast.successDescription'),
         });
-        sessionStorage.removeItem(SESSION_STORAGE_KEY);
+        if (!duplicateId) { // Only clear session storage for brand new invoices
+          sessionStorage.removeItem(SESSION_STORAGE_KEY);
+        }
       }
 
       await refreshData();
@@ -424,7 +425,7 @@ export function NewInvoiceForm() {
       console.error('Error saving invoice:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
       toast({
-        title: id ? 'Error al Actualizar' : t('invoices.new.toast.errorTitle'),
+        title: editId ? 'Error al Actualizar' : t('invoices.new.toast.errorTitle'),
         description: `No se pudo guardar la factura: ${errorMessage}.`,
         variant: 'destructive',
         duration: 10000,
@@ -840,7 +841,7 @@ export function NewInvoiceForm() {
                                                             render={({ field }) => (
                                                                 <FormItem>
                                                                     <FormControl>
-                                                                        <Input type="number" {...field} value={field.value ?? 0} className="w-24 py-2" />
+                                                                        <Input type="number" {...field} value={field.value ?? 0} className="w-24 py-2" onBlur={() => form.trigger(`items.${lineItemIndex}.numberOfBunches`)} />
                                                                     </FormControl>
                                                                     <FormMessage />
                                                                 </FormItem>
