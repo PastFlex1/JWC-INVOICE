@@ -118,13 +118,12 @@ export function PaymentForm({
   });
 
   const selectedEntityId = form.watch('entityId');
-  const paymentInvoices = form.watch('paymentInvoices');
+  const watchedPaymentInvoices = form.watch('paymentInvoices');
 
   useEffect(() => {
     if (selectedEntityId && paymentType) {
         const entityInvoices = invoices.filter(inv => {
           const isCorrectType = inv.type === paymentType || inv.type === 'both';
-          const isNotPaid = inv.status !== 'Paid';
           
           let isCorrectEntity = false;
           if (paymentType === 'purchase') {
@@ -133,7 +132,7 @@ export function PaymentForm({
             isCorrectEntity = inv.customerId === selectedEntityId;
           }
           
-          return isCorrectEntity && isCorrectType && isNotPaid;
+          return isCorrectEntity && isCorrectType;
         });
 
         const calculatedInvoices = entityInvoices.map(invoice => {
@@ -142,16 +141,16 @@ export function PaymentForm({
               const priceField = paymentType === 'purchase' ? 'purchasePrice' : 'salePrice';
               return acc + item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
                 const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
-                return bunchAcc + (stems * bunch[priceField]);
+                return bunchAcc + (stems * (bunch[priceField] || 0));
               }, 0);
             }, 0);
 
-            const credits = creditNotes.filter(cn => cn.invoiceId === invoice.id && cn.type === paymentType).reduce((sum, note) => sum + note.amount, 0);
-            const debits = debitNotes.filter(dn => dn.invoiceId === invoice.id && dn.type === paymentType).reduce((sum, note) => sum + note.amount, 0);
-            const paid = payments.filter(p => p.invoiceId === invoice.id && p.type === paymentType).reduce((sum, payment) => sum + payment.amount, 0);
+            const creditsForType = creditNotes.filter(cn => cn.invoiceId === invoice.id && cn.type === paymentType).reduce((sum, note) => sum + note.amount, 0);
+            const debitsForType = debitNotes.filter(dn => dn.invoiceId === invoice.id && dn.type === paymentType).reduce((sum, note) => sum + note.amount, 0);
+            const paidForType = payments.filter(p => p.invoiceId === invoice.id && p.type === paymentType).reduce((sum, payment) => sum + payment.amount, 0);
             
-            const total = subtotal + debits - credits;
-            const balance = total - paid;
+            const total = subtotal + debitsForType - creditsForType;
+            const balance = total - paidForType;
             
             let consigneeName = '';
             if(paymentType === 'sale'){
@@ -192,7 +191,7 @@ export function PaymentForm({
             return;
         }
 
-        const preview = paymentInvoices
+        const preview = watchedPaymentInvoices
             .filter(inv => inv.isSelected && (inv.amountToPay || 0) > 0)
             .map(inv => ({ invoiceNumber: inv.invoiceNumber, amountToApply: inv.amountToPay! }));
         
@@ -240,13 +239,13 @@ export function PaymentForm({
   }
 
   const handleSelectAll = (checked: boolean) => {
-    const updatedInvoices = paymentInvoices.map(inv => ({...inv, isSelected: checked}));
+    const updatedInvoices = watchedPaymentInvoices.map(inv => ({...inv, isSelected: checked}));
     replace(updatedInvoices);
     form.trigger("paymentInvoices");
   };
 
   const handleSingleSelect = (checked: boolean, index: number) => {
-    const updatedInvoices = [...paymentInvoices];
+    const updatedInvoices = [...watchedPaymentInvoices];
     updatedInvoices[index].isSelected = checked;
     replace(updatedInvoices);
     form.trigger("paymentInvoices");
@@ -343,7 +342,7 @@ export function PaymentForm({
                                                             type="number"
                                                             step="0.01"
                                                             placeholder="0.00"
-                                                            disabled={!paymentInvoices[index]?.isSelected}
+                                                            disabled={!watchedPaymentInvoices[index]?.isSelected}
                                                             {...inputField}
                                                             onBlur={() => form.trigger("paymentInvoices")}
                                                             onChange={(e) => {
@@ -370,7 +369,7 @@ export function PaymentForm({
             </Card>
           )}
 
-          {paymentInvoices.some(inv => inv.isSelected) && (
+          {watchedPaymentInvoices.some(inv => inv.isSelected) && (
              <div className="space-y-4 border p-4 rounded-md">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="paymentDate" render={({ field }) => (
@@ -450,7 +449,7 @@ export function PaymentForm({
           )}
           
           <div className="flex justify-end gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={handlePreview} disabled={isSubmitting || !paymentInvoices.some(inv => inv.isSelected)}>
+              <Button type="button" variant="outline" onClick={handlePreview} disabled={isSubmitting || !watchedPaymentInvoices.some(inv => inv.isSelected)}>
                 Previsualizar Pago
               </Button>
           </div>

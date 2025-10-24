@@ -70,7 +70,7 @@ export async function addPayment(paymentData: Omit<Payment, 'id'>): Promise<stri
       const priceField = invoiceData.type === 'purchase' ? 'purchasePrice' : 'salePrice';
       return acc + item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
         const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
-        return bunchAcc + (stems * bunch[priceField]);
+        return bunchAcc + (stems * (bunch[priceField] || 0));
       }, 0);
     }, 0);
 
