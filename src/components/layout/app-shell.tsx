@@ -92,6 +92,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { href: '/view-payments', label: "Ver Pagos", icon: BookCheck },
   ];
 
+  const settingsNavItems = [
+    { href: '/settings', label: 'Configuración', icon: Settings },
+  ];
+
   const documentLinks = [
     { href: '/credit-notes', label: 'Notas de Crédito (Cliente)', icon: FileText },
     { href: '/debit-notes', label: 'Notas de Débito (Cliente)', icon: FileText },
@@ -129,6 +133,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <h3 className="mb-2 px-2 text-lg font-semibold tracking-tight transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">{t('sidebar.main')}</h3>
             <div className="space-y-1">
                {mainNavItems.map((item) => (
+                <SidebarMenuItem key={item.href}>
+                  <SidebarMenuButton
+                    asChild
+                    isActive={pathname.startsWith(item.href)}
+                    className="gap-3"
+                    tooltip={item.label}
+                  >
+                    <Link href={item.href} prefetch={true}>
+                      <item.icon className="h-5 w-5" />
+                      <span className='transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0'>{item.label}</span>
+                    </Link>
+                  </SidebarMenuButton>
+                </SidebarMenuItem>
+              ))}
+            </div>
+          </div>
+          <div className="px-4 py-2">
+            <h3 className="mb-2 px-2 text-lg font-semibold tracking-tight transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">Configuración</h3>
+            <div className="space-y-1">
+               {settingsNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     asChild
