@@ -44,7 +44,7 @@ const bunchItemSchema = z.object({
   product: z.string().min(1, 'Product name is required'),
   variety: z.string().min(1, 'Variety is required.'),
   color: z.string().min(1, 'Color is required.'),
-  length: z.string().regex(/^\s*\d+\s*(-\s*\d+\s*)?$/, 'La longitud debe ser un número o un rango (ej: 40-50)'),
+  length: z.string().regex(/^\s*\d+\s*(-?\s*\d+\s*)?$/, 'La longitud debe ser un número o un rango (ej: 40-50)'),
   stemsPerBunch: z.coerce.number().positive('Must be > 0'),
   bunchesPerBox: z.coerce.number().min(0, 'Must be >= 0'),
   purchasePrice: z.coerce.number().min(0, 'Must be >= 0'),
@@ -129,10 +129,12 @@ export function NewInvoiceForm() {
             bunches: item.bunches.map(bunch => ({
               ...bunch,
               id: uuidv4(),
+              length: String(bunch.length), // Ensure length is a string
             })),
           })),
         };
-        delete dataForForm.status; // Remove old status field if present
+        delete dataForForm.saleStatus;
+        delete dataForForm.purchaseStatus;
         form.reset(dataForForm);
       } else {
         console.warn(`Invoice with id ${idToLoad} not found.`);
@@ -926,8 +928,8 @@ export function NewInvoiceForm() {
                          <TableFooter>
                             <TableRow>
                                 <TableCell colSpan={2} className="font-bold">Totales</TableCell>
-                                <TableCell className="font-bold">{totals.totalBoxes}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBoxTypeValue.toFixed(2)}</TableCell>
+                                <TableCell className="font-bold">{totals.totalBoxes}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBunches}</TableCell>
                                 <TableCell colSpan={3}></TableCell>
                                 <TableCell className="font-bold">{totals.totalStemsPerBunch}</TableCell>
