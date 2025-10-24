@@ -21,7 +21,7 @@ export function SettingsClient() {
           </CardHeader>
           <CardContent>
             <p className="text-xs text-muted-foreground">
-              Ver información sobre la versión del sistema y detalles generales.
+              Este sistema está diseñado para la gestión integral de facturación en la industria florícola. Permite crear facturas de compra y venta, gestionar clientes y proveedores, registrar pagos, y generar estados de cuenta detallados para un control financiero completo.
             </p>
           </CardContent>
         </Card>
