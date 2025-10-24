@@ -111,7 +111,7 @@ export default function SendDocumentsDialog({ customer, invoices, isOpen, onClos
     setIsSending(true);
     setError(null);
 
-    const subject = `Documentos para ${customer.name}`;
+    const subject = `STATEMENT ${customer.name}`;
     const body = `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
     
     try {

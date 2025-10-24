@@ -111,7 +111,7 @@ export default function HistoricalSendDocumentsDialog({ customer, invoices, isOp
     setIsSending(true);
     setError(null);
 
-    const subject = `Estado de Cuenta Histórico para ${customer.name}`;
+    const subject = `STATEMENT ${customer.name}`;
     const body = `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
     
     try {

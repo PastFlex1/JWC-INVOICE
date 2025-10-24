@@ -112,7 +112,7 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
     setIsSending(true);
     setError(null);
 
-    const subject = `Estado de Cuenta para ${finca.name}`;
+    const subject = `STATEMENT ${finca.name}`;
     const body = `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
     
     try {
