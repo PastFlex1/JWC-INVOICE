@@ -70,7 +70,8 @@ export function DebitNoteForm({ onSubmit, onClose, isSubmitting, invoices, custo
             }, 0);
           }, 0);
           return { ...inv, total };
-        });
+        })
+        .sort((a, b) => new Date(b.farmDepartureDate).getTime() - new Date(a.farmDepartureDate).getTime());
       setFilteredInvoices(customerInvoices);
       form.setValue('invoiceId', '');
     } else {
