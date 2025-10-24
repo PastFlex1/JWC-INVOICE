@@ -54,7 +54,8 @@ export interface Invoice {
   masterAWB: string;
   houseAWB: string;
   items: LineItem[];
-  status: 'Paid' | 'Pending' | 'Overdue';
+  saleStatus: 'Paid' | 'Pending' | 'Overdue' | 'N/A';
+  purchaseStatus: 'Paid' | 'Pending' | 'Overdue' | 'N/A';
 }
 
 

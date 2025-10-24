@@ -1,6 +1,6 @@
 
 import { db } from '@/lib/firebase';
-import type { DebitNote } from '@/lib/types';
+import type { DebitNote, Invoice } from '@/lib/types';
 import {
   collection,
   getDocs,
@@ -68,8 +68,19 @@ export async function addDebitNote(debitNoteData: Omit<DebitNote, 'id'>): Promis
     const invoiceRef = doc(db, 'invoices', debitNoteData.invoiceId);
     const invoiceDoc = await transaction.get(invoiceRef);
 
-    if (invoiceDoc.exists() && invoiceDoc.data().status === 'Paid') {
-      transaction.update(invoiceRef, { status: 'Pending' });
+    if (invoiceDoc.exists()) {
+      const invoiceData = invoiceDoc.data() as Invoice;
+      const updatePayload: { saleStatus?: string; purchaseStatus?: string } = {};
+
+      if (debitNoteData.type === 'sale' && invoiceData.saleStatus === 'Paid') {
+          updatePayload.saleStatus = 'Pending';
+      } else if (debitNoteData.type === 'purchase' && invoiceData.purchaseStatus === 'Paid') {
+          updatePayload.purchaseStatus = 'Pending';
+      }
+      
+      if(Object.keys(updatePayload).length > 0) {
+        transaction.update(invoiceRef, updatePayload);
+      }
     }
    });
 

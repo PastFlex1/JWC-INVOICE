@@ -113,7 +113,7 @@ export function InvoicesClient() {
         const searchFields = [
             invoice.invoiceNumber,
             customerName,
-            invoice.status,
+            invoice.saleStatus,
         ];
 
         return searchFields.some(field => field.toLowerCase().includes(lowerCaseSearch));

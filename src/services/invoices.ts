@@ -2,6 +2,7 @@
 
 
 
+
 import { db } from '@/lib/firebase';
 import type { Invoice, LineItem, Customer, Consignatario, Carguera, Pais } from '@/lib/types';
 import {
@@ -34,6 +35,23 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData> | DocumentS
     ? data.flightDate.toDate().toISOString() 
     : data.flightDate;
 
+  // Migration for old status field
+  let saleStatus = data.saleStatus;
+  let purchaseStatus = data.purchaseStatus;
+
+  if (data.status && !saleStatus && !purchaseStatus) {
+    if (data.type === 'sale') {
+      saleStatus = data.status;
+      purchaseStatus = 'N/A';
+    } else if (data.type === 'purchase') {
+      purchaseStatus = data.status;
+      saleStatus = 'N/A';
+    } else { // 'both'
+      saleStatus = data.status;
+      purchaseStatus = data.status;
+    }
+  }
+
   return {
     id: snapshot.id,
     type: data.type || 'sale',
@@ -49,7 +67,8 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData> | DocumentS
     masterAWB: data.masterAWB,
     houseAWB: data.houseAWB,
     items: Array.isArray(data.items) ? data.items : [],
-    status: data.status || 'Pending',
+    saleStatus: saleStatus || (data.type === 'purchase' ? 'N/A' : 'Pending'),
+    purchaseStatus: purchaseStatus || (data.type === 'sale' ? 'N/A' : 'Pending'),
     consignatarioId: data.consignatarioId,
   };
 };
@@ -94,15 +113,28 @@ export async function getInvoiceWithDetails(id: string): Promise<InvoiceWithDeta
 }
 
 
-export async function addInvoice(invoiceData: Omit<Invoice, 'id'>): Promise<string> {
+export async function addInvoice(invoiceData: Omit<Invoice, 'id' | 'saleStatus' | 'purchaseStatus'>): Promise<string> {
    if (!db) throw new Error("Firebase is not configured. Check your .env file.");
    const invoicesCollection = collection(db, 'invoices');
    
+   let saleStatus: Invoice['saleStatus'] = 'Pending';
+   let purchaseStatus: Invoice['purchaseStatus'] = 'Pending';
+
+   if (invoiceData.type === 'sale') {
+     purchaseStatus = 'N/A';
+   } else if (invoiceData.type === 'purchase') {
+     saleStatus = 'N/A';
+   }
+
    const dataToSave = {
     ...invoiceData,
     farmDepartureDate: Timestamp.fromDate(new Date(invoiceData.farmDepartureDate)),
     flightDate: Timestamp.fromDate(new Date(invoiceData.flightDate)),
+    saleStatus,
+    purchaseStatus,
   };
+  delete (dataToSave as any).status;
+
 
   const docRef = await addDoc(invoicesCollection, dataToSave);
   return docRef.id;
@@ -113,6 +145,8 @@ export async function updateInvoice(id: string, invoiceData: Partial<Omit<Invoic
   const invoiceDoc = doc(db, 'invoices', id);
   const dataToUpdate: any = { ...invoiceData };
   
+  delete dataToUpdate.status;
+
   if (dataToUpdate.farmDepartureDate && typeof dataToUpdate.farmDepartureDate === 'string') {
     dataToUpdate.farmDepartureDate = Timestamp.fromDate(new Date(dataToUpdate.farmDepartureDate));
   }

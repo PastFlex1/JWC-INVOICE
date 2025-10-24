@@ -63,7 +63,7 @@ export function FarmAccountStatementClient() {
     const finca = fincas.find(f => f.id === selectedFincaId);
     if (!finca) return null;
 
-    let fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both') && inv.status !== 'Paid');
+    let fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both') && inv.purchaseStatus !== 'Paid');
     
     if (selectedCustomerId) {
       fincaInvoices = fincaInvoices.filter(inv => inv.customerId === selectedCustomerId);
@@ -118,7 +118,7 @@ export function FarmAccountStatementClient() {
     const totalPayments = processedInvoices.reduce((acc, inv) => acc + inv.payments, 0);
 
     const urgentPayment = processedInvoices
-        .filter(inv => inv.status === 'Overdue')
+        .filter(inv => inv.purchaseStatus === 'Overdue')
         .reduce((acc, inv) => acc + inv.balance, 0);
 
     return {

@@ -112,7 +112,7 @@ export function AccountsPayableClient() {
         const searchFields = [
             invoice.invoiceNumber,
             farmName,
-            invoice.status,
+            invoice.purchaseStatus,
         ];
 
         return searchFields.some(field => field.toLowerCase().includes(lowerCaseSearch));

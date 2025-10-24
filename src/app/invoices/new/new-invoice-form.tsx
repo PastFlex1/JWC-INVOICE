@@ -115,7 +115,7 @@ export function NewInvoiceForm() {
     if (idToLoad && !isAppDataLoading) {
       const invoiceToLoad = invoices.find(inv => inv.id === idToLoad);
       if (invoiceToLoad) {
-        const dataForForm = {
+        const dataForForm: any = {
           ...invoiceToLoad,
           id: duplicateId ? undefined : invoiceToLoad.id, // clear ID if duplicating
           invoiceNumber: duplicateId ? '' : invoiceToLoad.invoiceNumber, // clear invoice number if duplicating
@@ -132,6 +132,7 @@ export function NewInvoiceForm() {
             })),
           })),
         };
+        delete dataForForm.status; // Remove old status field if present
         form.reset(dataForForm);
       } else {
         console.warn(`Invoice with id ${idToLoad} not found.`);
@@ -390,25 +391,24 @@ export function NewInvoiceForm() {
   
     const { id, ...dataToSubmit } = values;
 
-    const invoiceData = {
+    const invoiceData: Omit<Invoice, 'id' | 'saleStatus' | 'purchaseStatus'> = {
       ...dataToSubmit,
       consignatarioId: values.consignatarioId || '',
       reference: values.reference || '',
       farmDepartureDate: values.farmDepartureDate.toISOString(),
       flightDate: values.flightDate.toISOString(),
-      status: 'Pending',
       items: values.items as LineItem[],
     };
 
     try {
       if (editId) {
-        await updateInvoice(editId, invoiceData);
+        await updateInvoice(editId, invoiceData as Partial<Omit<Invoice, 'id'>>);
         toast({
           title: "Factura Actualizada",
           description: "La factura ha sido actualizada correctamente.",
         });
       } else {
-        await addInvoice(invoiceData as Omit<Invoice, 'id'>);
+        await addInvoice(invoiceData);
         toast({
           title: t('invoices.new.toast.successTitle'),
           description: t('invoices.new.toast.successDescription'),
@@ -911,8 +911,7 @@ export function NewInvoiceForm() {
                         </TableBody>
                          <TableFooter>
                             <TableRow>
-                                <TableCell colSpan={1} className="font-bold">Totales</TableCell>
-                                <TableCell className="font-bold">{totals.totalBoxes}</TableCell>
+                                <TableCell colSpan={2} className="font-bold">Totales</TableCell>
                                 <TableCell className="font-bold">{totals.totalBoxTypeValue.toFixed(2)}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBunches}</TableCell>
                                 <TableCell colSpan={4}></TableCell>

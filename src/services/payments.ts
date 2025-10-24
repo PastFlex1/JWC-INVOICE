@@ -63,7 +63,7 @@ export async function addPayment(paymentData: Omit<Payment, 'id'>): Promise<stri
         throw new Error("Invoice does not exist!");
     }
 
-    const invoiceData = invoiceDoc.data() as Omit<Invoice, 'id'>;
+    const invoiceData = invoiceDoc.data() as Invoice;
 
     const subtotal = invoiceData.items.reduce((acc, item) => {
       if (!item.bunches) return acc;
@@ -96,13 +96,17 @@ export async function addPayment(paymentData: Omit<Payment, 'id'>): Promise<stri
     const newTotalPaid = totalPaidAmount + paymentData.amount;
     const newBalance = totalCharge - newTotalPaid;
     
-    let newStatus: 'Paid' | 'Pending' | 'Overdue';
-    if (newBalance <= 0.01) {
-        newStatus = 'Paid';
-    } else {
-        const dueDate = new Date(invoiceData.flightDate);
-        dueDate.setDate(dueDate.getDate() + 30);
-        newStatus = new Date() > dueDate ? 'Overdue' : 'Pending';
+    const isPaid = newBalance <= 0.01;
+    const dueDate = new Date(invoiceData.flightDate);
+    dueDate.setDate(dueDate.getDate() + 30);
+    const isOverdue = new Date() > dueDate;
+    
+    const updatePayload: { saleStatus?: string; purchaseStatus?: string } = {};
+
+    if (paymentData.type === 'sale') {
+      updatePayload.saleStatus = isPaid ? 'Paid' : isOverdue ? 'Overdue' : 'Pending';
+    } else if (paymentData.type === 'purchase') {
+      updatePayload.purchaseStatus = isPaid ? 'Paid' : isOverdue ? 'Overdue' : 'Pending';
     }
 
     const newPaymentRef = doc(collection(db, 'payments'));
@@ -113,7 +117,9 @@ export async function addPayment(paymentData: Omit<Payment, 'id'>): Promise<stri
     transaction.set(newPaymentRef, newPaymentData);
     paymentId = newPaymentRef.id;
 
-    transaction.update(invoiceRef, { status: newStatus });
+    if (Object.keys(updatePayload).length > 0) {
+      transaction.update(invoiceRef, updatePayload);
+    }
    });
 
    if (!paymentId) {
@@ -144,17 +150,23 @@ export async function addBulkPayment(
     batch.set(newPaymentRef, newPaymentData);
 
     const newBalance = invoice.balance - invoice.amountToPay;
-    let newStatus: 'Paid' | 'Pending' | 'Overdue';
-    if (newBalance <= 0.01) {
-        newStatus = 'Paid';
-    } else {
-       const dueDate = new Date(invoice.flightDate);
-       dueDate.setDate(dueDate.getDate() + 30); // Assuming 30 days payment term
-       newStatus = new Date() > dueDate ? 'Overdue' : 'Pending';
-    }
+    const isPaid = newBalance <= 0.01;
+    const dueDate = new Date(invoice.flightDate);
+    dueDate.setDate(dueDate.getDate() + 30); // Assuming 30 days payment term
+    const newStatus = isPaid ? 'Paid' : (new Date() > dueDate ? 'Overdue' : 'Pending');
 
     const invoiceRef = doc(db, 'invoices', invoice.invoiceId);
-    batch.update(invoiceRef, { status: newStatus });
+    const updatePayload: { saleStatus?: string; purchaseStatus?: string } = {};
+    
+    if (paymentData.type === 'sale') {
+        updatePayload.saleStatus = newStatus;
+    } else if (paymentData.type === 'purchase') {
+        updatePayload.purchaseStatus = newStatus;
+    }
+
+    if (Object.keys(updatePayload).length > 0) {
+      batch.update(invoiceRef, updatePayload);
+    }
   }
 
   await batch.commit();

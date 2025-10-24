@@ -56,7 +56,7 @@ export function AccountStatementClient() {
     const customer = customers.find(c => c.id === selectedCustomerId);
     if (!customer) return null;
 
-    let customerInvoices = invoices.filter(inv => inv.customerId === selectedCustomerId && (inv.type === 'sale' || inv.type === 'both') && inv.status !== 'Paid');
+    let customerInvoices = invoices.filter(inv => inv.customerId === selectedCustomerId && (inv.type === 'sale' || inv.type === 'both') && inv.saleStatus !== 'Paid');
     
     if (selectedMonth !== 'all') {
       customerInvoices = customerInvoices.filter(inv => format(parseISO(inv.farmDepartureDate), 'yyyy-MM') === selectedMonth);
@@ -107,7 +107,7 @@ export function AccountStatementClient() {
     const totalPayments = processedInvoices.reduce((acc, inv) => acc + inv.payments, 0);
 
     const urgentPayment = processedInvoices
-        .filter(inv => inv.status === 'Overdue')
+        .filter(inv => inv.saleStatus === 'Overdue')
         .reduce((acc, inv) => acc + inv.balance, 0);
 
     return {
