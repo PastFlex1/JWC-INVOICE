@@ -1,8 +1,6 @@
 
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
-import * as fs from 'fs';
-import * as path from 'path';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
