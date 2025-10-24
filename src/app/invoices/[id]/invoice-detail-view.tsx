@@ -20,12 +20,17 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
   const isNational = customer?.type === 'National';
 
   const totals = useMemo(() => {
-    let totalBoxes = invoice?.items?.length || 0;
+    let totalBoxes = 0;
     let totalBunches = 0;
     let totalStems = 0;
     let totalFob = 0;
+    let totalBoxTypeValue = 0;
+    const boxTypeValues: { [key: string]: number } = { eb: 0.13, qb: 0.25, hb: 0.50, jhb: 0.50 };
+
 
     invoice?.items?.forEach(item => {
+      totalBoxes += 1;
+      totalBoxTypeValue += boxTypeValues[item.boxType] || 0;
       if (item.bunches && Array.isArray(item.bunches)) {
         item.bunches.forEach(bunch => {
           const bunchesCount = Number(bunch.bunchesPerBox) || 0;
@@ -43,7 +48,7 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
     const iva = isNational ? totalFob * 0.15 : 0;
     const totalConIva = totalFob + iva;
 
-    return { totalBoxes, totalBunches, totalStems, totalFob, iva, totalConIva };
+    return { totalBoxes, totalBunches, totalStems, totalFob, iva, totalConIva, totalBoxTypeValue };
   }, [invoice, isNational]);
 
 
@@ -160,7 +165,8 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
                 
                  <div className="grid grid-cols-[30px,40px,0.8fr,1.5fr,1fr,45px,45px,55px,55px,65px] font-bold text-center bg-gray-100 border-l border-r border-b border-gray-400 text-xs">
                     <div className="p-1 border-r border-gray-400 text-center">{totals.totalBoxes}</div>
-                    <div className="p-1 border-r border-gray-400 col-span-5 text-center">TOTALES</div>
+                    <div className="p-1 border-r border-gray-400 text-center">{totals.totalBoxTypeValue.toFixed(2)}</div>
+                    <div className="p-1 border-r border-gray-400 col-span-4 text-center">TOTALES</div>
                     <div className="p-1 border-r border-gray-400">{totals.totalStems}</div>
                     <div className="p-1 border-r border-gray-400">{totals.totalBunches}</div>
                     <div className="p-1 border-r border-gray-400"></div> {/* unit price */}

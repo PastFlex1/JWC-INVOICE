@@ -24,12 +24,17 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
   const isNational = customer?.type === 'National';
 
   const totals = useMemo(() => {
-    let totalBoxes = invoice?.items?.length || 0;
+    let totalBoxes = 0;
     let totalBunches = 0;
     let totalStems = 0;
     let totalFob = 0;
+    let totalBoxTypeValue = 0;
+    const boxTypeValues: { [key: string]: number } = { eb: 0.13, qb: 0.25, hb: 0.50, jhb: 0.50 };
+
 
     invoice?.items?.forEach(item => {
+      totalBoxes += 1;
+      totalBoxTypeValue += boxTypeValues[item.boxType] || 0;
       if (item.bunches && Array.isArray(item.bunches)) {
         item.bunches.forEach(bunch => {
           const bunchesCount = Number(bunch.bunchesPerBox) || 0;
@@ -47,7 +52,7 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
     const iva = isNational ? totalFob * 0.15 : 0;
     const totalConIva = totalFob + iva;
 
-    return { totalBoxes, totalBunches, totalStems, totalFob, iva, totalConIva };
+    return { totalBoxes, totalBunches, totalStems, totalFob, iva, totalConIva, totalBoxTypeValue };
   }, [invoice, isNational]);
 
 
@@ -95,7 +100,7 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
       
       ws_data.push([]);
       ws_data.push(
-        [totals.totalBoxes, "", "TOTALES", "", "", "", totals.totalStems, totals.totalBunches, "", `$${totals.totalFob.toFixed(2)}`]
+        [totals.totalBoxes, totals.totalBoxTypeValue.toFixed(2), "TOTALES", "", "", "", totals.totalStems, totals.totalBunches, "", `$${totals.totalFob.toFixed(2)}`]
       );
 
       ws_data.push([]);
