@@ -22,6 +22,7 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
   const { toast } = useToast();
 
   const isNational = customer?.type === 'National';
+  const boxTypeValues: { [key: string]: number } = { eb: 0.13, qb: 0.25, hb: 0.50, jhb: 0.50 };
 
   const totals = useMemo(() => {
     let totalBoxes = 0;
@@ -29,7 +30,6 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
     let totalStems = 0;
     let totalFob = 0;
     let totalBoxTypeValue = 0;
-    const boxTypeValues: { [key: string]: number } = { eb: 0.13, qb: 0.25, hb: 0.50, jhb: 0.50 };
 
 
     invoice?.items?.forEach(item => {
@@ -53,7 +53,7 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
     const totalConIva = totalFob + iva;
 
     return { totalBoxes, totalBunches, totalStems, totalFob, iva, totalConIva, totalBoxTypeValue };
-  }, [invoice, isNational]);
+  }, [invoice, isNational, boxTypeValues]);
 
 
   const handleDownloadExcel = () => {
@@ -71,10 +71,11 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
         ["Address:", consignatario?.direccion || customer?.address || ''],
         ["Country:", consignatario?.pais || pais?.nombre || ''],
         [],
-        ["CAJAS", "TIPO", "MARCA", "PRODUCTO", "VARIEDAD", "LONG.", "TALLOS", "BUNCHES", "P. VENTA", "TOTAL"]
+        ["CAJAS", "TIPO", "FULL BOX", "MARCA", "PRODUCTO", "VARIEDAD", "LONG.", "TALLOS", "BUNCHES", "P. VENTA", "TOTAL"]
       ];
 
       invoice.items.forEach((item, itemIndex) => {
+        const itemBoxValue = boxTypeValues[item.boxType] || 0;
         (item.bunches || []).forEach((bunch, bunchIndex) => {
             const stemsPerBunch = bunch.stemsPerBunch || 0;
             const bunchesPerBox = bunch.bunchesPerBox || 0;
@@ -86,6 +87,7 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
             ws_data.push([
               bunchIndex === 0 ? item.boxNumber : '',
               bunchIndex === 0 ? item.boxType.toUpperCase() : '',
+              bunchIndex === 0 ? itemBoxValue.toFixed(2) : '',
               invoice.reference || '',
               bunch.product,
               bunch.variety,
@@ -100,18 +102,18 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
       
       ws_data.push([]);
       ws_data.push(
-        [totals.totalBoxes, totals.totalBoxTypeValue.toFixed(2), "TOTALES", "", "", "", totals.totalStems, totals.totalBunches, "", `$${totals.totalFob.toFixed(2)}`]
+        [totals.totalBoxes, "", totals.totalBoxTypeValue.toFixed(2), "TOTALES", "", "", "", totals.totalStems, totals.totalBunches, "", `$${totals.totalFob.toFixed(2)}`]
       );
 
       ws_data.push([]);
-      ws_data.push(["", "", "", "", "", "", "", "", "SUBTOTAL", `$${totals.totalFob.toFixed(2)}`]);
-      ws_data.push(["", "", "", "", "", "", "", "", "IVA 15%", `$${totals.iva.toFixed(2)}`]);
-      ws_data.push(["", "", "", "", "", "", "", "", "TOTAL", `$${totals.totalConIva.toFixed(2)}`]);
+      ws_data.push(["", "", "", "", "", "", "", "", "", "SUBTOTAL", `$${totals.totalFob.toFixed(2)}`]);
+      ws_data.push(["", "", "", "", "", "", "", "", "", "IVA 15%", `$${totals.iva.toFixed(2)}`]);
+      ws_data.push(["", "", "", "", "", "", "", "", "", "TOTAL", `$${totals.totalConIva.toFixed(2)}`]);
 
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
 
       ws['!cols'] = [
-        { wch: 8 }, { wch: 8 }, { wch: 15 }, { wch: 20 }, { wch: 20 }, 
+        { wch: 8 }, { wch: 8 }, { wch: 10 }, { wch: 15 }, { wch: 20 }, { wch: 20 }, 
         { wch: 8 }, { wch: 8 }, { wch: 8 }, { wch: 10 }, { wch: 12 }
       ];
       

@@ -18,6 +18,7 @@ type InvoiceDetailViewProps = {
 export function InvoiceDetailView({ invoice, customer, consignatario, carguera, pais, financials }: InvoiceDetailViewProps) {
   
   const isNational = customer?.type === 'National';
+  const boxTypeValues: { [key: string]: number } = { eb: 0.13, qb: 0.25, hb: 0.50, jhb: 0.50 };
 
   const totals = useMemo(() => {
     let totalBoxes = 0;
@@ -25,8 +26,6 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
     let totalStems = 0;
     let totalFob = 0;
     let totalBoxTypeValue = 0;
-    const boxTypeValues: { [key: string]: number } = { eb: 0.13, qb: 0.25, hb: 0.50, jhb: 0.50 };
-
 
     invoice?.items?.forEach(item => {
       totalBoxes += 1;
@@ -49,10 +48,12 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
     const totalConIva = totalFob + iva;
 
     return { totalBoxes, totalBunches, totalStems, totalFob, iva, totalConIva, totalBoxTypeValue };
-  }, [invoice, isNational]);
+  }, [invoice, isNational, boxTypeValues]);
 
 
   const renderItemRow = (item: LineItem, index: number) => {
+    const itemBoxValue = boxTypeValues[item.boxType] || 0;
+
     return (
        <React.Fragment key={item.id || index}>
         {(item.bunches || []).map((bunch, bunchIndex) => {
@@ -67,6 +68,7 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
                  <div key={bunch.id || bunchIndex} className="contents text-[10px] leading-tight">
                     <div className="border-b border-l border-gray-400 p-1 text-center">{bunchIndex === 0 ? item.boxNumber : ''}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-center">{bunchIndex === 0 ? item.boxType.toUpperCase() : ''}</div>
+                    <div className="border-b border-l border-gray-400 p-1 text-center">{bunchIndex === 0 ? itemBoxValue.toFixed(2) : ''}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-left">{invoice.reference}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-left">{bunch.product}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-left">{bunch.variety}</div>
@@ -146,9 +148,10 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
 
             {/* Items Table */}
             <section>
-                <div className="grid grid-cols-[30px,40px,0.8fr,1.5fr,1fr,45px,45px,55px,55px,65px] font-bold text-center bg-gray-100 border-t border-l border-r border-gray-400 text-[9px] leading-tight">
+                <div className="grid grid-cols-[30px,40px,55px,0.8fr,1.5fr,1fr,45px,45px,55px,55px,65px] font-bold text-center bg-gray-100 border-t border-l border-r border-gray-400 text-[9px] leading-tight">
                     <div className="p-1 border-r border-gray-400">CAJAS</div>
                     <div className="p-1 border-r border-gray-400">TIPO</div>
+                    <div className="p-1 border-r border-gray-400">FULL BOX</div>
                     <div className="p-1 border-r border-gray-400 text-left">MARCA</div>
                     <div className="p-1 border-r border-gray-400 text-left">PRODUCTO</div>
                     <div className="p-1 border-r border-gray-400 text-left">VARIEDAD</div>
@@ -159,13 +162,13 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
                     <div className="p-1">TOTAL</div>
                 </div>
                 
-                <div className="border-l border-r border-b border-gray-400 grid grid-cols-[30px,40px,0.8fr,1.5fr,1fr,45px,45px,55px,55px,65px]">
+                <div className="border-l border-r border-b border-gray-400 grid grid-cols-[30px,40px,55px,0.8fr,1.5fr,1fr,45px,45px,55px,55px,65px]">
                     {invoice.items.map((item, index) => renderItemRow(item, index))}
                 </div>
                 
-                 <div className="grid grid-cols-[30px,40px,0.8fr,1.5fr,1fr,45px,45px,55px,55px,65px] font-bold text-center bg-gray-100 border-l border-r border-b border-gray-400 text-xs">
+                 <div className="grid grid-cols-[30px,40px,55px,0.8fr,1.5fr,1fr,45px,45px,55px,55px,65px] font-bold text-center bg-gray-100 border-l border-r border-b border-gray-400 text-xs">
                     <div className="p-1 border-r border-gray-400 text-center">{totals.totalBoxes}</div>
-                    <div className="p-1 border-r border-gray-400 text-center">{totals.totalBoxTypeValue.toFixed(2)}</div>
+                    <div className="p-1 border-r border-gray-400 col-span-2 text-center">{totals.totalBoxTypeValue.toFixed(2)}</div>
                     <div className="p-1 border-r border-gray-400 col-span-4 text-center">TOTALES</div>
                     <div className="p-1 border-r border-gray-400">{totals.totalStems}</div>
                     <div className="p-1 border-r border-gray-400">{totals.totalBunches}</div>
