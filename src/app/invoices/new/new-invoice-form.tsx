@@ -44,7 +44,7 @@ const bunchItemSchema = z.object({
   product: z.string().min(1, 'Product name is required'),
   variety: z.string().min(1, 'Variety is required.'),
   color: z.string().min(1, 'Color is required.'),
-  length: z.string().min(1, 'Length is required.'),
+  length: z.string().regex(/^\s*\d+\s*(-\s*\d+\s*)?$/, 'La longitud debe ser un número o un rango (ej: 40-50)'),
   stemsPerBunch: z.coerce.number().positive('Must be > 0'),
   bunchesPerBox: z.coerce.number().min(0, 'Must be >= 0'),
   purchasePrice: z.coerce.number().min(0, 'Must be >= 0'),
@@ -182,7 +182,7 @@ export function NewInvoiceForm() {
   });
 
   const totals = useMemo(() => {
-    const boxTypeValues = { eb: 0.13, qb: 0.25, hb: 0.50, jhb: 0.50 };
+    const boxTypeValues: { [key: string]: number } = { eb: 0.13, qb: 0.25, hb: 0.50, jhb: 0.50 };
     const currentItems = watchedItems || [];
     const result = currentItems.reduce((acc, item) => {
         acc.totalBoxTypeValue += boxTypeValues[item.boxType] || 0;
@@ -407,7 +407,7 @@ export function NewInvoiceForm() {
           description: "La factura ha sido actualizada correctamente.",
         });
       } else {
-        await addInvoice(invoiceData as Omit<Invoice, 'id' | 'saleStatus' | 'purchaseStatus'>);
+        await addInvoice(invoiceData);
         toast({
           title: t('invoices.new.toast.successTitle'),
           description: t('invoices.new.toast.successDescription'),
@@ -871,7 +871,20 @@ export function NewInvoiceForm() {
                                                         <SelectContent>{colors.map(c => <SelectItem key={c.productoId} value={c.color}>{c.color}</SelectItem>)}</SelectContent>
                                                     </Select>
                                                 )}/></TableCell>
-                                                <TableCell><FormField control={form.control} name={`${bunchPath}.length`} render={({ field }) => <Input type="text" {...field} value={field.value ?? ''} className="w-24 py-2"/>}/></TableCell>
+                                                <TableCell>
+                                                  <FormField 
+                                                    control={form.control} 
+                                                    name={`${bunchPath}.length`} 
+                                                    render={({ field }) => (
+                                                      <FormItem>
+                                                        <FormControl>
+                                                          <Input type="text" {...field} value={field.value ?? ''} className="w-24 py-2"/>
+                                                        </FormControl>
+                                                        <FormMessage />
+                                                      </FormItem>
+                                                    )}
+                                                  />
+                                                </TableCell>
                                                 <TableCell><FormField control={form.control} name={`${bunchPath}.stemsPerBunch`} render={({ field }) => <Input type="number" {...field} value={field.value ?? 0} className="w-24 py-2"/>}/></TableCell>
                                                 <TableCell>
                                                     <FormField 
@@ -913,9 +926,10 @@ export function NewInvoiceForm() {
                          <TableFooter>
                             <TableRow>
                                 <TableCell colSpan={2} className="font-bold">Totales</TableCell>
+                                <TableCell className="font-bold">{totals.totalBoxes}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBoxTypeValue.toFixed(2)}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBunches}</TableCell>
-                                <TableCell colSpan={4}></TableCell>
+                                <TableCell colSpan={3}></TableCell>
                                 <TableCell className="font-bold">{totals.totalStemsPerBunch}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBunchesPerBox}</TableCell>
                                 <TableCell className="font-bold">${totals.averagePurchasePrice.toFixed(2)}</TableCell>
