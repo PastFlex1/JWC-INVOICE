@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -127,7 +128,7 @@ export function ProductosClient() {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: 'Error al Guardar',
-        description: `No se pudo guardar el producto: ${errorMessage}.`,
+        description: `No se pudo guardar el producto: ${'errorMessage'}.`,
         variant: 'destructive',
         duration: 10000,
       });
@@ -148,7 +149,7 @@ export function ProductosClient() {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: 'Error al Guardar',
-        description: `No se pudo guardar la variedad: ${errorMessage}.`,
+        description: `No se pudo guardar la variedad: ${'errorMessage'}.`,
         variant: 'destructive',
         duration: 10000,
       });
@@ -176,7 +177,7 @@ export function ProductosClient() {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: 'Error al Eliminar',
-        description: `No se pudo eliminar el producto: ${errorMessage}.`,
+        description: `No se pudo eliminar el producto: ${'errorMessage'}.`,
         variant: 'destructive',
         duration: 10000,
       });
@@ -209,7 +210,7 @@ export function ProductosClient() {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: 'Error al Eliminar',
-        description: `No se pudo eliminar la variedad: ${errorMessage}.`,
+        description: `No se pudo eliminar la variedad: ${'errorMessage'}.`,
         variant: 'destructive',
         duration: 10000,
       });

@@ -1,6 +1,7 @@
 
 
 
+
 import { db } from '@/lib/firebase';
 import type { Producto } from '@/lib/types';
 import {
@@ -55,3 +56,4 @@ export async function deleteProducto(id: string): Promise<void> {
   const productoDoc = doc(db, 'productos', id);
   await deleteDoc(productoDoc);
 }
+

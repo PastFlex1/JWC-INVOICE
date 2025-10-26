@@ -1,4 +1,5 @@
 
+
 import { db } from '@/lib/firebase';
 import type { Variedad } from '@/lib/types';
 import {
@@ -46,3 +47,4 @@ export async function deleteVariedad(id: string): Promise<void> {
   const variedadDoc = doc(db, 'variedades', id);
   await deleteDoc(variedadDoc);
 }
+
