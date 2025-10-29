@@ -23,8 +23,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
     }
 
-    const signatureHtml = `
+    const automatedReplyNotice = `
       <br><br>
+      <div style="font-family: Arial, sans-serif; font-size: 11px; color: #888; margin-top: 20px;">
+        <p>Please don't answer to this email, because is automatically, if you need assistance, please contact to <a href="mailto:jcwf@outlook.es">jcwf@outlook.es</a></p>
+      </div>
+    `;
+
+    const signatureHtml = `
       <div style="font-family: Arial, sans-serif; font-size: 12px; color: #555; margin-top: 15px;">
         <p style="margin: 0;">Best Regards</p>
         <p style="margin: 0;">Team: JCW FLOWERS</p>
@@ -36,7 +42,7 @@ export async function POST(request: Request) {
       </div>
     `;
 
-    const emailHtml = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${emailBody.replace(/\n/g, '<br>')}</div>${signatureHtml}`;
+    const emailHtml = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${emailBody.replace(/\n/g, '<br>')}</div>${automatedReplyNotice}${signatureHtml}`;
 
     await resend.emails.send({
       from: 'jwcf <facturacion@puntodeventastore.store>',
