@@ -31,6 +31,9 @@ export async function POST(request: Request) {
         <p style="margin: 0;">Teams: Alexa JCW FLOWERS</p>
         <p style="margin: 0;">Email: jcwf@outlook.es</p>
       </div>
+      <div style="text-align: center; margin-top: 20px;">
+        <img src="https://firebasestorage.googleapis.com/v0/b/jcw-flowers.appspot.com/o/logo.png?alt=media&token=bf63943a-1438-4171-a0e2-892c81358b85" alt="JCW Flowers Logo" width="200" />
+      </div>
     `;
 
     const emailHtml = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${emailBody.replace(/\n/g, '<br>')}</div>${signatureHtml}`;
