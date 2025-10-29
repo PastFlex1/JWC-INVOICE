@@ -72,7 +72,7 @@ export default function SendReportDialog({
     startTransition(async () => {
       const subject = reportTitle;
       const defaultBody = reportDescription;
-      const body = values.body ? `Dear Client,\n\n${values.body}\n\n${reportDescription}` : defaultBody;
+      const body = values.body ? `${defaultBody}\n\n${values.body}` : defaultBody;
       
       const reportElement = document.getElementById(elementIdToPrint);
       if (!reportElement) {

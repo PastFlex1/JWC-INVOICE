@@ -116,7 +116,7 @@ export default function HistoricalSendDocumentsDialog({ customer, invoices, isOp
 
     const subject = `STATEMENT ${customer.name}`;
     const defaultBody = `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
-    const body = values.body ? `Dear Client,\n\n${values.body}\n\nAttached you will find your Statement Update\nThanks for prefer us product` : defaultBody;
+    const body = values.body ? `${defaultBody}\n\n${values.body}` : defaultBody;
     
     try {
         const statementPdfBase64 = await generatePdfForElement('historical-statement-to-print');

@@ -80,7 +80,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
     startTransition(async () => {
       const subject = `INVOICE ${invoice.invoiceNumber} JWC FLOWERS`;
       const defaultBody = `Dear Client,\nAttached you will find your invoice\nThanks for prefer us product`;
-      const body = values.body ? `Dear Client,\n\n${values.body}\n\nAttached you will find your invoice\nThanks for prefer us product` : defaultBody;
+      const body = values.body ? `${defaultBody}\n\n${values.body}` : defaultBody;
       
       const invoiceElement = document.getElementById('invoice-to-print');
       if (!invoiceElement) {
