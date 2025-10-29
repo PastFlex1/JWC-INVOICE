@@ -115,7 +115,8 @@ export default function SendDocumentsDialog({ customer, invoices, isOpen, onClos
     setError(null);
 
     const subject = `STATEMENT ${customer.name}`;
-    const body = values.body || `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
+    const defaultBody = `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
+    const body = values.body ? `Dear Client,\n\n${values.body}\n\nAttached you will find your Statement Update\nThanks for prefer us product` : defaultBody;
     
     try {
         const statementPdfBase64 = await generatePdfForElement('statement-to-print');

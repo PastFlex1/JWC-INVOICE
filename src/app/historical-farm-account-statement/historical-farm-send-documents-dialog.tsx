@@ -114,7 +114,8 @@ export default function HistoricalSendFarmDocumentsDialog({ finca, isOpen, onClo
     setError(null);
 
     const subject = `STATEMENT ${finca.name}`;
-    const body = values.body || `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
+    const defaultBody = `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
+    const body = values.body ? `Dear Client,\n\n${values.body}\n\nAttached you will find your Statement Update\nThanks for prefer us product` : defaultBody;
     
     try {
         const statementPdfBase64 = await generatePdfForElement('historical-farm-statement-to-print');

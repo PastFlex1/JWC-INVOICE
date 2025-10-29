@@ -78,8 +78,9 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setError(null);
     startTransition(async () => {
-      const subject = `INVOICE ${invoice.invoiceNumber} JCWF`;
-      const body = values.body || `Dear Client,\nAttached you will find your invoice\nThanks for prefer us product`;
+      const subject = `INVOICE ${invoice.invoiceNumber} JWC FLOWERS`;
+      const defaultBody = `Dear Client,\nAttached you will find your invoice\nThanks for prefer us product`;
+      const body = values.body ? `Dear Client,\n\n${values.body}\n\nAttached you will find your invoice\nThanks for prefer us product` : defaultBody;
       
       const invoiceElement = document.getElementById('invoice-to-print');
       if (!invoiceElement) {
