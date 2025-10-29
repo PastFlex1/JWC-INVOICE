@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useTransition } from 'react';
@@ -21,6 +22,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Send } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Textarea } from '@/components/ui/textarea';
 
 const formSchema = z.object({
   to: z.string()
@@ -35,6 +37,7 @@ const formSchema = z.object({
         message: 'Proporcione una lista válida de direcciones de correo electrónico separadas por comas.',
       }
     ),
+  body: z.string().optional(),
 });
 
 type SendReportDialogProps = {
@@ -61,14 +64,14 @@ export default function SendReportDialog({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
-    defaultValues: { to: '' }
+    defaultValues: { to: '', body: '' }
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setError(null);
     startTransition(async () => {
       const subject = reportTitle;
-      const body = reportDescription;
+      const body = values.body || reportDescription;
       
       const reportElement = document.getElementById(elementIdToPrint);
       if (!reportElement) {
@@ -141,6 +144,19 @@ export default function SendReportDialog({
                     <FormLabel>Para</FormLabel>
                     <FormControl>
                       <Input placeholder="email@ejemplo.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="body"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mensaje Personalizado (Opcional)</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Escriba un mensaje para añadir al correo..." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

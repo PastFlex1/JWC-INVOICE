@@ -22,6 +22,7 @@ import type { Finca } from '@/lib/types';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { Textarea } from '@/components/ui/textarea';
 
 const formSchema = z.object({
   to: z.string()
@@ -36,6 +37,7 @@ const formSchema = z.object({
         message: 'Proporcione una lista válida de direcciones de correo electrónico separadas por comas.',
       }
     ),
+  body: z.string().optional(),
 });
 
 type SendDocumentsDialogProps = {
@@ -97,6 +99,7 @@ export default function HistoricalSendFarmDocumentsDialog({ finca, isOpen, onClo
     if (finca && isOpen) {
       form.reset({
         to: finca.email || '', 
+        body: '',
       });
       setError(null);
     }
@@ -111,7 +114,7 @@ export default function HistoricalSendFarmDocumentsDialog({ finca, isOpen, onClo
     setError(null);
 
     const subject = `STATEMENT ${finca.name}`;
-    const body = `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
+    const body = values.body || `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
     
     try {
         const statementPdfBase64 = await generatePdfForElement('historical-farm-statement-to-print');
@@ -182,7 +185,7 @@ export default function HistoricalSendFarmDocumentsDialog({ finca, isOpen, onClo
               </Alert>
             )}
 
-            <div className="py-6">
+            <div className="py-6 space-y-4">
               <FormField
                 control={form.control}
                 name="to"
@@ -191,6 +194,19 @@ export default function HistoricalSendFarmDocumentsDialog({ finca, isOpen, onClo
                     <FormLabel>Para</FormLabel>
                     <FormControl>
                       <Input placeholder="proveedor@email.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="body"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mensaje Personalizado (Opcional)</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Escriba un mensaje para añadir al correo..." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -24,6 +24,7 @@ import { Loader2, Send } from 'lucide-react';
 import type { Invoice, Customer } from '@/lib/types';
 import { useTranslation } from '@/context/i18n-context';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Textarea } from '@/components/ui/textarea';
 
 const formSchema = z.object({
   to: z.string()
@@ -38,6 +39,7 @@ const formSchema = z.object({
         message: 'Proporcione una lista válida de direcciones de correo electrónico separadas por comas.',
       }
     ),
+  body: z.string().optional(),
 });
 
 
@@ -63,6 +65,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
     if (customer && isOpen) {
       form.reset({
         to: customer.email || '',
+        body: '',
       });
       setError(null);
     }
@@ -76,7 +79,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
     setError(null);
     startTransition(async () => {
       const subject = `INVOICE ${invoice.invoiceNumber} JCWF`;
-      const body = `Dear Client,\nAttached you will find your invoice\nThanks for prefer us product`;
+      const body = values.body || `Dear Client,\nAttached you will find your invoice\nThanks for prefer us product`;
       
       const invoiceElement = document.getElementById('invoice-to-print');
       if (!invoiceElement) {
@@ -185,6 +188,19 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
                     <FormLabel>Para</FormLabel>
                     <FormControl>
                       <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="body"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Mensaje Personalizado (Opcional)</FormLabel>
+                    <FormControl>
+                      <Textarea placeholder="Escriba un mensaje para añadir al correo..." {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
