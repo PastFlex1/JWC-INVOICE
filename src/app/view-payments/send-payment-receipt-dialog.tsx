@@ -131,71 +131,69 @@ export function SendPaymentReceiptDialog({ payment, isOpen, onClose }: SendPayme
 
   return (
     <Dialog open={isOpen} onOpenChange={!isPending ? onClose : () => {}}>
-      <DialogContent className="sm:max-w-5xl">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
-            <DialogHeader>
-              <DialogTitle>Enviar Recibo de Pago por Correo</DialogTitle>
-              <DialogDescription>
-                El recibo de pago para {payment.entityName} será enviado. Puede añadir múltiples correos separados por comas.
-              </DialogDescription>
-            </DialogHeader>
+      <DialogContent className="sm:max-w-4xl">
+        <DialogHeader>
+            <DialogTitle>Enviar Recibo de Pago por Correo</DialogTitle>
+            <DialogDescription>
+            Revise el recibo y confirme los detalles del envío para {payment.entityName}.
+            </DialogDescription>
+        </DialogHeader>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
-              <div className="space-y-4 flex flex-col">
-                {error && (
-                  <Alert variant="destructive">
-                    <AlertTitle>Error</AlertTitle>
-                    <AlertDescription>{error}</AlertDescription>
-                  </Alert>
-                )}
-
-                <FormField
-                  control={form.control}
-                  name="to"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Para</FormLabel>
-                      <FormControl>
-                        <Input {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="body"
-                  render={({ field }) => (
-                    <FormItem className="flex-grow flex flex-col">
-                      <FormLabel>Mensaje Personalizado (Opcional)</FormLabel>
-                      <FormControl>
-                        <Textarea placeholder="Escriba un mensaje para añadir al correo..." className="flex-grow" {...field} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
-              <div className="h-[60vh] overflow-y-auto border rounded-md p-4 bg-gray-50/50">
-                 <div id={`payment-receipt-${payment.id}-modal`}>
-                    <PaymentReceiptView payment={payment} />
-                 </div>
-              </div>
+        <div className="h-[60vh] overflow-y-auto border rounded-md p-4 bg-gray-50/50 mt-4">
+            <div id={`payment-receipt-${payment.id}-modal`}>
+            <PaymentReceiptView payment={payment} />
             </div>
-             <DialogFooter className="pt-6">
+        </div>
+        
+        <Form {...form}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="mt-4 space-y-4">
+            {error && (
+                <Alert variant="destructive">
+                <AlertTitle>Error</AlertTitle>
+                <AlertDescription>{error}</AlertDescription>
+                </Alert>
+            )}
+
+            <FormField
+                control={form.control}
+                name="to"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Enviar a</FormLabel>
+                    <FormControl>
+                    <Input {...field} placeholder="email1@ejemplo.com, email2@ejemplo.com" />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            <FormField
+                control={form.control}
+                name="body"
+                render={({ field }) => (
+                <FormItem>
+                    <FormLabel>Mensaje Personalizado (Opcional)</FormLabel>
+                    <FormControl>
+                    <Textarea placeholder="Escriba un mensaje para añadir al correo..." {...field} />
+                    </FormControl>
+                    <FormMessage />
+                </FormItem>
+                )}
+            />
+            
+            <DialogFooter className="pt-4">
                 <Button type="button" variant="outline" onClick={onClose} disabled={isPending}>
-                  Cancelar
+                Cancelar
                 </Button>
                 <Button type="submit" disabled={isPending}>
-                  {isPending ? (
+                {isPending ? (
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  ) : (
+                ) : (
                     <Send className="mr-2 h-4 w-4" />
-                  )}
-                  {isPending ? 'Enviando...' : 'Enviar Correo'}
+                )}
+                {isPending ? 'Enviando...' : 'Confirmar y Enviar'}
                 </Button>
-              </DialogFooter>
+            </DialogFooter>
           </form>
         </Form>
       </DialogContent>
