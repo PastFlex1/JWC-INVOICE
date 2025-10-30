@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Calendar as CalendarIcon, X as XIcon, Eye, Download, Mail } from 'lucide-react';
+import { Search, Calendar as CalendarIcon, X as XIcon, Eye, Download, Mail, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -24,8 +24,16 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { PaymentReceiptView } from './payment-receipt-view';
 import { SendPaymentReceiptDialog } from './send-payment-receipt-dialog';
+import PaymentReceiptDownloadPdfButton from './payment-receipt-download-pdf';
+import PaymentReceiptDownloadExcelButton from './payment-receipt-download-excel';
 
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -264,6 +272,21 @@ export function ViewPaymentsClient() {
                                      <Button variant="ghost" size="icon" title="Enviar por Correo" onClick={() => setPaymentToSend(payment)}>
                                         <Mail className="h-4 w-4" />
                                     </Button>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="ghost" size="icon" title="Descargar">
+                                                <Download className="h-4 w-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
+                                        <DropdownMenuContent align="end">
+                                            <DropdownMenuItem>
+                                                <PaymentReceiptDownloadPdfButton payment={payment} />
+                                            </DropdownMenuItem>
+                                            <DropdownMenuItem>
+                                                <PaymentReceiptDownloadExcelButton payment={payment} />
+                                            </DropdownMenuItem>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -308,7 +331,9 @@ export function ViewPaymentsClient() {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                  {selectedPayment && (
-                   <PaymentReceiptView payment={selectedPayment} />
+                    <div id={`payment-receipt-container-${selectedPayment.id}`}>
+                        <PaymentReceiptView payment={selectedPayment} />
+                    </div>
                  )}
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => setSelectedPayment(null)}>Cerrar</AlertDialogCancel>
