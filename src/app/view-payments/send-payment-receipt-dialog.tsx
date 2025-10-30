@@ -190,7 +190,7 @@ export function SendPaymentReceiptDialog({ payment, isOpen, onClose }: SendPayme
                   </Button>
                 </DialogFooter>
               </div>
-              <div className="h-[60vh] overflow-y-auto border rounded-md">
+              <div className="h-[60vh] overflow-y-auto border rounded-md p-4 bg-gray-50">
                  <div id={`payment-receipt-${payment.id}-modal`}>
                     <PaymentReceiptView payment={payment} />
                  </div>
