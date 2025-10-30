@@ -131,7 +131,7 @@ export function SendPaymentReceiptDialog({ payment, isOpen, onClose }: SendPayme
 
   return (
     <Dialog open={isOpen} onOpenChange={!isPending ? onClose : () => {}}>
-      <DialogContent className="sm:max-w-4xl">
+      <DialogContent className="sm:max-w-5xl">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
@@ -141,10 +141,10 @@ export function SendPaymentReceiptDialog({ payment, isOpen, onClose }: SendPayme
               </DialogDescription>
             </DialogHeader>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-              <div className="space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-4">
+              <div className="space-y-4 flex flex-col">
                 {error && (
-                  <Alert variant="destructive" className="my-4">
+                  <Alert variant="destructive">
                     <AlertTitle>Error</AlertTitle>
                     <AlertDescription>{error}</AlertDescription>
                   </Alert>
@@ -167,35 +167,35 @@ export function SendPaymentReceiptDialog({ payment, isOpen, onClose }: SendPayme
                   control={form.control}
                   name="body"
                   render={({ field }) => (
-                    <FormItem>
+                    <FormItem className="flex-grow flex flex-col">
                       <FormLabel>Mensaje Personalizado (Opcional)</FormLabel>
                       <FormControl>
-                        <Textarea placeholder="Escriba un mensaje para añadir al correo..." {...field} />
+                        <Textarea placeholder="Escriba un mensaje para añadir al correo..." className="flex-grow" {...field} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
                 />
-                 <DialogFooter className="pt-4">
-                  <Button type="button" variant="outline" onClick={onClose} disabled={isPending}>
-                    Cancelar
-                  </Button>
-                  <Button type="submit" disabled={isPending}>
-                    {isPending ? (
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    ) : (
-                      <Send className="mr-2 h-4 w-4" />
-                    )}
-                    {isPending ? 'Enviando...' : 'Enviar Correo'}
-                  </Button>
-                </DialogFooter>
               </div>
-              <div className="h-[60vh] overflow-y-auto border rounded-md p-4 bg-gray-50">
+              <div className="h-[60vh] overflow-y-auto border rounded-md p-4 bg-gray-50/50">
                  <div id={`payment-receipt-${payment.id}-modal`}>
                     <PaymentReceiptView payment={payment} />
                  </div>
               </div>
             </div>
+             <DialogFooter className="pt-6">
+                <Button type="button" variant="outline" onClick={onClose} disabled={isPending}>
+                  Cancelar
+                </Button>
+                <Button type="submit" disabled={isPending}>
+                  {isPending ? (
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  ) : (
+                    <Send className="mr-2 h-4 w-4" />
+                  )}
+                  {isPending ? 'Enviando...' : 'Enviar Correo'}
+                </Button>
+              </DialogFooter>
           </form>
         </Form>
       </DialogContent>
