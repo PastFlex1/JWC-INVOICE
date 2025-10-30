@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Calendar as CalendarIcon, X as XIcon, Eye } from 'lucide-react';
+import { Search, Calendar as CalendarIcon, X as XIcon, Eye, Download, Mail } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -24,6 +24,8 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
+import { PaymentReceiptView } from './payment-receipt-view';
+import { SendPaymentReceiptDialog } from './send-payment-receipt-dialog';
 
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -41,17 +43,18 @@ function useDebounce<T>(value: T, delay: number): T {
 
 const ITEMS_PER_PAGE = 15;
 
-type PaymentDetail = {
+export type PaymentDetail = {
     invoiceNumber: string;
     amount: number;
     customerName: string;
     consigneeName: string;
 };
 
-type AggregatedPayment = {
+export type AggregatedPayment = {
     id: string;
     paymentDate: string;
     entityName: string;
+    entityEmail: string | undefined;
     amount: number;
     paymentMethod: Payment['paymentMethod'];
     reference?: string;
@@ -66,10 +69,12 @@ export function ViewPaymentsClient() {
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedPayment, setSelectedPayment] = useState<AggregatedPayment | null>(null);
+  const [paymentToSend, setPaymentToSend] = useState<AggregatedPayment | null>(null);
+
   const { t } = useTranslation();
 
-  const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
-  const fincaMap = useMemo(() => new Map(fincas.map(f => [f.id, f.name])), [fincas]);
+  const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c])), [customers]);
+  const fincaMap = useMemo(() => new Map(fincas.map(f => [f.id, f])), [fincas]);
   const consignatarioMap = useMemo(() => new Map(consignatarios.map(c => [c.id, c.nombreConsignatario])), [consignatarios]);
   const invoiceMap = useMemo(() => new Map(invoices.map(i => [i.id, i])), [invoices]);
 
@@ -81,18 +86,17 @@ export function ViewPaymentsClient() {
           if (!invoice) return;
 
           let entityId: string | null = null;
-          let entityName: string | null = null;
+          let entity: Customer | Finca | undefined;
           
-          // Determine the primary entity (customer or farm) for grouping
-          if (invoice.type === 'purchase') {
+          if (p.type === 'purchase') {
               entityId = invoice.farmId;
-              entityName = fincaMap.get(entityId) || "Finca desconocida";
-          } else { // 'sale' or 'both'
+              entity = fincaMap.get(entityId);
+          } else { // 'sale' or 'both' for a customer payment
               entityId = invoice.customerId;
-              entityName = customerMap.get(entityId) || "Cliente desconocido";
+              entity = customerMap.get(entityId);
           }
 
-          if (!entityId || !entityName) return;
+          if (!entityId || !entity) return;
 
           const paymentDateStr = format(parseISO(p.paymentDate), 'yyyy-MM-dd');
           const groupKey = `${paymentDateStr}-${entityId}-${p.paymentMethod}-${p.reference || ''}`;
@@ -101,7 +105,8 @@ export function ViewPaymentsClient() {
               groupedPayments[groupKey] = {
                   id: groupKey,
                   paymentDate: p.paymentDate,
-                  entityName: entityName,
+                  entityName: entity.name,
+                  entityEmail: 'email' in entity ? entity.email : undefined,
                   amount: 0,
                   paymentMethod: p.paymentMethod,
                   reference: p.reference,
@@ -110,7 +115,7 @@ export function ViewPaymentsClient() {
               };
           }
 
-          const customerName = customerMap.get(invoice.customerId) || 'Cliente Desconocido';
+          const customerName = customerMap.get(invoice.customerId)?.name || 'Cliente Desconocido';
           const consigneeName = invoice.consignatarioId ? (consignatarioMap.get(invoice.consignatarioId) || 'Consignatario Desconocido') : customerName;
 
           groupedPayments[groupKey].amount += p.amount;
@@ -253,8 +258,11 @@ export function ViewPaymentsClient() {
                                 <TableCell>{payment.paymentMethod}</TableCell>
                                 <TableCell>{payment.reference}</TableCell>
                                 <TableCell className="text-right">
-                                    <Button variant="ghost" size="icon" onClick={() => setSelectedPayment(payment)}>
+                                    <Button variant="ghost" size="icon" title="Ver Detalle" onClick={() => setSelectedPayment(payment)}>
                                         <Eye className="h-4 w-4" />
+                                    </Button>
+                                     <Button variant="ghost" size="icon" title="Enviar por Correo" onClick={() => setPaymentToSend(payment)}>
+                                        <Mail className="h-4 w-4" />
                                     </Button>
                                 </TableCell>
                             </TableRow>
@@ -292,40 +300,23 @@ export function ViewPaymentsClient() {
         </div>
 
         <AlertDialog open={!!selectedPayment} onOpenChange={() => setSelectedPayment(null)}>
-            <AlertDialogContent className="sm:max-w-3xl">
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Detalle del Pago</AlertDialogTitle>
-                    <AlertDialogDescription>
-                        Desglose del pago de ${selectedPayment?.amount.toFixed(2)} a {selectedPayment?.entityName} en {selectedPayment ? format(parseISO(selectedPayment.paymentDate), 'PPP') : ''}.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <div className="max-h-96 overflow-y-auto">
-                    <Table>
-                        <TableHeader>
-                        <TableRow>
-                            <TableHead>N° Factura</TableHead>
-                            <TableHead>Cliente</TableHead>
-                            <TableHead>Consignatario</TableHead>
-                            <TableHead className="text-right">Monto Aplicado</TableHead>
-                        </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                        {selectedPayment?.details.map((detail, index) => (
-                            <TableRow key={index}>
-                            <TableCell>{detail.invoiceNumber}</TableCell>
-                            <TableCell>{detail.customerName}</TableCell>
-                            <TableCell>{detail.consigneeName}</TableCell>
-                            <TableCell className="text-right">${detail.amount.toFixed(2)}</TableCell>
-                            </TableRow>
-                        ))}
-                        </TableBody>
-                    </Table>
-                </div>
+            <AlertDialogContent className="sm:max-w-4xl">
+                 {selectedPayment && (
+                   <PaymentReceiptView payment={selectedPayment} />
+                 )}
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => setSelectedPayment(null)}>Cerrar</AlertDialogCancel>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
+
+        {paymentToSend && (
+            <SendPaymentReceiptDialog
+                isOpen={!!paymentToSend}
+                onClose={() => setPaymentToSend(null)}
+                payment={paymentToSend}
+            />
+        )}
     </>
   );
 }
