@@ -301,6 +301,12 @@ export function ViewPaymentsClient() {
 
         <AlertDialog open={!!selectedPayment} onOpenChange={() => setSelectedPayment(null)}>
             <AlertDialogContent className="sm:max-w-4xl">
+                 <AlertDialogHeader>
+                    <AlertDialogTitle>Detalle del Recibo de Pago</AlertDialogTitle>
+                    <AlertDialogDescription>
+                        Este es un resumen del pago realizado por {selectedPayment?.entityName}.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
                  {selectedPayment && (
                    <PaymentReceiptView payment={selectedPayment} />
                  )}
