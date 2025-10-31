@@ -25,6 +25,8 @@ import {
 import { PaymentReceiptView } from './payment-receipt-view';
 import { SendPaymentReceiptDialog } from './send-payment-receipt-dialog';
 import { ViewPaymentsView } from './view-payments-view';
+import PaymentReceiptDownloadPdfButton from './payment-receipt-download-pdf';
+import PaymentReceiptDownloadExcelButton from './payment-receipt-download-excel';
 
 
 function useDebounce<T>(value: T, delay: number): T {
