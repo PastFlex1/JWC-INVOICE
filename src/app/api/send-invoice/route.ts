@@ -23,19 +23,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
     }
 
-    // A more robust HTML structure for the email body
-    const emailHtml = `
-      <html>
-        <body>
-          <div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6;">
-            ${emailBody.replace(/\n/g, '<br>')}
-          </div>
-        </body>
-      </html>
-    `;
+    // Simple HTML structure as per user's working example
+    const emailHtml = `<p>${emailBody.replace(/\n/g, '<br>')}</p>`;
 
     await resend.emails.send({
-      from: 'facturacion@puntodeventastore.store',
+      from: 'JWC FLOWERS <facturacion@puntodeventastore.store>',
       to: toEmails,
       subject: subject,
       html: emailHtml,
