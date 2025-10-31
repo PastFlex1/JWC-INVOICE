@@ -4,9 +4,7 @@ import { useState, useEffect, useMemo } from 'react';
 import { Search, Calendar as CalendarIcon, X as XIcon, Eye, Download, Mail, MoreVertical } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import type { Payment, Invoice, Customer, Finca } from '@/lib/types';
 import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
@@ -24,16 +22,9 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { PaymentReceiptView } from './payment-receipt-view';
 import { SendPaymentReceiptDialog } from './send-payment-receipt-dialog';
-import PaymentReceiptDownloadPdfButton from './payment-receipt-download-pdf';
-import PaymentReceiptDownloadExcelButton from './payment-receipt-download-excel';
+import { ViewPaymentsView } from './view-payments-view';
 
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -48,8 +39,6 @@ function useDebounce<T>(value: T, delay: number): T {
   }, [value, delay]);
   return debouncedValue;
 }
-
-const ITEMS_PER_PAGE = 15;
 
 export type PaymentDetail = {
     invoiceNumber: string;
@@ -75,7 +64,6 @@ export function ViewPaymentsClient() {
   const [searchTerm, setSearchTerm] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
-  const [currentPage, setCurrentPage] = useState(1);
   const [selectedPayment, setSelectedPayment] = useState<AggregatedPayment | null>(null);
   const [paymentToSend, setPaymentToSend] = useState<AggregatedPayment | null>(null);
 
@@ -163,17 +151,6 @@ export function ViewPaymentsClient() {
     });
   }, [aggregatedPayments, debouncedSearchTerm, dateRange]);
 
-
-  const totalPages = Math.ceil(filteredPayments.length / ITEMS_PER_PAGE);
-
-  const paginatedPayments = useMemo(() => {
-    const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-    return filteredPayments.slice(startIndex, startIndex + ITEMS_PER_PAGE);
-  }, [filteredPayments, currentPage]);
-
-  const handlePrevPage = () => setCurrentPage((prev) => Math.max(prev - 1, 1));
-  const handleNextPage = () => setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-
   return (
     <>
         <div className="space-y-6">
@@ -239,86 +216,12 @@ export function ViewPaymentsClient() {
                         </Button>
                     )}
                     </div>
-                    <div className="overflow-x-auto">
-                    <Table>
-                        <TableHeader>
-                        <TableRow>
-                            <TableHead>Fecha</TableHead>
-                            <TableHead>Cliente/Proveedor</TableHead>
-                            <TableHead>Monto Total</TableHead>
-                            <TableHead>Facturas Pagadas</TableHead>
-                            <TableHead>Método</TableHead>
-                            <TableHead>Banco</TableHead>
-                            <TableHead className="text-right">Acciones</TableHead>
-                        </TableRow>
-                        </TableHeader>
-                        <TableBody>
-                        {paginatedPayments.map((payment) => (
-                            <TableRow key={payment.id}>
-                                <TableCell>{format(parseISO(payment.paymentDate), 'PPP')}</TableCell>
-                                <TableCell className="font-medium">{payment.entityName}</TableCell>
-                                <TableCell className="font-bold">${payment.amount.toFixed(2)}</TableCell>
-                                <TableCell>
-                                    <Badge variant="secondary">
-                                        Pago a {payment.details.length} factura(s)
-                                    </Badge>
-                                </TableCell>
-                                <TableCell>{payment.paymentMethod}</TableCell>
-                                <TableCell>{payment.reference}</TableCell>
-                                <TableCell className="text-right">
-                                    <Button variant="ghost" size="icon" title="Ver Detalle" onClick={() => setSelectedPayment(payment)}>
-                                        <Eye className="h-4 w-4" />
-                                    </Button>
-                                     <Button variant="ghost" size="icon" title="Enviar por Correo" onClick={() => setPaymentToSend(payment)}>
-                                        <Mail className="h-4 w-4" />
-                                    </Button>
-                                    <DropdownMenu>
-                                        <DropdownMenuTrigger asChild>
-                                            <Button variant="ghost" size="icon" title="Descargar">
-                                                <Download className="h-4 w-4" />
-                                            </Button>
-                                        </DropdownMenuTrigger>
-                                        <DropdownMenuContent align="end">
-                                            <DropdownMenuItem>
-                                                <PaymentReceiptDownloadPdfButton payment={payment} />
-                                            </DropdownMenuItem>
-                                            <DropdownMenuItem>
-                                                <PaymentReceiptDownloadExcelButton payment={payment} />
-                                            </DropdownMenuItem>
-                                        </DropdownMenuContent>
-                                    </DropdownMenu>
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                        </TableBody>
-                    </Table>
-                    </div>
+                    <ViewPaymentsView 
+                      payments={filteredPayments}
+                      onViewPayment={setSelectedPayment}
+                      onSendPayment={setPaymentToSend}
+                    />
                 </CardContent>
-                {totalPages > 1 && (
-                    <CardFooter className="flex items-center justify-between">
-                    <div className="text-sm text-muted-foreground">
-                        {t('common.page', { currentPage: currentPage, totalPages: totalPages })}
-                    </div>
-                    <div className="flex items-center gap-2">
-                        <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handlePrevPage}
-                        disabled={currentPage === 1}
-                        >
-                        {t('common.previous')}
-                        </Button>
-                        <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleNextPage}
-                        disabled={currentPage >= totalPages}
-                        >
-                        {t('common.next')}
-                        </Button>
-                    </div>
-                    </CardFooter>
-                )}
             </Card>
         </div>
 
@@ -331,12 +234,18 @@ export function ViewPaymentsClient() {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                  {selectedPayment && (
-                    <div id={`payment-receipt-container-${selectedPayment.id}`}>
+                    <div id={`payment-receipt-container-${selectedPayment.id}`} className="max-h-[60vh] overflow-y-auto">
                         <PaymentReceiptView payment={selectedPayment} />
                     </div>
                  )}
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => setSelectedPayment(null)}>Cerrar</AlertDialogCancel>
+                     {selectedPayment && (
+                        <>
+                           <PaymentReceiptDownloadPdfButton payment={selectedPayment} />
+                           <PaymentReceiptDownloadExcelButton payment={selectedPayment} />
+                        </>
+                    )}
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
