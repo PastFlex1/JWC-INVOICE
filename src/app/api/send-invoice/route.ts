@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     const emailHtml = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${emailBody.replace(/\n/g, '<br>')}</div>`;
 
     await resend.emails.send({
-      from: 'onboarding@resend.dev',
+      from: 'facturacion@puntodeventastore.store',
       to: toEmails,
       subject: subject,
       html: emailHtml,
