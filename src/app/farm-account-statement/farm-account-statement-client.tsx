@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -28,7 +27,7 @@ export type StatementData = {
 export function FarmAccountStatementClient() {
   const { fincas, invoices, creditNotes, debitNotes, payments, customers, consignatarios } = useAppData();
   const [selectedFincaId, setSelectedFincaId] = useState<string | null>(null);
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
+  const [selectedConsignatarioId, setSelectedConsignatarioId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
 
@@ -39,22 +38,22 @@ export function FarmAccountStatementClient() {
     if (!selectedFincaId) return [];
     let fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both'));
 
-    if (selectedCustomerId) {
-      fincaInvoices = fincaInvoices.filter(inv => inv.customerId === selectedCustomerId);
+    if (selectedConsignatarioId) {
+      fincaInvoices = fincaInvoices.filter(inv => inv.consignatarioId === selectedConsignatarioId);
     }
     
     const months = new Set(fincaInvoices.map(inv => format(parseISO(inv.farmDepartureDate), 'yyyy-MM')));
     return Array.from(months).sort((a, b) => b.localeCompare(a));
-  }, [selectedFincaId, selectedCustomerId, invoices]);
+  }, [selectedFincaId, selectedConsignatarioId, invoices]);
 
   useEffect(() => {
     setSelectedMonth('all');
-    setSelectedCustomerId(null);
+    setSelectedConsignatarioId(null);
   }, [selectedFincaId]);
 
   useEffect(() => {
     setSelectedMonth('all');
-  }, [selectedCustomerId]);
+  }, [selectedConsignatarioId]);
 
 
   const statementData = useMemo((): StatementData | null => {
@@ -65,8 +64,8 @@ export function FarmAccountStatementClient() {
 
     let fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both') && inv.purchaseStatus !== 'Paid');
     
-    if (selectedCustomerId) {
-      fincaInvoices = fincaInvoices.filter(inv => inv.customerId === selectedCustomerId);
+    if (selectedConsignatarioId) {
+      fincaInvoices = fincaInvoices.filter(inv => inv.consignatarioId === selectedConsignatarioId);
     }
 
     if (selectedMonth !== 'all') {
@@ -131,7 +130,7 @@ export function FarmAccountStatementClient() {
       urgentPayment,
       statementDate: latestInvoiceDate,
     };
-  }, [selectedFincaId, selectedCustomerId, selectedMonth, fincas, invoices, creditNotes, debitNotes, payments, customerMap, consignatarioMap]);
+  }, [selectedFincaId, selectedConsignatarioId, selectedMonth, fincas, invoices, creditNotes, debitNotes, payments, customerMap, consignatarioMap]);
 
   return (
     <>
@@ -170,15 +169,15 @@ export function FarmAccountStatementClient() {
             </Select>
 
             {selectedFincaId && (
-              <Select onValueChange={(value) => setSelectedCustomerId(value === 'all' ? null : value)}>
+              <Select onValueChange={(value) => setSelectedConsignatarioId(value === 'all' ? null : value)}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
-                  <SelectValue placeholder="Filtrar por cliente..." />
+                  <SelectValue placeholder="Filtrar por consignatario..." />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos los Clientes</SelectItem>
-                  {customers.map(customer => (
-                    <SelectItem key={customer.id} value={customer.id}>
-                      {customer.name}
+                  <SelectItem value="all">Todos los Consignatarios</SelectItem>
+                  {consignatarios.map(consignatario => (
+                    <SelectItem key={consignatario.id} value={consignatario.id}>
+                      {consignatario.nombreConsignatario}
                     </SelectItem>
                   ))}
                 </SelectContent>
