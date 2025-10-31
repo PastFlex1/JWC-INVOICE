@@ -24,8 +24,7 @@ export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentRece
     // Create a temporary container for the receipt view
     const tempContainer = document.createElement('div');
     tempContainer.style.position = 'absolute';
-    tempContainer.style.left = '-9999px';
-    tempContainer.id = `temp-pdf-container-${payment.id}`;
+    tempContainer.style.left = '-9999px'; // Position it off-screen
     document.body.appendChild(tempContainer);
     
     // This is a bit of a hack: React can't render to a detached element.
@@ -33,14 +32,19 @@ export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentRece
     const { createRoot } = await import('react-dom/client');
     const root = createRoot(tempContainer);
     
-    root.render(<PaymentReceiptView payment={payment} />);
+    // Render the component inside the temporary container
+    root.render(
+      <div id={`printable-receipt-${payment.id}`} style={{ width: '8.5in', padding: '0.5in' }}>
+        <PaymentReceiptView payment={payment} />
+      </div>
+    );
     
     // Allow a moment for rendering
     await new Promise(resolve => setTimeout(resolve, 500));
     
-    const receiptElement = document.querySelector(`#temp-pdf-container-${payment.id} > div`);
+    const printableElement = document.getElementById(`printable-receipt-${payment.id}`);
 
-    if (!receiptElement) {
+    if (!printableElement) {
       toast({
         title: "Error",
         description: "No se pudo encontrar el contenido para generar el PDF.",
@@ -52,23 +56,43 @@ export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentRece
     }
 
     try {
-      const canvas = await html2canvas(receiptElement as HTMLElement, {
+       const canvas = await html2canvas(printableElement, {
         scale: 3,
         useCORS: true,
         logging: false,
       });
 
       const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'pt', 'a4');
+      
+      const pdf = new jsPDF({
+        orientation: 'p',
+        unit: 'pt',
+        format: 'a4'
+      });
+      
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
       
-      const imgWidth = canvas.width;
-      const imgHeight = canvas.height;
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
       
-      const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+      const ratio = pdfWidth / canvasWidth;
+      const imgHeight = canvasHeight * ratio;
       
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth * ratio, imgHeight * ratio);
+      const x = (pdfWidth - (canvasWidth * ratio)) / 2;
+
+      let position = 0;
+      let remainingHeight = imgHeight;
+
+      pdf.addImage(imgData, 'PNG', x, position, canvasWidth * ratio, imgHeight);
+      remainingHeight -= pdfHeight;
+
+      while (remainingHeight > 0) {
+        position -= pdfHeight;
+        pdf.addPage();
+        pdf.addImage(imgData, 'PNG', x, position, canvasWidth * ratio, imgHeight);
+        remainingHeight -= pdfHeight;
+      }
       
       const fileName = `Recibo-de-Pago-${payment.entityName.replace(/ /g, '_')}.pdf`;
       pdf.save(fileName);
@@ -87,17 +111,15 @@ export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentRece
       });
     } finally {
       setIsGenerating(false);
-      // Clean up the temporary element
       root.unmount();
       document.body.removeChild(tempContainer);
     }
   };
 
   return (
-    <button onClick={handleDownloadPdf} disabled={isGenerating} className="w-full flex items-center justify-start text-sm p-2 hover:bg-accent rounded-sm">
+    <Button onClick={handleDownloadPdf} disabled={isGenerating}>
       {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
       Descargar PDF
-    </button>
+    </Button>
   );
 }
-

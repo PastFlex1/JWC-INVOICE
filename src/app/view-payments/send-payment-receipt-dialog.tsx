@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -70,7 +71,9 @@ export function SendPaymentReceiptDialog({ payment, isOpen, onClose }: SendPayme
       const defaultBody = `Dear Client,\nAttached you will find your payment receipt.\nThanks for prefer us product`;
       const body = values.body ? `${defaultBody}\n\n${values.body}` : defaultBody;
       
-      const receiptElement = document.getElementById(`payment-receipt-${payment.id}-modal`);
+      const receiptElementId = `payment-receipt-${payment.id}-modal`;
+      const receiptElement = document.getElementById(receiptElementId);
+
       if (!receiptElement) {
         setError("Could not find receipt content to generate PDF.");
         return;
@@ -81,17 +84,39 @@ export function SendPaymentReceiptDialog({ payment, isOpen, onClose }: SendPayme
           scale: 3,
           useCORS: true,
           logging: false,
+          width: receiptElement.scrollWidth,
+          height: receiptElement.scrollHeight,
+          windowWidth: document.documentElement.scrollWidth,
+          windowHeight: document.documentElement.scrollHeight,
         });
 
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF('p', 'pt', 'a4');
+
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
-        const imgWidth = canvas.width;
-        const imgHeight = canvas.height;
-        const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-        
-        pdf.addImage(imgData, 'PNG', 0, 0, imgWidth * ratio, imgHeight * ratio);
+
+        const canvasWidth = canvas.width;
+        const canvasHeight = canvas.height;
+
+        const ratio = pdfWidth / canvasWidth;
+        const imgHeight = canvasHeight * ratio;
+
+        const x = (pdfWidth - (canvasWidth * ratio)) / 2;
+
+        let position = 0;
+        let remainingHeight = imgHeight;
+
+        pdf.addImage(imgData, 'PNG', x, position, canvasWidth * ratio, imgHeight);
+        remainingHeight -= pdfHeight;
+
+        while (remainingHeight > 0) {
+            position -= pdfHeight;
+            pdf.addPage();
+            pdf.addImage(imgData, 'PNG', x, position, canvasWidth * ratio, imgHeight);
+            remainingHeight -= pdfHeight;
+        }
+
         const pdfBase64 = pdf.output('datauristring').split(',')[1];
         
         const response = await fetch('/api/send-invoice', {
