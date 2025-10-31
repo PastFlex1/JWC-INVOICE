@@ -45,7 +45,7 @@ export async function POST(request: Request) {
     const emailHtml = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${emailBody.replace(/\n/g, '<br>')}</div>${automatedReplyNotice}${signatureHtml}`;
 
     await resend.emails.send({
-      from: 'JWC FLOWERS <facturacion@puntodeventastore.store>',
+      from: 'onboarding@resend.dev',
       to: toEmails,
       subject: subject,
       html: emailHtml,
