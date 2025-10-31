@@ -23,26 +23,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
     }
 
-    const automatedReplyNotice = `
-      <br><br>
-      <div style="font-family: Arial, sans-serif; font-size: 11px; color: #888; margin-top: 20px;">
-        <p>Please don't answer to this email, because is automatically, if you need assistance, please contact to <a href="mailto:jcwf@outlook.es">jcwf@outlook.es</a></p>
-      </div>
-    `;
-
-    const signatureHtml = `
-      <div style="font-family: Arial, sans-serif; font-size: 12px; color: #555; margin-top: 15px;">
-        <p style="margin: 0;">Best Regards</p>
-        <p style="margin: 0;">Team: JCW FLOWERS</p>
-        <p style="margin: 0;">Teams: Alexa JCW FLOWERS</p>
-        <p style="margin: 0;">Email: jcwf@outlook.es</p>
-      </div>
-      <div style="text-align: center; margin-top: 20px;">
-        <img src="https://firebasestorage.googleapis.com/v0/b/jcw-flowers.appspot.com/o/logo.png?alt=media&token=bf63943a-1438-4171-a0e2-892c81358b85" alt="JCW Flowers Logo" width="200" />
-      </div>
-    `;
-
-    const emailHtml = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${emailBody.replace(/\n/g, '<br>')}</div>${automatedReplyNotice}${signatureHtml}`;
+    const emailHtml = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${emailBody.replace(/\n/g, '<br>')}</div>`;
 
     await resend.emails.send({
       from: 'onboarding@resend.dev',
