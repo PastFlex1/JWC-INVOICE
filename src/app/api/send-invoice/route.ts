@@ -23,7 +23,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
     }
 
-    const emailHtml = `<div style="font-family: Arial, sans-serif; font-size: 14px;">${emailBody.replace(/\n/g, '<br>')}</div>`;
+    const emailHtml = `
+      <div style="font-family: Arial, sans-serif; font-size: 14px; line-height: 1.6;">
+        ${emailBody.replace(/\n/g, '<br>')}
+      </div>
+    `;
 
     await resend.emails.send({
       from: 'facturacion@puntodeventastore.store',
