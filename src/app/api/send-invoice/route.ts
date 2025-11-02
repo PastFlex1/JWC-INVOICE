@@ -30,6 +30,7 @@ export async function POST(request: Request) {
     const logoBuffer = fs.readFileSync(logoPath);
     const logoBase64 = logoBuffer.toString('base64');
     
+    // Embed the logo directly into the HTML using a Base64 data URI
     const emailHtml = `
       <html>
         <body>
@@ -41,17 +42,13 @@ export async function POST(request: Request) {
           <p>Team: JCW FLOWERS</p>
           <p>Teams: Alexa JCW FLOWERS</p>
           <p>Email: jcwf@outlook.es</p>
-          <img src="cid:logo" alt="JCW Flowers Logo" width="200" />
+          <img src="data:image/png;base64,${logoBase64}" alt="JCW Flowers Logo" width="200" />
         </body>
       </html>
     `;
 
+    // Only the PDF files are needed as attachments now
     const attachments = pdfAttachments || [];
-    attachments.push({
-      filename: 'logo.png',
-      content: logoBase64,
-      cid: 'logo',
-    });
 
     await resend.emails.send({
       from: 'JWC FLOWERS <facturacion@puntodeventastore.store>',
