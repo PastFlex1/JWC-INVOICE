@@ -90,7 +90,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
       
       try {
         const canvas = await html2canvas(invoiceElement, {
-          scale: 3,
+          scale: 2,
           useCORS: true,
           logging: false,
         });
