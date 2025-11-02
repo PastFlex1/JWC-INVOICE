@@ -15,7 +15,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
 import { Input } from '@/components/ui/input';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components-ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import {
@@ -54,7 +54,7 @@ const bunchItemSchema = z.object({
 
 const lineItemSchema = z.object({
   id: z.string(),
-  boxNumber: z.coerce.number().min(1, 'Must be > 0'),
+  numberOfBoxes: z.coerce.number().min(1, 'Must be > 0'),
   boxType: z.enum(['qb', 'eb', 'hb', 'jhb'], { required_error: 'Select a type.' }),
   numberOfBunches: z.coerce.number().min(0, '# Ramos must be >= 0'),
   bunches: z.array(bunchItemSchema).min(1, 'At least one bunch is required.'),
@@ -125,6 +125,7 @@ export function NewInvoiceForm() {
           reference: invoiceToLoad.reference || '',
           items: invoiceToLoad.items.map(item => ({
             ...item,
+            numberOfBoxes: (item as any).boxNumber || 1, // Migration from boxNumber
             id: uuidv4(),
             bunches: item.bunches.map(bunch => ({
               ...bunch,
@@ -135,6 +136,7 @@ export function NewInvoiceForm() {
         };
         delete dataForForm.saleStatus;
         delete dataForForm.purchaseStatus;
+        delete dataForForm.boxNumber; // clean up old field
         form.reset(dataForForm);
       } else {
         console.warn(`Invoice with id ${idToLoad} not found.`);
@@ -187,29 +189,36 @@ export function NewInvoiceForm() {
     const boxTypeValues: { [key: string]: number } = { eb: 0.13, qb: 0.25, hb: 0.50, jhb: 0.50 };
     const currentItems = watchedItems || [];
     const result = currentItems.reduce((acc, item) => {
-        acc.totalBoxTypeValue += boxTypeValues[item.boxType] || 0;
-        acc.totalBoxes += 1;
-        acc.totalBunches += Number(item.numberOfBunches) || 0;
+        const numBoxes = Number(item.numberOfBoxes) || 0;
+        acc.totalBoxTypeValue += (boxTypeValues[item.boxType] || 0) * numBoxes;
+        acc.totalBoxes += numBoxes;
+        acc.totalBunches += (Number(item.numberOfBunches) || 0) * numBoxes;
         
         item.bunches.forEach(bunch => {
-            acc.totalStemsPerBunch += Number(bunch.stemsPerBunch) || 0;
-            acc.totalBunchesPerBox += Number(bunch.bunchesPerBox) || 0;
-            const totalStems = (Number(bunch.stemsPerBunch) || 0) * (Number(bunch.bunchesPerBox) || 0);
-            acc.totalStems += totalStems;
+            const bunchesPerBox = Number(bunch.bunchesPerBox) || 0;
+            const stemsPerBunch = Number(bunch.stemsPerBunch) || 0;
+            const purchasePrice = Number(bunch.purchasePrice) || 0;
+            const salePrice = Number(bunch.salePrice) || 0;
 
-            acc.totalPurchasePrice += Number(bunch.purchasePrice) || 0;
-            acc.totalSalePrice += Number(bunch.salePrice) || 0;
+            acc.totalStemsPerBunch += stemsPerBunch;
+            acc.totalBunchesPerBox += bunchesPerBox;
+            const totalStemsForBunch = stemsPerBunch * bunchesPerBox;
+            const totalStemsForLine = totalStemsForBunch * numBoxes;
+            acc.totalStems += totalStemsForLine;
+
+            acc.totalPurchasePrice += purchasePrice;
+            acc.totalSalePrice += salePrice;
             acc.bunchCount += 1;
 
-            if ((Number(bunch.purchasePrice) || 0) > 0) {
-                acc.totalDifference += ((Number(bunch.salePrice) - Number(bunch.purchasePrice)) / Number(bunch.purchasePrice)) * 100;
+            if (purchasePrice > 0) {
+                acc.totalDifference += ((salePrice - purchasePrice) / purchasePrice) * 100;
                 acc.differenceCount += 1;
-            } else if ((Number(bunch.salePrice) || 0) > 0) {
+            } else if (salePrice > 0) {
                 acc.totalDifference += Infinity;
                 acc.differenceCount += 1;
             }
 
-            acc.totalValue += totalStems * (Number(bunch.salePrice) || 0);
+            acc.totalValue += totalStemsForLine * salePrice;
         });
         return acc;
     }, {
@@ -301,7 +310,7 @@ export function NewInvoiceForm() {
   const handleAddLineItem = () => {
     appendLineItem({
         id: uuidv4(),
-        boxNumber: (lineItems.length > 0 ? Math.max(...lineItems.map(item => item.boxNumber)) : 0) + 1,
+        numberOfBoxes: 1,
         boxType: 'hb',
         numberOfBunches: 1,
         bunches: [{
@@ -398,7 +407,10 @@ export function NewInvoiceForm() {
       reference: values.reference || '',
       farmDepartureDate: values.farmDepartureDate.toISOString(),
       flightDate: values.flightDate.toISOString(),
-      items: values.items as LineItem[],
+      items: values.items.map(item => ({
+        ...item,
+        boxNumber: item.numberOfBoxes, // Keep for legacy compatibility if needed
+      })) as LineItem[],
     };
 
     try {
@@ -769,7 +781,7 @@ export function NewInvoiceForm() {
                         <TableHeader>
                             <TableRow>
                                 <TableHead className="w-16">N°</TableHead>
-                                <TableHead className="w-24">Nº Caja</TableHead>
+                                <TableHead className="w-24">Cant. Cajas</TableHead>
                                 <TableHead className="w-32">Tipo Caja</TableHead>
                                 <TableHead className="w-24"># Ramos</TableHead>
                                 <TableHead className="min-w-[150px]">Producto</TableHead>
@@ -798,8 +810,9 @@ export function NewInvoiceForm() {
                                         const purchasePrice = form.watch(`${bunchPath}.purchasePrice`) || 0;
                                         const stemsPerBunch = form.watch(`${bunchPath}.stemsPerBunch`) || 0;
                                         const bunchesPerBox = form.watch(`${bunchPath}.bunchesPerBox`) || 0;
+                                        const numberOfBoxes = form.watch(`${lineItemPath}.numberOfBoxes`) || 0;
 
-                                        const totalStems = stemsPerBunch * bunchesPerBox;
+                                        const totalStems = stemsPerBunch * bunchesPerBox * numberOfBoxes;
                                         const totalValue = (totalStems * salePrice).toFixed(2);
                                         
                                         let differencePercent = '0 %';
@@ -818,7 +831,7 @@ export function NewInvoiceForm() {
                                             <TableRow key={bunch.id}>
                                                 <TableCell className="align-top pt-2 font-medium">{rowCounter}</TableCell>
                                                 <TableCell className="align-top pt-2">
-                                                    {bunchIndex === 0 ? <FormField control={form.control} name={`items.${lineItemIndex}.boxNumber`} render={({ field }) => <Input type="number" {...field} value={field.value ?? 0} className="w-24 py-2" />} /> : null}
+                                                    {bunchIndex === 0 ? <FormField control={form.control} name={`items.${lineItemIndex}.numberOfBoxes`} render={({ field }) => <Input type="number" {...field} value={field.value ?? 0} className="w-24 py-2" />} /> : null}
                                                 </TableCell>
                                                 <TableCell className="align-top pt-2">
                                                      {bunchIndex === 0 ? (
