@@ -23,7 +23,6 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
     }
 
-    // Simple HTML structure as per user's working example
     const emailHtml = `<p>${emailBody.replace(/\n/g, '<br>')}</p>`;
 
     await resend.emails.send({
