@@ -29,6 +29,8 @@ import { cn } from '@/lib/utils';
 import { type DateRange } from 'react-day-picker';
 import SendReportDialog from '@/app/shared/send-report-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import FarmCreditNotesDownloadPdfButton from './farm-credit-notes-download-pdf';
+import FarmCreditNotesDownloadExcelButton from './farm-credit-notes-download-excel';
 
 type CreditNoteFormData = Omit<CreditNote, 'id'>;
 type CreditNoteWithDetails = CreditNote & { farmName?: string };
@@ -227,6 +229,17 @@ export function FarmCreditNotesClient() {
                     <XIcon className="h-4 w-4" />
                 </Button>
               )}
+              <div className="flex-grow" />
+              {localCreditNotes.length > 0 && (
+                <div className="flex gap-2">
+                  <FarmCreditNotesDownloadPdfButton notes={localCreditNotes} />
+                  <FarmCreditNotesDownloadExcelButton notes={localCreditNotes} />
+                  <Button variant="outline" onClick={() => setIsSendDialogOpen(true)}>
+                    <Mail className="mr-2 h-4 w-4" />
+                    Enviar por Correo
+                  </Button>
+                </div>
+              )}
             </div>
              <FarmCreditNotesView 
               notes={localCreditNotes} 
@@ -250,6 +263,15 @@ export function FarmCreditNotesClient() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <SendReportDialog
+        isOpen={isSendDialogOpen}
+        onClose={() => setIsSendDialogOpen(false)}
+        reportTitle="Reporte de Notas de Crédito (Finca)"
+        reportDescription="El reporte adjunto contiene un resumen de las notas de crédito de finca para el período seleccionado."
+        attachmentFileName="Reporte-Notas-de-Credito-Finca.pdf"
+        elementIdToPrint="farm-credit-notes-to-print"
+      />
     </>
   );
 }

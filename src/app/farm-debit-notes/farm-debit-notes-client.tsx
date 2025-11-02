@@ -29,6 +29,8 @@ import { cn } from '@/lib/utils';
 import { type DateRange } from 'react-day-picker';
 import SendReportDialog from '@/app/shared/send-report-dialog';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import FarmDebitNotesDownloadPdfButton from './farm-debit-notes-download-pdf';
+import FarmDebitNotesDownloadExcelButton from './farm-debit-notes-download-excel';
 
 type DebitNoteFormData = Omit<DebitNote, 'id'>;
 type DebitNoteWithDetails = DebitNote & { farmName?: string };
@@ -227,6 +229,17 @@ export function FarmDebitNotesClient() {
                     <XIcon className="h-4 w-4" />
                 </Button>
               )}
+              <div className="flex-grow" />
+              {localDebitNotes.length > 0 && (
+                <div className="flex gap-2">
+                  <FarmDebitNotesDownloadPdfButton notes={localDebitNotes} />
+                  <FarmDebitNotesDownloadExcelButton notes={localDebitNotes} />
+                  <Button variant="outline" onClick={() => setIsSendDialogOpen(true)}>
+                    <Mail className="mr-2 h-4 w-4" />
+                    Enviar por Correo
+                  </Button>
+                </div>
+              )}
             </div>
             <FarmDebitNotesView 
               notes={localDebitNotes} 
@@ -250,6 +263,15 @@ export function FarmDebitNotesClient() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <SendReportDialog
+        isOpen={isSendDialogOpen}
+        onClose={() => setIsSendDialogOpen(false)}
+        reportTitle="Reporte de Notas de Débito (Finca)"
+        reportDescription="El reporte adjunto contiene un resumen de las notas de débito de finca para el período seleccionado."
+        attachmentFileName="Reporte-Notas-de-Debito-Finca.pdf"
+        elementIdToPrint="farm-debit-notes-to-print"
+      />
     </>
   );
 }

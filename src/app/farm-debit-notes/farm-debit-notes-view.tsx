@@ -18,7 +18,7 @@ export function FarmDebitNotesView({ notes, onDelete }: FarmDebitNotesViewProps)
     const totalAmount = notes.reduce((sum, note) => sum + note.amount, 0);
 
   return (
-    <Card className="p-6 bg-white text-black shadow-lg border print:shadow-none print:border-0" id="debit-notes-to-print">
+    <Card className="p-6 bg-white text-black shadow-lg border print:shadow-none print:border-0" id="farm-debit-notes-to-print">
       <CardContent className="p-0 text-sm leading-tight">
         <header className="flex justify-between items-start mb-6">
           <div className="w-1/2">
