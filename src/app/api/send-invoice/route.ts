@@ -25,12 +25,10 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
     }
 
-    // Read logo file and convert to base64
+    // Read logo file
     const logoPath = path.join(process.cwd(), 'public', 'logo.png');
     const logoBuffer = fs.readFileSync(logoPath);
-    const logoBase64 = logoBuffer.toString('base64');
     
-    // Embed the logo directly into the HTML using a Base64 data URI
     const emailHtml = `
       <html>
         <body>
@@ -42,13 +40,19 @@ export async function POST(request: Request) {
           <p>Team: JCW FLOWERS</p>
           <p>Teams: Alexa JCW FLOWERS</p>
           <p>Email: jcwf@outlook.es</p>
-          <img src="data:image/png;base64,${logoBase64}" alt="JCW Flowers Logo" width="200" />
+          <img src="cid:logo" alt="JCW Flowers Logo" width="200" />
         </body>
       </html>
     `;
 
-    // Only the PDF files are needed as attachments now
     const attachments = pdfAttachments || [];
+    
+    // Add the logo as an attachment with a Content-ID
+    attachments.push({
+      filename: 'logo.png',
+      content: logoBuffer,
+      cid: 'logo'
+    });
 
     await resend.emails.send({
       from: 'JWC FLOWERS <facturacion@puntodeventastore.store>',
