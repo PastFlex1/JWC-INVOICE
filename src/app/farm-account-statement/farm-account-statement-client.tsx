@@ -27,6 +27,7 @@ export type StatementData = {
 export function FarmAccountStatementClient() {
   const { fincas, invoices, creditNotes, debitNotes, payments, customers, consignatarios } = useAppData();
   const [selectedFincaId, setSelectedFincaId] = useState<string | null>(null);
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [selectedConsignatarioId, setSelectedConsignatarioId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
@@ -34,23 +35,44 @@ export function FarmAccountStatementClient() {
   const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
   const consignatarioMap = useMemo(() => new Map(consignatarios.map(c => [c.id, c.nombreConsignatario])), [consignatarios]);
 
+  const availableCustomers = useMemo(() => {
+    if (!selectedFincaId) return [];
+    const customerIds = new Set(invoices.filter(inv => inv.farmId === selectedFincaId).map(inv => inv.customerId));
+    return customers.filter(c => customerIds.has(c.id));
+  }, [selectedFincaId, invoices, customers]);
+  
+  const availableConsignatarios = useMemo(() => {
+    if (!selectedCustomerId) return [];
+    const consigneeIds = new Set(consignatarios.filter(c => c.customerId === selectedCustomerId).map(c => c.id));
+    return consignatarios.filter(c => consigneeIds.has(c.id));
+  }, [selectedCustomerId, consignatarios]);
+
+
   const availableMonths = useMemo(() => {
     if (!selectedFincaId) return [];
     let fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both'));
-
+    if (selectedCustomerId) {
+      fincaInvoices = fincaInvoices.filter(inv => inv.customerId === selectedCustomerId);
+    }
     if (selectedConsignatarioId) {
       fincaInvoices = fincaInvoices.filter(inv => inv.consignatarioId === selectedConsignatarioId);
     }
     
     const months = new Set(fincaInvoices.map(inv => format(parseISO(inv.farmDepartureDate), 'yyyy-MM')));
     return Array.from(months).sort((a, b) => b.localeCompare(a));
-  }, [selectedFincaId, selectedConsignatarioId, invoices]);
+  }, [selectedFincaId, selectedCustomerId, selectedConsignatarioId, invoices]);
 
   useEffect(() => {
-    setSelectedMonth('all');
+    setSelectedCustomerId(null);
     setSelectedConsignatarioId(null);
+    setSelectedMonth('all');
   }, [selectedFincaId]);
 
+  useEffect(() => {
+    setSelectedConsignatarioId(null);
+    setSelectedMonth('all');
+  }, [selectedCustomerId]);
+  
   useEffect(() => {
     setSelectedMonth('all');
   }, [selectedConsignatarioId]);
@@ -64,6 +86,9 @@ export function FarmAccountStatementClient() {
 
     let fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both') && inv.purchaseStatus !== 'Paid');
     
+    if (selectedCustomerId) {
+      fincaInvoices = fincaInvoices.filter(inv => inv.customerId === selectedCustomerId);
+    }
     if (selectedConsignatarioId) {
       fincaInvoices = fincaInvoices.filter(inv => inv.consignatarioId === selectedConsignatarioId);
     }
@@ -130,7 +155,7 @@ export function FarmAccountStatementClient() {
       urgentPayment,
       statementDate: latestInvoiceDate,
     };
-  }, [selectedFincaId, selectedConsignatarioId, selectedMonth, fincas, invoices, creditNotes, debitNotes, payments, customerMap, consignatarioMap]);
+  }, [selectedFincaId, selectedCustomerId, selectedConsignatarioId, selectedMonth, fincas, invoices, creditNotes, debitNotes, payments, customerMap, consignatarioMap]);
 
   return (
     <>
@@ -169,13 +194,29 @@ export function FarmAccountStatementClient() {
             </Select>
 
             {selectedFincaId && (
-              <Select onValueChange={(value) => setSelectedConsignatarioId(value === 'all' ? null : value)}>
+              <Select onValueChange={setSelectedCustomerId} value={selectedCustomerId || ''}>
+                <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
+                  <SelectValue placeholder="Filtrar por cliente..." />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">Todos los Clientes</SelectItem>
+                  {availableCustomers.map(customer => (
+                    <SelectItem key={customer.id} value={customer.id}>
+                      {customer.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+
+            {selectedCustomerId && (
+              <Select onValueChange={(value) => setSelectedConsignatarioId(value === 'all' ? null : value)} value={selectedConsignatarioId || ''}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
                   <SelectValue placeholder="Filtrar por consignatario..." />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="all">Todos los Consignatarios</SelectItem>
-                  {consignatarios.map(consignatario => (
+                  {availableConsignatarios.map(consignatario => (
                     <SelectItem key={consignatario.id} value={consignatario.id}>
                       {consignatario.nombreConsignatario}
                     </SelectItem>
