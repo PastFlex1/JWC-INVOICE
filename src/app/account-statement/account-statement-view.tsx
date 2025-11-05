@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { format, parseISO } from 'date-fns';
 import type { StatementData } from './account-statement-client';
@@ -14,14 +14,17 @@ type AccountStatementViewProps = {
 
 export function AccountStatementView({ data, dateLocale }: AccountStatementViewProps) {
   const { t } = useTranslation();
-  const groupedInvoices = data.invoices.reduce((acc, invoice) => {
-    const month = format(parseISO(invoice.farmDepartureDate), 'yyyy-MM');
-    if (!acc[month]) {
-      acc[month] = [];
-    }
-    acc[month].push(invoice);
-    return acc;
-  }, {} as Record<string, typeof data.invoices>);
+  
+  const groupedInvoices = useMemo(() => {
+    return data.invoices.reduce((acc, invoice) => {
+      const month = format(parseISO(invoice.farmDepartureDate), 'yyyy-MM');
+      if (!acc[month]) {
+        acc[month] = [];
+      }
+      acc[month].push(invoice);
+      return acc;
+    }, {} as Record<string, typeof data.invoices>);
+  }, [data.invoices]);
 
   return (
     <Card className="p-6 bg-white text-black shadow-lg border print:shadow-none print:border-0" id="statement-to-print">
