@@ -417,8 +417,8 @@ export function NewInvoiceForm() {
       if (editId) {
         await updateInvoice(editId, invoiceData as Partial<Omit<Invoice, 'id'>>);
         toast({
-          title: "Factura Actualizada",
-          description: "La factura ha sido actualizada correctamente.",
+          title: t('invoices.new.toast.updateSuccessTitle'),
+          description: t('invoices.new.toast.updateSuccessDescription'),
         });
       } else {
         await addInvoice(invoiceData);
@@ -439,8 +439,8 @@ export function NewInvoiceForm() {
       console.error('Error saving invoice:', error);
       const errorMessage = error instanceof Error ? error.message : 'An unknown error occurred.';
       toast({
-        title: editId ? 'Error al Actualizar' : t('invoices.new.toast.errorTitle'),
-        description: `No se pudo guardar la factura: ${errorMessage}.`,
+        title: editId ? t('invoices.new.toast.updateErrorTitle') : t('invoices.new.toast.errorTitle'),
+        description: t('invoices.new.toast.errorDescription', { error: errorMessage }),
         variant: 'destructive',
         duration: 10000,
       });
@@ -454,7 +454,7 @@ export function NewInvoiceForm() {
         <div className="flex h-[80vh] w-full items-center justify-center">
             <div className="flex flex-col items-center gap-4">
                 <Loader2 className="h-12 w-12 text-primary animate-spin" />
-                <p className="text-muted-foreground">Cargando datos de factura...</p>
+                <p className="text-muted-foreground">{t('invoices.new.loadingData')}</p>
             </div>
         </div>
     );
@@ -464,8 +464,8 @@ export function NewInvoiceForm() {
     <>
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight font-headline">{editId ? "Editar Factura" : "Nueva Factura"}</h2>
-        <p className="text-muted-foreground">{editId ? "Modifique los detalles de la factura." : "Crear una nueva factura de venta o compra."}</p>
+        <h2 className="text-3xl font-bold tracking-tight font-headline">{editId ? t('invoices.new.editTitle') : t('invoices.new.title')}</h2>
+        <p className="text-muted-foreground">{editId ? t('invoices.new.editDescription') : t('invoices.new.description')}</p>
       </div>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
@@ -479,7 +479,7 @@ export function NewInvoiceForm() {
                 name="type"
                 render={({ field }) => (
                   <FormItem className="col-span-full">
-                    <FormLabel>Tipo de Factura</FormLabel>
+                    <FormLabel>{t('invoices.new.invoiceType')}</FormLabel>
                     <FormControl>
                       <RadioGroup
                         onValueChange={field.onChange}
@@ -490,19 +490,19 @@ export function NewInvoiceForm() {
                           <FormControl>
                             <RadioGroupItem value="sale" />
                           </FormControl>
-                          <FormLabel className="font-normal">Venta (Estado de Cuenta Cliente)</FormLabel>
+                          <FormLabel className="font-normal">{t('invoices.new.typeSale')}</FormLabel>
                         </FormItem>
                         <FormItem className="flex items-center space-x-3 space-y-0">
                           <FormControl>
                             <RadioGroupItem value="purchase" />
                           </FormControl>
-                          <FormLabel className="font-normal">Compra (Estado de Cuenta Finca)</FormLabel>
+                          <FormLabel className="font-normal">{t('invoices.new.typePurchase')}</FormLabel>
                         </FormItem>
                         <FormItem className="flex items-center space-x-3 space-y-0">
                           <FormControl>
                             <RadioGroupItem value="both" />
                           </FormControl>
-                          <FormLabel className="font-normal">Ambos</FormLabel>
+                          <FormLabel className="font-normal">{t('invoices.new.typeBoth')}</FormLabel>
                         </FormItem>
                       </RadioGroup>
                     </FormControl>
@@ -780,22 +780,22 @@ export function NewInvoiceForm() {
                     <Table>
                         <TableHeader>
                             <TableRow>
-                                <TableHead className="w-16">N°</TableHead>
-                                <TableHead className="w-24">Cant. Cajas</TableHead>
-                                <TableHead className="w-32">Tipo Caja</TableHead>
-                                <TableHead className="w-24"># Ramos</TableHead>
-                                <TableHead className="min-w-[150px]">Producto</TableHead>
-                                <TableHead className="min-w-[150px]">Variedad</TableHead>
-                                <TableHead className="min-w-[150px]">Color</TableHead>
-                                <TableHead className="w-24">Long.</TableHead>
-                                <TableHead className="w-24">Tallos/Ramo</TableHead>
-                                <TableHead className="w-24">Ramos/Caja</TableHead>
-                                <TableHead className="w-24">P. Compra</TableHead>
-                                <TableHead className="w-24">P. Venta</TableHead>
-                                <TableHead className="w-24">Total Tallos</TableHead>
-                                <TableHead className="w-24">Total</TableHead>
-                                <TableHead className="w-24">Diferencia (%)</TableHead>
-                                <TableHead className="w-[100px]">Acciones</TableHead>
+                                <TableHead className="w-16">{t('invoices.new.items.no')}</TableHead>
+                                <TableHead className="w-24">{t('invoices.new.items.boxCount')}</TableHead>
+                                <TableHead className="w-32">{t('invoices.new.items.boxType')}</TableHead>
+                                <TableHead className="w-24">{t('invoices.new.items.bunchCount')}</TableHead>
+                                <TableHead className="min-w-[150px]">{t('invoices.new.items.product')}</TableHead>
+                                <TableHead className="min-w-[150px]">{t('invoices.new.items.variety')}</TableHead>
+                                <TableHead className="min-w-[150px]">{t('invoices.new.items.color')}</TableHead>
+                                <TableHead className="w-24">{t('invoices.new.items.length')}</TableHead>
+                                <TableHead className="w-24">{t('invoices.new.items.stemsPerBunch')}</TableHead>
+                                <TableHead className="w-24">{t('invoices.new.items.bunchesPerBox')}</TableHead>
+                                <TableHead className="w-24">{t('invoices.new.items.purchasePrice')}</TableHead>
+                                <TableHead className="w-24">{t('invoices.new.items.salePrice')}</TableHead>
+                                <TableHead className="w-24">{t('invoices.new.items.totalStems')}</TableHead>
+                                <TableHead className="w-24">{t('invoices.new.items.total')}</TableHead>
+                                <TableHead className="w-24">{t('invoices.new.items.difference')}</TableHead>
+                                <TableHead className="w-[100px]">{t('invoices.new.items.actions')}</TableHead>
                             </TableRow>
                         </TableHeader>
                         <TableBody>
@@ -866,13 +866,13 @@ export function NewInvoiceForm() {
                                                 </TableCell>
                                                 <TableCell className="min-w-[150px]"><FormField control={form.control} name={`${bunchPath}.product`} render={({ field }) => (
                                                     <Select onValueChange={(value) => { field.onChange(value); handleProductChange(lineItemIndex, bunchIndex, value); }} value={field.value ?? ''}>
-                                                        <FormControl><SelectTrigger className="py-2"><SelectValue placeholder="Producto" /></SelectTrigger></FormControl>
+                                                        <FormControl><SelectTrigger className="py-2"><SelectValue placeholder={t('invoices.new.items.productPlaceholder')} /></SelectTrigger></FormControl>
                                                         <SelectContent>{uniqueProducts.map(p => <SelectItem key={p.id} value={p.name}>{p.name}</SelectItem>)}</SelectContent>
                                                     </Select>
                                                 )} /></TableCell>
                                                 <TableCell className="min-w-[150px]"><FormField control={form.control} name={`${bunchPath}.variety`} render={({ field }) => (
                                                      <Select onValueChange={(value) => { field.onChange(value); handleVarietyChange(lineItemIndex, bunchIndex, value); }} value={field.value ?? ''} disabled={!selectedProduct}>
-                                                        <FormControl><SelectTrigger className="py-2"><SelectValue placeholder="Variedad" /></SelectTrigger></FormControl>
+                                                        <FormControl><SelectTrigger className="py-2"><SelectValue placeholder={t('invoices.new.items.varietyPlaceholder')} /></SelectTrigger></FormControl>
                                                         <SelectContent>{varieties.map(v => <SelectItem key={v} value={v}>{v}</SelectItem>)}</SelectContent>
                                                     </Select>
                                                 )}/></TableCell>
@@ -882,7 +882,7 @@ export function NewInvoiceForm() {
                                                         const colorData = colors.find(c => c.color === value); 
                                                         handleColorChange(lineItemIndex, bunchIndex, colorData); 
                                                     }} value={field.value ?? ''} disabled={!selectedVariety}>
-                                                        <FormControl><SelectTrigger className="py-2"><SelectValue placeholder="Color" /></SelectTrigger></FormControl>
+                                                        <FormControl><SelectTrigger className="py-2"><SelectValue placeholder={t('invoices.new.items.colorPlaceholder')} /></SelectTrigger></FormControl>
                                                         <SelectContent>{colors.map(c => <SelectItem key={c.productoId} value={c.color}>{c.color}</SelectItem>)}</SelectContent>
                                                     </Select>
                                                 )}/></TableCell>
@@ -940,7 +940,7 @@ export function NewInvoiceForm() {
                         </TableBody>
                          <TableFooter>
                             <TableRow>
-                                <TableCell colSpan={2} className="font-bold">Totales</TableCell>
+                                <TableCell colSpan={2} className="font-bold">{t('invoices.new.items.totals')}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBoxTypeValue.toFixed(2)}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBoxes}</TableCell>
                                 <TableCell className="font-bold">{totals.totalBunches}</TableCell>
@@ -969,7 +969,7 @@ export function NewInvoiceForm() {
             </Button>
             <Button type="submit" disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              {isSubmitting ? t('common.saving') : (editId ? 'Guardar Cambios' : t('invoices.new.save'))}
+              {isSubmitting ? t('common.saving') : (editId ? t('invoices.new.saveChanges') : t('invoices.new.save'))}
             </Button>
           </div>
         </form>
@@ -978,15 +978,15 @@ export function NewInvoiceForm() {
     <AlertDialog open={!!itemToDelete} onOpenChange={() => setItemToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Está seguro?</AlertDialogTitle>
+            <AlertDialogTitle>{t('invoices.new.deleteRowTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. ¿Está seguro de que desea eliminar esta fila?
+              {t('invoices.new.deleteRowDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setItemToDelete(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setItemToDelete(null)}>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={confirmRemoveBunch} variant="destructive">
-              Eliminar
+              {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
