@@ -12,7 +12,7 @@ import AccountStatementExcelButton from './account-statement-download-excel';
 import SendDocumentsDialog from './send-documents-dialog';
 import { useTranslation } from '@/context/i18n-context';
 import { format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { es, enUS } from 'date-fns/locale';
 
 export type StatementData = {
   customer: Customer;
@@ -30,7 +30,9 @@ export function AccountStatementClient() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
-  const { t } = useTranslation();
+  const { t, locale } = useTranslation();
+  const dateLocale = useMemo(() => (locale === 'es' ? es : enUS), [locale]);
+
 
   const consignatarioMap = useMemo(() => {
     return consignatarios.reduce((acc, c) => {
@@ -167,7 +169,7 @@ export function AccountStatementClient() {
                   <SelectItem value="all">Todos los Meses</SelectItem>
                   {availableMonths.map(month => (
                     <SelectItem key={month} value={month}>
-                      {format(parseISO(`${month}-02`), "MMMM yyyy", { locale: es })}
+                      {format(parseISO(`${month}-02`), "MMMM yyyy", { locale: dateLocale })}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -177,7 +179,7 @@ export function AccountStatementClient() {
         </Card>
         
         {statementData && statementData.invoices.length > 0 && (
-          <AccountStatementView data={statementData} />
+          <AccountStatementView data={statementData} dateLocale={dateLocale} />
         )}
 
         {selectedCustomerId && (!statementData || statementData.invoices.length === 0) && (

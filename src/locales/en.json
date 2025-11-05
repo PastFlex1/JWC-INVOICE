@@ -253,6 +253,7 @@
         "payments": "PAYMENTS",
         "balance": "BALANCE",
         "pendingMonth": "PENDING {month}",
+        "totalForMonth": "TOTAL {month}",
         "totalPending": "TOTAL PENDING",
         "creditPolicyTitle": "CREDIT POLICY",
         "policy1": "All claims must be made within 10 days of receiving the flower.",

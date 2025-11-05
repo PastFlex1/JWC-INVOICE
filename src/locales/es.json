@@ -253,6 +253,7 @@
       "payments": "PAGOS",
       "balance": "SALDO",
       "pendingMonth": "PENDIENTE {month}",
+      "totalForMonth": "TOTAL {month}",
       "totalPending": "TOTAL PENDIENTE",
       "creditPolicyTitle": "POLITICA DE CRÉDITO",
       "policy1": "Todo reclamo debe ser realizado dentro de los 10 días posteriores a la recepción de la flor.",

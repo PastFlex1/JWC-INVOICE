@@ -3,15 +3,16 @@
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
 import type { StatementData } from './account-statement-client';
 import { useTranslation } from '@/context/i18n-context';
+import type { Locale } from 'date-fns';
 
 type AccountStatementViewProps = {
   data: StatementData;
+  dateLocale: Locale;
 };
 
-export function AccountStatementView({ data }: AccountStatementViewProps) {
+export function AccountStatementView({ data, dateLocale }: AccountStatementViewProps) {
   const { t } = useTranslation();
   const groupedInvoices = data.invoices.reduce((acc, invoice) => {
     const month = format(parseISO(invoice.farmDepartureDate), 'yyyy-MM');
@@ -95,7 +96,7 @@ export function AccountStatementView({ data }: AccountStatementViewProps) {
                 },
                 { total: 0, creditsDebits: 0, payments: 0, balance: 0 }
               );
-              const monthName = format(parseISO(`${month}-02`), "MMMM yyyy", { locale: es });
+              const monthName = format(parseISO(`${month}-02`), "MMMM yyyy", { locale: dateLocale });
               return (
               <React.Fragment key={month}>
                 <div className="grid grid-cols-[100px,100px,1fr,100px,100px,100px,100px] bg-gray-100 font-bold">
@@ -113,7 +114,7 @@ export function AccountStatementView({ data }: AccountStatementViewProps) {
                    </div>
                 ))}
                 <div className="grid grid-cols-[100px,100px,1fr,100px,100px,100px,100px] font-bold text-xs bg-gray-100 border-b border-black">
-                    <div className="p-1 border-r border-black col-span-3 text-center">TOTAL {monthName.toUpperCase()}</div>
+                    <div className="p-1 border-r border-black col-span-3 text-center">{t('accountStatement.view.totalForMonth', { month: monthName.toUpperCase() })}</div>
                     <div className="p-1 border-r border-black text-right">${monthlyTotals.total.toFixed(2)}</div>
                     <div className="p-1 border-r border-black text-right">${monthlyTotals.creditsDebits.toFixed(2)}</div>
                     <div className="p-1 border-r border-black text-right">${monthlyTotals.payments.toFixed(2)}</div>
