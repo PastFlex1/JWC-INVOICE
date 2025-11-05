@@ -52,7 +52,7 @@ export function ViewPaymentsView({ payments, onViewPayment, onSendPayment }: Vie
               <TableHead>{t('viewPayments.table.invoicesPaid')}</TableHead>
               <TableHead>{t('viewPayments.table.method')}</TableHead>
               <TableHead>{t('viewPayments.table.bank')}</TableHead>
-              <TableHead className="text-right">{t('common.actions')}</TableHead>
+              <TableHead className="text-right">{t('common.actions.title')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
