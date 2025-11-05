@@ -163,10 +163,10 @@ export function AccountStatementClient() {
             {selectedCustomerId && availableMonths.length > 0 && (
               <Select onValueChange={setSelectedMonth} value={selectedMonth}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[200px]">
-                  <SelectValue placeholder="Filtrar por mes..." />
+                  <SelectValue placeholder={t('accountStatement.filterByMonth')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos los Meses</SelectItem>
+                  <SelectItem value="all">{t('accountStatement.allMonths')}</SelectItem>
                   {availableMonths.map(month => (
                     <SelectItem key={month} value={month}>
                       {format(parseISO(`${month}-02`), "MMMM yyyy", { locale: dateLocale })}
@@ -184,7 +184,7 @@ export function AccountStatementClient() {
 
         {selectedCustomerId && (!statementData || statementData.invoices.length === 0) && (
           <div className="text-center py-12 text-muted-foreground">
-            <p>No se encontraron facturas para el período seleccionado.</p>
+            <p>{t('accountStatement.noInvoices')}</p>
           </div>
         )}
 

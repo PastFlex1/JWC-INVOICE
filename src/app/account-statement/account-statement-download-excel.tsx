@@ -8,6 +8,7 @@ import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { StatementData } from './account-statement-client';
 import { format, parseISO } from 'date-fns';
+import { useTranslation } from '@/context/i18n-context';
 
 type AccountStatementExcelButtonProps = {
   data: StatementData;
@@ -16,18 +17,27 @@ type AccountStatementExcelButtonProps = {
 export default function AccountStatementExcelButton({ data }: AccountStatementExcelButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleDownloadExcel = () => {
     setIsGenerating(true);
     try {
       const ws_data = [
-        ["ESTADO DE CUENTA", data.customer.name.toUpperCase()],
+        [t('accountStatement.excel.title'), data.customer.name.toUpperCase()],
         [],
-        ["CLIENTE:", data.customer.name],
-        ["DIRECCION:", data.customer.address],
-        ["CIUDAD:", `${data.customer.estadoCiudad}, ${data.customer.pais}`],
+        [t('accountStatement.excel.customer'), data.customer.name],
+        [t('accountStatement.excel.address'), data.customer.address],
+        [t('accountStatement.excel.city'), `${data.customer.estadoCiudad}, ${data.customer.pais}`],
         [],
-        ["FECHA", "FACTURA #", "CLIENTE", "CARGOS", "CRÉDITOS/DÉBITOS", "PAGOS", "SALDO"]
+        [
+          t('accountStatement.view.date'), 
+          t('accountStatement.view.invoiceNo'), 
+          t('accountStatement.view.customer'), 
+          t('accountStatement.view.charges'), 
+          t('accountStatement.view.creditsDebits'), 
+          t('accountStatement.view.payments'), 
+          t('accountStatement.view.balance')
+        ]
       ];
 
       const groupedInvoices = data.invoices.reduce((acc, invoice) => {
@@ -40,7 +50,7 @@ export default function AccountStatementExcelButton({ data }: AccountStatementEx
       }, {} as Record<string, typeof data.invoices>);
 
       Object.entries(groupedInvoices).forEach(([month, invoices]) => {
-        ws_data.push([`PENDIENTE ${month.toUpperCase()}`]);
+        ws_data.push([t('accountStatement.view.pendingMonth', { month: month.toUpperCase() })]);
         invoices.forEach(invoice => {
           ws_data.push([
             format(parseISO(invoice.flightDate), 'dd/MM/yyyy'),
@@ -63,7 +73,7 @@ export default function AccountStatementExcelButton({ data }: AccountStatementEx
             { total: 0, creditsDebits: 0, payments: 0, balance: 0 }
         );
         ws_data.push([
-            "", "", `TOTAL ${month.toUpperCase()}`,
+            "", "", t('accountStatement.view.totalForMonth', { month: month.toUpperCase() }),
             monthlyTotals.total,
             monthlyTotals.creditsDebits,
             monthlyTotals.payments,
@@ -73,7 +83,7 @@ export default function AccountStatementExcelButton({ data }: AccountStatementEx
 
       ws_data.push([]);
       ws_data.push([
-        "", "", "TOTAL PENDIENTE",
+        "", "", t('accountStatement.view.totalPending'),
         data.invoices.reduce((acc, inv) => acc + inv.total, 0),
         data.totalCredits - data.totalDebits,
         data.totalPayments,
@@ -89,21 +99,21 @@ export default function AccountStatementExcelButton({ data }: AccountStatementEx
       ];
       
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Estado de Cuenta");
+      XLSX.utils.book_append_sheet(wb, ws, t('accountStatement.excel.sheetName'));
 
-      const fileName = `Estado-de-Cuenta-${data.customer.name.replace(/ /g, '_')}.xlsx`;
+      const fileName = `${t('accountStatement.excel.fileName')}-${data.customer.name.replace(/ /g, '_')}.xlsx`;
       XLSX.writeFile(wb, fileName);
       
       toast({
-        title: "Éxito",
-        description: `El archivo ${fileName} se ha descargado.`,
+        title: t('common.success'),
+        description: t('common.downloadSuccess', { fileName }),
       });
 
     } catch (error) {
       console.error("Error generating Excel:", error);
       toast({
-        title: "Error",
-        description: "Ocurrió un error inesperado al generar el archivo Excel.",
+        title: t('common.error'),
+        description: t('common.excelError'),
         variant: "destructive",
       });
     } finally {
@@ -114,7 +124,7 @@ export default function AccountStatementExcelButton({ data }: AccountStatementEx
   return (
     <Button onClick={handleDownloadExcel} disabled={isGenerating} variant="outline">
       {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-      Descargar Excel
+      {t('accountStatement.downloadExcel')}
     </Button>
   );
 }

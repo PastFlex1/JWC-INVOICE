@@ -5,12 +5,14 @@ import { Card, CardContent } from '@/components/ui/card';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
 import type { StatementData } from './historical-farm-account-statement-client';
+import { useTranslation } from '@/context/i18n-context';
 
 type HistoricalFarmAccountStatementViewProps = {
   data: StatementData;
 };
 
 export function HistoricalFarmAccountStatementView({ data }: HistoricalFarmAccountStatementViewProps) {
+  const { t } = useTranslation();
   
   const allInvoices = data.invoices;
 
@@ -41,10 +43,10 @@ export function HistoricalFarmAccountStatementView({ data }: HistoricalFarmAccou
             </div>
           </div>
           <div className="w-1/2 flex flex-col items-end">
-            <h1 className="text-xl font-bold mb-4 tracking-wider">ESTADO DE CUENTA HISTÓRICO {data.finca.name.toUpperCase()}</h1>
+            <h1 className="text-xl font-bold mb-4 tracking-wider">{t('farmAccountStatement.view.title', { farmName: data.finca.name.toUpperCase() })}</h1>
             <div className="w-[280px] text-xs mt-4">
               <div className="flex border border-gray-300 bg-gray-100 font-bold">
-                <div className="w-2/3 p-1">SALDO DE CUENTA:</div>
+                <div className="w-2/3 p-1">{t('farmAccountStatement.view.balanceTitle')}:</div>
                 <div className="w-1/3 p-1 text-center">{format(parseISO(data.statementDate), 'dd/MM/yyyy')}</div>
               </div>
               <div className="flex border-l border-r border-b border-gray-300">
@@ -54,7 +56,7 @@ export function HistoricalFarmAccountStatementView({ data }: HistoricalFarmAccou
             </div>
              <div className="w-[280px] text-xs mt-2">
               <div className="flex border border-gray-300 bg-gray-100 font-bold">
-                <div className="w-2/3 p-1">PAGO URGENTE FACTURAS:</div>
+                <div className="w-2/3 p-1">{t('farmAccountStatement.view.urgentPayment')}:</div>
                 <div className="w-1/3 p-1 text-center">{format(parseISO(data.statementDate), 'dd/MM/yyyy')}</div>
               </div>
               <div className="flex border-l border-r border-b border-gray-300">
@@ -67,28 +69,28 @@ export function HistoricalFarmAccountStatementView({ data }: HistoricalFarmAccou
 
         <section className="border border-black p-2 mb-4 text-xs">
           <div className="grid grid-cols-[auto,1fr] gap-x-2">
-            <strong>PROVEEDOR:</strong>
+            <strong>{t('farmAccountStatement.view.supplier')}:</strong>
             <span className="font-bold">{data.finca.name.toUpperCase()}</span>
-            <strong>DIRECCIÓN:</strong>
+            <strong>{t('farmAccountStatement.view.address')}:</strong>
             <span>{data.finca.address}</span>
-            <strong>RUC:</strong>
+            <strong>{t('farmAccountStatement.view.taxId')}:</strong>
             <span>{data.finca.taxId}</span>
           </div>
         </section>
 
         <section>
           <div className="grid grid-cols-[100px,100px,1fr,100px,100px,100px,100px] font-bold text-center bg-gray-200 border-t border-l border-r border-black text-xs">
-            <div className="p-1 border-r border-black">FECHA</div>
-            <div className="p-1 border-r border-black">FACTURA #</div>
-            <div className="p-1 border-r border-black">PROVEEDOR</div>
-            <div className="p-1 border-r border-black">CARGOS</div>
-            <div className="p-1 border-r border-black">CRÉDITOS/DÉBITOS</div>
-            <div className="p-1 border-r border-black">PAGOS</div>
-            <div className="p-1">SALDO</div>
+            <div className="p-1 border-r border-black">{t('farmAccountStatement.view.date')}</div>
+            <div className="p-1 border-r border-black">{t('farmAccountStatement.view.invoiceNo')}</div>
+            <div className="p-1 border-r border-black">{t('farmAccountStatement.view.supplier')}</div>
+            <div className="p-1 border-r border-black">{t('farmAccountStatement.view.charges')}</div>
+            <div className="p-1 border-r border-black">{t('farmAccountStatement.view.creditsDebits')}</div>
+            <div className="p-1 border-r border-black">{t('farmAccountStatement.view.payments')}</div>
+            <div className="p-1">{t('farmAccountStatement.view.balance')}</div>
           </div>
           <div className="border-l border-r border-b border-black text-xs">
             <div className="grid grid-cols-[100px,100px,1fr,100px,100px,100px,100px] bg-gray-100 font-bold">
-                  <div className="p-1 border-b border-black col-span-7">HISTORIAL COMPLETO</div>
+                  <div className="p-1 border-b border-black col-span-7">{t('historicalFarmAccountStatement.fullHistory')}</div>
             </div>
             {allInvoices.map(invoice => (
                 <div key={invoice.id} className="grid grid-cols-[100px,100px,1fr,100px,100px,100px,100px] border-b border-gray-300">
@@ -104,7 +106,7 @@ export function HistoricalFarmAccountStatementView({ data }: HistoricalFarmAccou
           </div>
 
            <div className="grid grid-cols-[100px,100px,1fr,100px,100px,100px,100px] font-bold text-xs bg-gray-200 border-b border-l border-r border-black">
-              <div className="p-1 border-r border-black col-span-3 text-center">TOTAL PENDIENTE</div>
+              <div className="p-1 border-r border-black col-span-3 text-center">{t('farmAccountStatement.view.totalPending')}</div>
               <div className="p-1 border-r border-black text-right">${allTimeTotals.total.toFixed(2)}</div>
               <div className="p-1 border-r border-black text-right">${allTimeTotals.creditsDebits.toFixed(2)}</div>
               <div className="p-1 border-r border-black text-right">${allTimeTotals.payments.toFixed(2)}</div>

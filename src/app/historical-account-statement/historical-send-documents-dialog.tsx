@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -23,31 +23,50 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Textarea } from '@/components/ui/textarea';
+import { useTranslation } from '@/context/i18n-context';
 
-const formSchema = z.object({
-  to: z.string()
-    .min(1, 'Se requiere al menos un correo electrónico.')
-    .refine(
-      (value) => {
-        const emails = value.split(',').map(email => email.trim()).filter(Boolean);
-        if (emails.length === 0) return false;
-        return emails.every(email => z.string().email().safeParse(email).success);
-      },
-      {
-        message: 'Proporcione una lista válida de direcciones de correo electrónico separadas por comas.',
-      }
-    ),
-  body: z.string().optional(),
-});
+const HistoricalSendDocumentsDialog = ({ customer, invoices, isOpen, onClose }: { customer: Customer | null; invoices: Invoice[]; isOpen: boolean; onClose: () => void; }) => {
+  const { toast } = useToast();
+  const { t } = useTranslation();
+  const [isSending, setIsSending] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-type SendDocumentsDialogProps = {
-  customer: Customer | null;
-  invoices: Invoice[];
-  isOpen: boolean;
-  onClose: () => void;
-};
+  const formSchema = useMemo(() => z.object({
+    to: z.string()
+      .min(1, t('accountStatement.sendDialog.toRequired'))
+      .refine(
+        (value) => {
+          const emails = value.split(',').map(email => email.trim()).filter(Boolean);
+          if (emails.length === 0) return false;
+          return emails.every(email => z.string().email().safeParse(email).success);
+        },
+        {
+          message: t('accountStatement.sendDialog.toInvalid'),
+        }
+      ),
+    body: z.string().optional(),
+  }), [t]);
 
-async function generatePdfForElement(elementId: string): Promise<string | null> {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    mode: 'onChange',
+  });
+  
+  useEffect(() => {
+    if (customer && isOpen) {
+      form.reset({
+        to: customer.email,
+        body: '',
+      });
+      setError(null);
+    }
+  }, [customer, isOpen, form]);
+  
+  if (!customer) {
+    return null;
+  }
+
+  async function generatePdfForElement(elementId: string): Promise<string | null> {
     const element = document.getElementById(elementId);
     if (!element) return null;
 
@@ -85,47 +104,22 @@ async function generatePdfForElement(elementId: string): Promise<string | null> 
     }
 }
 
-
-export default function HistoricalSendDocumentsDialog({ customer, invoices, isOpen, onClose }: SendDocumentsDialogProps) {
-  const { toast } = useToast();
-  const [isSending, setIsSending] = useState(false);
-  const [error, setError] = useState<string | null>(null);
-
-  const form = useForm<z.infer<typeof formSchema>>({
-    resolver: zodResolver(formSchema),
-    mode: 'onChange',
-  });
-  
-  useEffect(() => {
-    if (customer && isOpen) {
-      form.reset({
-        to: customer.email,
-        body: '',
-      });
-      setError(null);
-    }
-  }, [customer, isOpen, form]);
-  
-  if (!customer) {
-    return null;
-  }
-
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
     setIsSending(true);
     setError(null);
 
-    const subject = `STATEMENT ${customer.name}`;
-    const defaultBody = `Dear Client,\nAttached you will find your Statement Update\nThanks for prefer us product`;
+    const subject = t('historicalAccountStatement.sendDialog.subject', { customerName: customer.name });
+    const defaultBody = t('historicalAccountStatement.sendDialog.defaultBody');
     const body = values.body ? `${defaultBody}\n\n${values.body}` : defaultBody;
     
     try {
         const statementPdfBase64 = await generatePdfForElement('historical-statement-to-print');
         if (!statementPdfBase64) {
-          throw new Error("Failed to generate the account statement PDF.");
+          throw new Error(t('accountStatement.sendDialog.pdfGenerationError'));
         }
 
         const attachments = [{
-            filename: `Estado-de-Cuenta-Historico-${customer.name.replace(/ /g, '_')}.pdf`,
+            filename: `${t('historicalAccountStatement.pdf.fileName')}-${customer.name.replace(/ /g, '_')}.pdf`,
             content: statementPdfBase64,
         }];
 
@@ -145,12 +139,12 @@ export default function HistoricalSendDocumentsDialog({ customer, invoices, isOp
         const result = await response.json();
 
         if (!response.ok) {
-            throw new Error(result.message || 'Failed to send email.');
+            throw new Error(result.message || t('accountStatement.sendDialog.sendError'));
         }
 
         toast({
-            title: "Correo Enviado",
-            description: `Se han enviado los documentos a ${values.to}.`,
+            title: t('sendInvoiceDialog.successTitle'),
+            description: t('sendInvoiceDialog.successDescriptionGeneric', { email: values.to }),
         });
         onClose();
         
@@ -158,7 +152,7 @@ export default function HistoricalSendDocumentsDialog({ customer, invoices, isOp
         const errorMessage = e.message || 'An unknown error occurred.';
         setError(errorMessage);
         toast({
-            title: "Error al Enviar",
+            title: t('sendInvoiceDialog.errorTitle'),
             description: errorMessage,
             variant: "destructive",
         });
@@ -174,15 +168,15 @@ export default function HistoricalSendDocumentsDialog({ customer, invoices, isOp
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
-              <DialogTitle>Enviar Estado de Cuenta Histórico</DialogTitle>
+              <DialogTitle>{t('historicalAccountStatement.sendDialog.title')}</DialogTitle>
               <DialogDescription>
-                Se enviará el estado de cuenta por correo a {customer.name}. Puede añadir múltiples correos separados por comas.
+                {t('historicalAccountStatement.sendDialog.description', { customerName: customer.name })}
               </DialogDescription>
             </DialogHeader>
 
             {error && (
               <Alert variant="destructive" className="my-4">
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{t('common.error')}</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -193,7 +187,7 @@ export default function HistoricalSendDocumentsDialog({ customer, invoices, isOp
                 name="to"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Para</FormLabel>
+                    <FormLabel>{t('sendInvoiceDialog.to')}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -206,9 +200,9 @@ export default function HistoricalSendDocumentsDialog({ customer, invoices, isOp
                 name="body"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Mensaje Personalizado (Opcional)</FormLabel>
+                    <FormLabel>{t('sendInvoiceDialog.body')}</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Escriba un mensaje para añadir al correo..." {...field} />
+                      <Textarea placeholder={t('sendInvoiceDialog.bodyPlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -218,7 +212,7 @@ export default function HistoricalSendDocumentsDialog({ customer, invoices, isOp
             
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose} disabled={isSending}>
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={isSending}>
                 {isSending ? (
@@ -226,7 +220,7 @@ export default function HistoricalSendDocumentsDialog({ customer, invoices, isOp
                 ) : (
                   <Send className="mr-2 h-4 w-4" />
                 )}
-                {isSending ? 'Enviando...' : `Enviar`}
+                {isSending ? t('sendInvoiceDialog.sending') : t('sendInvoiceDialog.send')}
               </Button>
             </DialogFooter>
           </form>
@@ -235,3 +229,5 @@ export default function HistoricalSendDocumentsDialog({ customer, invoices, isOp
     </Dialog>
   );
 }
+
+export default HistoricalSendDocumentsDialog;

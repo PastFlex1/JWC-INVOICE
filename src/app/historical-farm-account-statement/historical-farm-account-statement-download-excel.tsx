@@ -7,6 +7,7 @@ import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { StatementData } from './historical-farm-account-statement-client';
 import { format, parseISO } from 'date-fns';
+import { useTranslation } from '@/context/i18n-context';
 
 type HistoricalFarmAccountStatementExcelButtonProps = {
   data: StatementData;
@@ -15,18 +16,27 @@ type HistoricalFarmAccountStatementExcelButtonProps = {
 export default function HistoricalFarmAccountStatementExcelButton({ data }: HistoricalFarmAccountStatementExcelButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleDownloadExcel = () => {
     setIsGenerating(true);
     try {
       const ws_data = [
-        ["ESTADO DE CUENTA HISTÓRICO", data.finca.name.toUpperCase()],
+        [t('historicalFarmAccountStatement.excel.title'), data.finca.name.toUpperCase()],
         [],
-        ["PROVEEDOR:", data.finca.name],
-        ["DIRECCIÓN:", data.finca.address],
-        ["RUC:", data.finca.taxId],
+        [t('farmAccountStatement.view.supplier'), data.finca.name],
+        [t('farmAccountStatement.view.address'), data.finca.address],
+        [t('farmAccountStatement.view.taxId'), data.finca.taxId],
         [],
-        ["FECHA", "FACTURA #", "PROVEEDOR", "CARGOS", "CRÉDITOS/DÉBITOS", "PAGOS", "SALDO"]
+        [
+            t('farmAccountStatement.view.date'), 
+            t('farmAccountStatement.view.invoiceNo'), 
+            t('farmAccountStatement.view.supplier'), 
+            t('farmAccountStatement.view.charges'), 
+            t('farmAccountStatement.view.creditsDebits'), 
+            t('farmAccountStatement.view.payments'), 
+            t('farmAccountStatement.view.balance')
+        ]
       ];
 
       data.invoices.forEach(invoice => {
@@ -43,7 +53,7 @@ export default function HistoricalFarmAccountStatementExcelButton({ data }: Hist
 
       ws_data.push([]);
       ws_data.push([
-        "", "", "TOTAL PENDIENTE",
+        "", "", t('farmAccountStatement.view.totalPending'),
         data.invoices.reduce((acc, inv) => acc + inv.total, 0),
         data.totalCredits - data.totalDebits,
         data.totalPayments,
@@ -58,21 +68,21 @@ export default function HistoricalFarmAccountStatementExcelButton({ data }: Hist
       ];
       
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Estado Cuenta Histórico Finca");
+      XLSX.utils.book_append_sheet(wb, ws, t('historicalFarmAccountStatement.excel.sheetName'));
 
-      const fileName = `Estado-Cuenta-Historico-Finca-${data.finca.name.replace(/ /g, '_')}.xlsx`;
+      const fileName = `${t('historicalFarmAccountStatement.excel.fileName')}-${data.finca.name.replace(/ /g, '_')}.xlsx`;
       XLSX.writeFile(wb, fileName);
       
       toast({
-        title: "Éxito",
-        description: `El archivo ${fileName} se ha descargado.`,
+        title: t('common.success'),
+        description: t('common.downloadSuccess', { fileName }),
       });
 
     } catch (error) {
       console.error("Error generating Excel:", error);
       toast({
-        title: "Error",
-        description: "Ocurrió un error inesperado al generar el archivo Excel.",
+        title: t('common.error'),
+        description: t('common.excelError'),
         variant: "destructive",
       });
     } finally {
@@ -83,7 +93,7 @@ export default function HistoricalFarmAccountStatementExcelButton({ data }: Hist
   return (
     <Button onClick={handleDownloadExcel} disabled={isGenerating} variant="outline">
       {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-      Descargar Excel
+      {t('farmAccountStatement.downloadExcel')}
     </Button>
   );
 }

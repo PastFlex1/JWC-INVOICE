@@ -249,15 +249,15 @@
       "reason": "Motivo"
     },
     "form": {
-        "customer": "Cliente",
-        "customerPlaceholder": "Seleccione un cliente",
-        "invoice": "Factura a Acreditar",
-        "invoicePlaceholder": "Seleccione una factura",
-        "consignee": "Consignatario",
-        "amount": "Monto a Acreditar",
-        "reason": "Motivo",
-        "reasonPlaceholder": "Ej: Calidad de la flor",
-        "date": "Fecha de Nota de Crédito"
+      "customer": "Cliente",
+      "customerPlaceholder": "Seleccione un cliente",
+      "invoice": "Factura a Acreditar",
+      "invoicePlaceholder": "Seleccione una factura",
+      "consignee": "Consignatario",
+      "amount": "Monto a Acreditar",
+      "reason": "Motivo",
+      "reasonPlaceholder": "Ej: Calidad de la flor",
+      "date": "Fecha de Nota de Crédito"
     },
     "toast": {
       "added": "Nota de crédito añadida correctamente.",
@@ -267,8 +267,8 @@
     },
     "confirmDeleteDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente la nota de crédito.",
     "email": {
-        "reportTitle": "Reporte de Notas de Crédito",
-        "reportDescription": "El reporte adjunto contiene un resumen de las notas de crédito para el período seleccionado."
+      "reportTitle": "Reporte de Notas de Crédito",
+      "reportDescription": "El reporte adjunto contiene un resumen de las notas de crédito para el período seleccionado."
     },
     "farm": {
       "title": "Notas de Crédito (Finca)",
@@ -333,35 +333,35 @@
     "pdfFileName": "Reporte-Notas-de-Debito",
     "excelFileName": "Reporte-Notas-de-Debito",
     "list": {
-        "title": "Lista de Notas de Débito",
-        "description": "Una lista de todas tus notas de débito de clientes.",
-        "date": "Fecha",
-        "invoice": "Factura #",
-        "consignee": "Consignatario",
-        "amount": "Monto",
-        "reason": "Motivo"
+      "title": "Lista de Notas de Débito",
+      "description": "Una lista de todas tus notas de débito de clientes.",
+      "date": "Fecha",
+      "invoice": "Factura #",
+      "consignee": "Consignatario",
+      "amount": "Monto",
+      "reason": "Motivo"
     },
     "form": {
-        "customer": "Cliente",
-        "customerPlaceholder": "Seleccione un cliente",
-        "invoice": "Factura a Debitar",
-        "invoicePlaceholder": "Seleccione una factura",
-        "consignee": "Consignatario",
-        "amount": "Monto a Debitar",
-        "reason": "Motivo",
-        "reasonPlaceholder": "Ej: Ajuste de precio",
-        "date": "Fecha de Nota de Débito"
+      "customer": "Cliente",
+      "customerPlaceholder": "Seleccione un cliente",
+      "invoice": "Factura a Debitar",
+      "invoicePlaceholder": "Seleccione una factura",
+      "consignee": "Consignatario",
+      "amount": "Monto a Debitar",
+      "reason": "Motivo",
+      "reasonPlaceholder": "Ej: Ajuste de precio",
+      "date": "Fecha de Nota de Débito"
     },
     "toast": {
-        "added": "Nota de débito añadida correctamente.",
-        "deleted": "Nota de débito eliminada correctamente.",
-        "error": "No se pudo guardar la nota de débito: {error}.",
-        "deleteError": "No se pudo eliminar la nota de débito: {error}."
+      "added": "Nota de débito añadida correctamente.",
+      "deleted": "Nota de débito eliminada correctamente.",
+      "error": "No se pudo guardar la nota de débito: {error}.",
+      "deleteError": "No se pudo eliminar la nota de débito: {error}."
     },
     "confirmDeleteDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente la nota de débito.",
     "email": {
-        "reportTitle": "Reporte de Notas de Débito",
-        "reportDescription": "El reporte adjunto contiene un resumen de las notas de débito para el período seleccionado."
+      "reportTitle": "Reporte de Notas de Débito",
+      "reportDescription": "El reporte adjunto contiene un resumen de las notas de débito para el período seleccionado."
     },
     "farm": {
       "title": "Notas de Débito (Finca)",
@@ -416,11 +416,36 @@
     "selectCustomerDescription": "Elija un cliente de la lista para generar su estado de cuenta.",
     "selectCustomerPlaceholder": "Seleccione un cliente...",
     "downloadPdf": "Descargar PDF",
+    "downloadExcel": "Descargar Excel",
     "sendDocuments": "Enviar Documentos",
     "pleaseSelectCustomer": "Por favor, seleccione un cliente para continuar.",
     "pdfError": "No se pudo encontrar el contenido para generar el PDF.",
     "downloadSuccess": "El archivo {fileName} se ha descargado.",
     "pdfUnexpectedError": "Ocurrió un error inesperado al procesar el PDF.",
+    "filterByMonth": "Filtrar por mes...",
+    "allMonths": "Todos los Meses",
+    "noInvoices": "No se encontraron facturas para el período seleccionado.",
+    "pdf": {
+      "fileName": "Estado-de-Cuenta"
+    },
+    "excel": {
+      "title": "ESTADO DE CUENTA",
+      "customer": "CLIENTE:",
+      "address": "DIRECCIÓN:",
+      "city": "CIUDAD:",
+      "sheetName": "Estado de Cuenta",
+      "fileName": "Estado-de-Cuenta"
+    },
+    "sendDialog": {
+      "title": "Enviar Estado de Cuenta",
+      "description": "Se enviará el estado de cuenta por correo a {customerName}. Puede añadir múltiples correos separados por comas.",
+      "toRequired": "Se requiere al menos un correo electrónico.",
+      "toInvalid": "Proporcione una lista válida de direcciones de correo electrónico separadas por comas.",
+      "subject": "ESTADO DE CUENTA {customerName}",
+      "defaultBody": "Estimado Cliente,\nAdjunto encontrará su actualización de Estado de Cuenta.\nGracias por preferir nuestro producto.",
+      "pdfGenerationError": "No se pudo generar el PDF del estado de cuenta.",
+      "sendError": "No se pudo enviar el correo."
+    },
     "view": {
       "title": "ESTADO DE CUENTA {customerName}",
       "balanceTitle": "SALDO DE CUENTA",
@@ -489,9 +514,56 @@
     "pdf": {
       "fileName": "Estado-de-Cuenta-Finca"
     },
-    "sendDocumentsDialog": {
+    "sendDialog": {
       "title": "Enviar Estado de Cuenta de Finca",
-      "description": "Se enviará el estado de cuenta por correo para {farmName}. Puede añadir múltiples correos separados por comas."
+      "description": "Se enviará el estado de cuenta por correo para {farmName}. Puede añadir múltiples correos separados por comas.",
+      "toRequired": "Se requiere al menos un correo electrónico.",
+      "toInvalid": "Proporcione una lista válida de direcciones de correo electrónico separadas por comas.",
+      "subject": "ESTADO DE CUENTA {farmName}",
+      "defaultBody": "Estimado Proveedor,\nAdjunto encontrará su actualización de Estado de Cuenta.\nGracias por su colaboración.",
+      "pdfGenerationError": "No se pudo generar el PDF del estado de cuenta.",
+      "sendError": "No se pudo enviar el correo."
+    }
+  },
+  "historicalAccountStatement": {
+    "title": "Estado de Cuenta Histórico",
+    "description": "Vea el historial completo de un cliente.",
+    "selectCustomerDescription": "Elija un cliente de la lista para generar su estado de cuenta histórico.",
+    "noInvoices": "No se encontraron facturas para el cliente seleccionado.",
+    "fullHistory": "HISTORIAL COMPLETO",
+    "pdf": {
+      "fileName": "Estado-de-Cuenta-Historico"
+    },
+    "excel": {
+      "title": "ESTADO DE CUENTA HISTÓRICO",
+      "sheetName": "Estado de Cuenta Histórico",
+      "fileName": "Estado-de-Cuenta-Historico"
+    },
+    "sendDialog": {
+      "title": "Enviar Estado de Cuenta Histórico",
+      "description": "Se enviará el estado de cuenta histórico por correo a {customerName}.",
+      "subject": "ESTADO DE CUENTA HISTÓRICO {customerName}",
+      "defaultBody": "Estimado Cliente,\nAdjunto encontrará su actualización de Estado de Cuenta Histórico.\nGracias por preferir nuestro producto."
+    }
+  },
+  "historicalFarmAccountStatement": {
+    "title": "Estado de Cuenta Histórico de Finca",
+    "description": "Vea el historial completo de un proveedor.",
+    "selectFarmDescription": "Elija una finca/proveedor para generar su estado de cuenta histórico.",
+    "fullHistory": "HISTORIAL COMPLETO",
+    "pdf": {
+      "fileName": "Estado-de-Cuenta-Historico-Finca"
+    },
+    "excel": {
+      "title": "ESTADO DE CUENTA HISTÓRICO DE FINCA",
+      "sheetName": "Estado de Cuenta Histórico Finca",
+      "fileName": "Estado-de-Cuenta-Historico-Finca"
+    },
+    "sendDialog": {
+      "title": "Enviar Estado de Cuenta Histórico de Finca",
+      "description": "Se enviará el estado de cuenta histórico por correo para {farmName}.",
+      "subject": "ESTADO DE CUENTA HISTÓRICO {farmName}",
+      "defaultBody": "Estimado Proveedor,\nAdjunto encontrará su actualización de Estado de Cuenta Histórico.\nGracias por su colaboración."
     }
   },
   "sendInvoiceDialog": {

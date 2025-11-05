@@ -91,7 +91,7 @@ export function HistoricalAccountStatementView({ data }: HistoricalAccountStatem
           </div>
           <div className="border-l border-r border-b border-black text-xs">
             <div className="grid grid-cols-[100px,100px,1fr,100px,100px,100px,100px] bg-gray-100 font-bold">
-              <div className="p-1 border-b border-black col-span-7">HISTORIAL COMPLETO</div>
+              <div className="p-1 border-b border-black col-span-7">{t('historicalAccountStatement.fullHistory')}</div>
             </div>
             {allInvoices.map(invoice => (
                 <div key={invoice.id} className="grid grid-cols-[100px,100px,1fr,100px,100px,100px,100px] border-b border-gray-300">

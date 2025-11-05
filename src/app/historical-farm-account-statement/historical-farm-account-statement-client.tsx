@@ -115,27 +115,27 @@ export function HistoricalFarmAccountStatementClient() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight font-headline">Estado de Cuenta Histórico de Finca</h2>
-            <p className="text-muted-foreground">Vea el historial completo de un proveedor.</p>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">{t('historicalFarmAccountStatement.title')}</h2>
+            <p className="text-muted-foreground">{t('historicalFarmAccountStatement.description')}</p>
           </div>
           {statementData && (
              <div className="flex gap-2">
                 <HistoricalFarmAccountStatementDownloadButton data={statementData} />
                 <HistoricalFarmAccountStatementExcelButton data={statementData} />
-                <Button variant="outline" onClick={() => setIsSendDialogOpen(true)}>Enviar Documentos</Button>
+                <Button variant="outline" onClick={() => setIsSendDialogOpen(true)}>{t('farmAccountStatement.sendDocuments')}</Button>
             </div>
           )}
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Seleccionar Finca</CardTitle>
-            <CardDescription>Elija una finca/proveedor para generar su estado de cuenta histórico.</CardDescription>
+            <CardTitle>{t('farmAccountStatement.selectFarm')}</CardTitle>
+            <CardDescription>{t('historicalFarmAccountStatement.selectFarmDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-4">
             <Select onValueChange={setSelectedFincaId}>
               <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
-                <SelectValue placeholder="Seleccione una finca..." />
+                <SelectValue placeholder={t('farmAccountStatement.selectFarmPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {fincas.map(finca => (
@@ -165,7 +165,7 @@ export function HistoricalFarmAccountStatementClient() {
                         format(dateRange.from, "LLL dd, y")
                       )
                     ) : (
-                      <span>Todas las fechas</span>
+                      <span>{t('common.allDates')}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -193,13 +193,13 @@ export function HistoricalFarmAccountStatementClient() {
 
         {selectedFincaId && (!statementData || statementData.invoices.length === 0) && (
           <div className="text-center py-12 text-muted-foreground">
-            <p>No se encontraron facturas para la finca seleccionada.</p>
+            <p>{t('farmAccountStatement.noInvoices')}</p>
           </div>
         )}
 
         {!selectedFincaId && (
           <div className="text-center py-12 text-muted-foreground">
-            <p>Por favor, seleccione una finca para continuar.</p>
+            <p>{t('farmAccountStatement.pleaseSelectFarm')}</p>
           </div>
         )}
       </div>

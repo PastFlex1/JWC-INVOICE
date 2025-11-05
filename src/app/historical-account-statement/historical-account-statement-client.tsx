@@ -126,8 +126,8 @@ export function HistoricalAccountStatementClient() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight font-headline">Estado de Cuenta Histórico</h2>
-            <p className="text-muted-foreground">Vea el historial completo de un cliente.</p>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">{t('historicalAccountStatement.title')}</h2>
+            <p className="text-muted-foreground">{t('historicalAccountStatement.description')}</p>
           </div>
           {statementData && (
              <div className="flex gap-2">
@@ -141,7 +141,7 @@ export function HistoricalAccountStatementClient() {
         <Card>
           <CardHeader>
             <CardTitle>{t('accountStatement.selectCustomer')}</CardTitle>
-            <CardDescription>{t('accountStatement.selectCustomerDescription')}</CardDescription>
+            <CardDescription>{t('historicalAccountStatement.selectCustomerDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-4">
             <Select onValueChange={setSelectedCustomerId}>
@@ -177,7 +177,7 @@ export function HistoricalAccountStatementClient() {
                         format(dateRange.from, "LLL dd, y")
                       )
                     ) : (
-                      <span>Todas las fechas</span>
+                      <span>{t('common.allDates')}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -206,7 +206,7 @@ export function HistoricalAccountStatementClient() {
 
         {selectedCustomerId && (!statementData || statementData.invoices.length === 0) && (
           <div className="text-center py-12 text-muted-foreground">
-            <p>No se encontraron facturas para el cliente seleccionado.</p>
+            <p>{t('historicalAccountStatement.noInvoices')}</p>
           </div>
         )}
 

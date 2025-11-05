@@ -416,35 +416,60 @@
     "selectCustomerDescription": "Choose a customer from the list to generate their statement.",
     "selectCustomerPlaceholder": "Select a customer...",
     "downloadPdf": "Download PDF",
+    "downloadExcel": "Download Excel",
     "sendDocuments": "Send Documents",
     "pleaseSelectCustomer": "Please select a customer to continue.",
     "pdfError": "Could not find the content to generate the PDF.",
     "downloadSuccess": "The file {fileName} has been downloaded.",
     "pdfUnexpectedError": "An unexpected error occurred while processing the PDF.",
+    "filterByMonth": "Filter by month...",
+    "allMonths": "All Months",
+    "noInvoices": "No invoices found for the selected period.",
+    "pdf": {
+      "fileName": "Account-Statement"
+    },
+    "excel": {
+      "title": "ACCOUNT STATEMENT",
+      "customer": "CUSTOMER:",
+      "address": "ADDRESS:",
+      "city": "CITY:",
+      "sheetName": "Account Statement",
+      "fileName": "Account-Statement"
+    },
+    "sendDialog": {
+      "title": "Send Account Statement",
+      "description": "The account statement for {customerName} will be sent by email. You can add multiple emails separated by commas.",
+      "toRequired": "At least one email is required.",
+      "toInvalid": "Provide a valid, comma-separated list of email addresses.",
+      "subject": "STATEMENT {customerName}",
+      "defaultBody": "Dear Client,\nAttached you will find your Statement Update.\nThanks for choosing our product.",
+      "pdfGenerationError": "Failed to generate the account statement PDF.",
+      "sendError": "Failed to send email."
+    },
     "view": {
-        "title": "ACCOUNT STATEMENT {customerName}",
-        "balanceTitle": "ACCOUNT BALANCE",
-        "urgentPayment": "URGENT PAYMENT FOR INVOICES",
-        "billingCustomer": "BILLING CUSTOMER",
-        "address": "ADDRESS",
-        "city": "CITY",
-        "date": "DATE",
-        "invoiceNo": "INVOICE #",
-        "customer": "CUSTOMER",
-        "charges": "CHARGES",
-        "creditsDebits": "CREDITS/DEBITS",
-        "payments": "PAYMENTS",
-        "balance": "BALANCE",
-        "pendingMonth": "PENDING {month}",
-        "totalForMonth": "TOTAL {month}",
-        "totalPending": "TOTAL PENDING",
-        "creditPolicyTitle": "CREDIT POLICY",
-        "policy1": "All claims must be made within 10 days of receiving the flower.",
-        "policy2": "Claims based on freight and cargo handling are not accepted.",
-        "policy3": "Payments must be made to JCW FLOWERS.",
-        "policy4": "All transfers or deposits must be notified by email to jcwf@outlook.es.",
-        "policyNoteTitle": "NOTE: ",
-        "policyNote": "Failure to comply with these policies may result in the suspension of your credit."
+      "title": "ACCOUNT STATEMENT {customerName}",
+      "balanceTitle": "ACCOUNT BALANCE",
+      "urgentPayment": "URGENT PAYMENT FOR INVOICES",
+      "billingCustomer": "BILLING CUSTOMER",
+      "address": "ADDRESS",
+      "city": "CITY",
+      "date": "DATE",
+      "invoiceNo": "INVOICE #",
+      "customer": "CUSTOMER",
+      "charges": "CHARGES",
+      "creditsDebits": "CREDITS/DEBITS",
+      "payments": "PAYMENTS",
+      "balance": "BALANCE",
+      "pendingMonth": "PENDING {month}",
+      "totalForMonth": "TOTAL {month}",
+      "totalPending": "TOTAL PENDING",
+      "creditPolicyTitle": "CREDIT POLICY",
+      "policy1": "All claims must be made within 10 days of receiving the flower.",
+      "policy2": "Claims based on freight and cargo handling are not accepted.",
+      "policy3": "Payments must be made to JCW FLOWERS.",
+      "policy4": "All transfers or deposits must be notified by email to jcwf@outlook.es.",
+      "policyNoteTitle": "NOTE: ",
+      "policyNote": "Failure to comply with these policies may result in the suspension of your credit."
     }
   },
   "farmAccountStatement": {
@@ -489,9 +514,56 @@
     "pdf": {
       "fileName": "Farm-Account-Statement"
     },
-    "sendDocumentsDialog": {
+    "sendDialog": {
       "title": "Send Farm Account Statement",
-      "description": "The account statement for {farmName} will be sent by email. You can add multiple emails separated by commas."
+      "description": "The account statement for {farmName} will be sent by email. You can add multiple emails separated by commas.",
+      "toRequired": "At least one email is required.",
+      "toInvalid": "Provide a valid, comma-separated list of email addresses.",
+      "subject": "STATEMENT {farmName}",
+      "defaultBody": "Dear Supplier,\nAttached you will find your Statement Update.\nThanks for your collaboration.",
+      "pdfGenerationError": "Failed to generate the account statement PDF.",
+      "sendError": "Failed to send email."
+    }
+  },
+  "historicalAccountStatement": {
+    "title": "Historical Account Statement",
+    "description": "View a customer's complete history.",
+    "selectCustomerDescription": "Choose a customer from the list to generate their historical statement.",
+    "noInvoices": "No invoices found for the selected customer.",
+    "fullHistory": "FULL HISTORY",
+    "pdf": {
+      "fileName": "Historical-Account-Statement"
+    },
+    "excel": {
+      "title": "HISTORICAL ACCOUNT STATEMENT",
+      "sheetName": "Historical Account Statement",
+      "fileName": "Historical-Account-Statement"
+    },
+    "sendDialog": {
+      "title": "Send Historical Account Statement",
+      "description": "The historical account statement for {customerName} will be sent by email.",
+      "subject": "HISTORICAL STATEMENT {customerName}",
+      "defaultBody": "Dear Client,\nAttached you will find your Historical Statement Update.\nThanks for choosing our product."
+    }
+  },
+  "historicalFarmAccountStatement": {
+    "title": "Historical Farm Account Statement",
+    "description": "View a supplier's complete history.",
+    "selectFarmDescription": "Choose a farm/supplier to generate their historical account statement.",
+    "fullHistory": "FULL HISTORY",
+    "pdf": {
+      "fileName": "Historical-Farm-Account-Statement"
+    },
+    "excel": {
+      "title": "HISTORICAL FARM ACCOUNT STATEMENT",
+      "sheetName": "Historical Farm Account Statement",
+      "fileName": "Historical-Farm-Account-Statement"
+    },
+    "sendDialog": {
+      "title": "Send Historical Farm Account Statement",
+      "description": "The historical account statement for {farmName} will be sent by email.",
+      "subject": "HISTORICAL STATEMENT {farmName}",
+      "defaultBody": "Dear Supplier,\nAttached you will find your Historical Statement Update.\nThanks for your collaboration."
     }
   },
   "sendInvoiceDialog": {
