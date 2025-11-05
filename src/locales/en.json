@@ -7,19 +7,42 @@
     "accountsPayable": "Accounts Payable",
     "invoices": "Invoices",
     "customers": "Customers",
+    "configuration": "Configuration",
+    "settings": "Settings",
+    "viewPayments": "View Payments",
     "devMode": "Development Mode",
     "dbAccess": "Direct DB Access"
   },
   "header": {
-    "newSale": "New Sale",
-    "newPurchase": "New Purchase",
+    "newInvoice": "New Invoice",
     "maintenance": "Maintenance",
     "masterTables": "Master Tables",
     "documents": "Documents",
-    "creditNotes": "Credit Notes",
-    "debitNotes": "Debit Notes",
-    "changeLanguage": "Change language",
-    "accountsPayable": "Accounts Payable"
+    "changeLanguage": "Change language"
+  },
+  "documents": {
+    "creditNotes_client": "Credit Notes (Client)",
+    "debitNotes_client": "Debit Notes (Client)",
+    "creditNotes_farm": "Credit Notes (Farm)",
+    "debitNotes_farm": "Debit Notes (Farm)",
+    "accountStatement_client": "Account Statement (Client)",
+    "accountStatement_farm": "Account Statement (Farm)",
+    "historicalAccountStatement_client": "Historical Statement (Client)",
+    "historicalAccountStatement_farm": "Historical Statement (Farm)",
+    "registerPayment": "Register Payment",
+    "registerPurchasePayment": "Register Purchase Payment"
+  },
+  "masterTables": {
+    "products": "Products",
+    "farms": "Farms",
+    "customers": "Customers",
+    "consignees": "Consignees",
+    "sellers": "Sellers",
+    "markings": "Markings",
+    "countries": "Countries",
+    "provinces": "Provinces",
+    "dae": "DAE",
+    "carriers": "Carriers"
   },
   "invoices": {
     "title": "Invoices",

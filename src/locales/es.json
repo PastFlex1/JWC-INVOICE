@@ -7,19 +7,42 @@
     "accountsPayable": "Cuentas por Pagar",
     "invoices": "Facturas",
     "customers": "Clientes",
+    "configuration": "Configuración",
+    "settings": "Ajustes",
+    "viewPayments": "Ver Pagos",
     "devMode": "Modo Desarrollo",
     "dbAccess": "Acceso Directo a DB"
   },
   "header": {
-    "newSale": "Nueva Venta",
-    "newPurchase": "Nueva Compra",
+    "newInvoice": "Nueva Factura",
     "maintenance": "Mantenimiento",
     "masterTables": "Tablas Maestras",
     "documents": "Documentos",
-    "creditNotes": "Notas de crédito",
-    "debitNotes": "Notas de débito",
-    "changeLanguage": "Cambiar idioma",
-    "accountsPayable": "Cuentas por Pagar"
+    "changeLanguage": "Cambiar idioma"
+  },
+  "documents": {
+    "creditNotes_client": "Notas de Crédito (Cliente)",
+    "debitNotes_client": "Notas de Débito (Cliente)",
+    "creditNotes_farm": "Notas de Crédito (Finca)",
+    "debitNotes_farm": "Notas de Débito (Finca)",
+    "accountStatement_client": "Estado de Cuenta (Cliente)",
+    "accountStatement_farm": "Estado de Cuenta (Finca)",
+    "historicalAccountStatement_client": "Estado Cuenta Histórico (Cliente)",
+    "historicalAccountStatement_farm": "Estado Cuenta Histórico (Finca)",
+    "registerPayment": "Registrar Pago",
+    "registerPurchasePayment": "Registrar Pago Compra"
+  },
+  "masterTables": {
+    "products": "Productos",
+    "farms": "Fincas",
+    "customers": "Clientes",
+    "consignees": "Consignatarios",
+    "sellers": "Vendedores",
+    "markings": "Marcaciones",
+    "countries": "Países",
+    "provinces": "Provincias",
+    "dae": "DAE",
+    "carriers": "Cargueras"
   },
   "invoices": {
     "title": "Facturas",

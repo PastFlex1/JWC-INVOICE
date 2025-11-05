@@ -89,37 +89,37 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const mainNavItems = [
     { href: '/invoices', label: t('sidebar.invoices'), icon: FileText },
     { href: '/accounts-payable', label: t('sidebar.accountsPayable'), icon: Receipt },
-    { href: '/view-payments', label: "Ver Pagos", icon: BookCheck },
+    { href: '/view-payments', label: t('sidebar.viewPayments'), icon: BookCheck },
   ];
 
   const settingsNavItems = [
-    { href: '/settings', label: 'Configuración', icon: Settings },
+    { href: '/settings', label: t('sidebar.settings'), icon: Settings },
   ];
 
   const documentLinks = [
-    { href: '/credit-notes', label: 'Notas de Crédito (Cliente)', icon: FileText },
-    { href: '/debit-notes', label: 'Notas de Débito (Cliente)', icon: FileText },
-    { href: '/farm-credit-notes', label: 'Notas de Crédito (Finca)', icon: FileText },
-    { href: '/farm-debit-notes', label: 'Notas de Débito (Finca)', icon: FileText },
-    { href: '/account-statement', label: 'Estado de Cuenta Cliente', icon: Users },
-    { href: '/farm-account-statement', label: 'Estado de Cuenta Finca', icon: Building },
-    { href: '/historical-account-statement', label: 'Estado Cuenta Histórico Cliente', icon: Archive },
-    { href: '/historical-farm-account-statement', label: 'Estado Cuenta Histórico Finca', icon: Archive },
-    { href: '/payments', label: 'Registrar Pago', icon: Banknote },
-    { href: '/record-purchase-payment', label: 'Registrar Pago Compra', icon: CreditCard },
+    { href: '/credit-notes', label: t('documents.creditNotes_client'), icon: FileText },
+    { href: '/debit-notes', label: t('documents.debitNotes_client'), icon: FileText },
+    { href: '/farm-credit-notes', label: t('documents.creditNotes_farm'), icon: FileText },
+    { href: '/farm-debit-notes', label: t('documents.debitNotes_farm'), icon: FileText },
+    { href: '/account-statement', label: t('documents.accountStatement_client'), icon: Users },
+    { href: '/farm-account-statement', label: t('documents.accountStatement_farm'), icon: Building },
+    { href: '/historical-account-statement', label: t('documents.historicalAccountStatement_client'), icon: Archive },
+    { href: '/historical-farm-account-statement', label: t('documents.historicalAccountStatement_farm'), icon: Archive },
+    { href: '/payments', label: t('documents.registerPayment'), icon: Banknote },
+    { href: '/record-purchase-payment', label: t('documents.registerPurchasePayment'), icon: CreditCard },
   ];
 
   const masterTableLinks = [
-      { href: '/productos', label: t('productos.title'), icon: Package },
-      { href: '/fincas', label: t('fincas.title'), icon: Building },
-      { href: '/customers', label: t('customers.title'), icon: Users },
-      { href: '/consignatarios', label: t('consignatarios.title'), icon: User },
-      { href: '/vendedores', label: t('vendedores.title'), icon: UserCircle },
-      { href: '/marcacion', label: t('marcacion.title'), icon: Tags },
-      { href: '/pais', label: t('pais.title'), icon: MapPin },
-      { href: '/provincias', label: t('provincias.title'), icon: MapPin },
-      { href: '/dae', label: t('dae.title'), icon: FileArchive },
-      { href: '/cargueras', label: t('cargueras.title'), icon: Ship },
+      { href: '/productos', label: t('masterTables.products'), icon: Package },
+      { href: '/fincas', label: t('masterTables.farms'), icon: Building },
+      { href: '/customers', label: t('masterTables.customers'), icon: Users },
+      { href: '/consignatarios', label: t('masterTables.consignees'), icon: User },
+      { href: '/vendedores', label: t('masterTables.sellers'), icon: UserCircle },
+      { href: '/marcacion', label: t('masterTables.markings'), icon: Tags },
+      { href: '/pais', label: t('masterTables.countries'), icon: MapPin },
+      { href: '/provincias', label: t('masterTables.provinces'), icon: MapPin },
+      { href: '/dae', label: t('masterTables.dae'), icon: FileArchive },
+      { href: '/cargueras', label: t('masterTables.carriers'), icon: Ship },
   ];
 
 
@@ -150,7 +150,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </div>
           </div>
           <div className="px-4 py-2">
-            <h3 className="mb-2 px-2 text-lg font-semibold tracking-tight transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">Configuración</h3>
+            <h3 className="mb-2 px-2 text-lg font-semibold tracking-tight transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">{t('sidebar.configuration')}</h3>
             <div className="space-y-1">
                {settingsNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
@@ -187,7 +187,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
            <div className="flex-1 flex items-center gap-2">
               <Button onClick={() => router.push('/invoices/new')}>
                 <Plus className="h-4 w-4 sm:mr-2" />
-                <span className="hidden sm:inline">Nueva Factura</span>
+                <span className="hidden sm:inline">{t('header.newInvoice')}</span>
               </Button>
            </div>
            <div className="ml-auto flex items-center gap-2">
