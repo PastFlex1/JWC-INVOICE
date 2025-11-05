@@ -158,9 +158,65 @@
     "add": "Add Farm"
   },
   "productos": {
-    "title": "Products",
-    "description": "Manage your products.",
-    "add": "Add Product"
+    "title": "Products & Varieties",
+    "description": "Manage your products and their varieties.",
+    "addProductType": "Add Product Type",
+    "addVariety": "Add Variety",
+    "list": {
+      "title": "Product List",
+      "description": "A list of all your product types and their varieties."
+    },
+    "searchPlaceholder": "Search product type...",
+    "varietyCount": "{count} varieties",
+    "viewVarieties": "View Varieties",
+    "viewDialog": {
+      "title": "Varieties for: {productName}",
+      "variety": "VARIETY",
+      "color": "COLOR",
+      "stems": "STEMS",
+      "barcode": "BARCODE",
+      "status": "STATUS",
+      "saveChanges": "Save Changes"
+    },
+    "form": {
+      "editTitle": "Edit Variety",
+      "addTitle": "Add New Variety",
+      "product": "Product",
+      "productPlaceholder": "Select a product",
+      "variety": "Variety",
+      "varietyPlaceholder": "e.g., ABSOLUT IN PINK",
+      "colorPicker": "Color (Picker)",
+      "colorName": "Color Name",
+      "colorNamePlaceholder": "e.g., Passion Red",
+      "stems": "No. of Stems",
+      "addButton": "Add Variety"
+    },
+    "variedadForm": {
+      "addTitle": "Add New Product Type",
+      "name": "Product Name",
+      "namePlaceholder": "e.g., Roses",
+      "addButton": "Add Product Type"
+    },
+    "toast": {
+      "updateSuccess": "Product updated successfully.",
+      "addSuccess": "Product added successfully.",
+      "saveError": "Could not save the product: {error}.",
+      "addVariedadSuccess": "Product type added successfully.",
+      "saveVariedadError": "Could not save the product type: {error}.",
+      "deleteSuccess": "Product deleted successfully.",
+      "deleteError": "Could not delete the product: {error}.",
+      "deleteVariedadSuccess": "Product type deleted successfully.",
+      "deleteVariedadError": "Could not delete the product type: {error}.",
+      "deleteVariedadErrorInUse": "Cannot delete '{name}' as it is being used by {count} product(s).",
+      "bulkUpdateSuccess": "{count} product(s) updated successfully.",
+      "bulkUpdateError": "Could not save all changes."
+    },
+    "status": {
+      "active": "Active",
+      "inactive": "Inactive"
+    },
+    "confirmDeleteVariedadDescription": "This action cannot be undone. This will permanently delete the product type. Make sure no varieties are associated with it.",
+    "confirmDeleteProductoDescription": "This action cannot be undone. This will permanently delete the variety."
   },
   "consignatarios": {
     "title": "Consignees",

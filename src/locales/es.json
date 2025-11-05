@@ -158,9 +158,65 @@
     "add": "Añadir Finca"
   },
   "productos": {
-    "title": "Productos",
-    "description": "Administra tus productos.",
-    "add": "Añadir Producto"
+    "title": "Productos y Variedades",
+    "description": "Administra tus productos y sus variedades.",
+    "addProductType": "Añadir Tipo de Producto",
+    "addVariety": "Añadir Variedad",
+    "list": {
+      "title": "Lista de Productos",
+      "description": "Una lista de todos tus tipos de productos y sus variedades."
+    },
+    "searchPlaceholder": "Buscar tipo de producto...",
+    "varietyCount": "{count} variedades",
+    "viewVarieties": "Ver Variedades",
+    "viewDialog": {
+      "title": "Variedades de: {productName}",
+      "variety": "VARIEDAD",
+      "color": "COLOR",
+      "stems": "TALLOS",
+      "barcode": "BARRAS",
+      "status": "ESTADO",
+      "saveChanges": "Guardar Cambios"
+    },
+    "form": {
+      "editTitle": "Editar Variedad",
+      "addTitle": "Añadir Nueva Variedad",
+      "product": "Producto",
+      "productPlaceholder": "Seleccione un producto",
+      "variety": "Variedad",
+      "varietyPlaceholder": "ej., ABSOLUT IN PINK",
+      "colorPicker": "Color (Selector)",
+      "colorName": "Nombre del Color",
+      "colorNamePlaceholder": "ej., Rojo Pasión",
+      "stems": "N° de Tallos",
+      "addButton": "Añadir Variedad"
+    },
+    "variedadForm": {
+      "addTitle": "Añadir Nuevo Tipo de Producto",
+      "name": "Nombre del Producto",
+      "namePlaceholder": "ej., Rosas",
+      "addButton": "Añadir Tipo de Producto"
+    },
+    "toast": {
+      "updateSuccess": "Producto actualizado correctamente.",
+      "addSuccess": "Producto añadido correctamente.",
+      "saveError": "No se pudo guardar el producto: {error}.",
+      "addVariedadSuccess": "Tipo de producto añadido correctamente.",
+      "saveVariedadError": "No se pudo guardar el tipo de producto: {error}.",
+      "deleteSuccess": "Producto eliminado correctamente.",
+      "deleteError": "No se pudo eliminar el producto: {error}.",
+      "deleteVariedadSuccess": "Tipo de producto eliminado correctamente.",
+      "deleteVariedadError": "No se pudo eliminar el tipo de producto: {error}.",
+      "deleteVariedadErrorInUse": "No se puede eliminar '{name}' porque está siendo utilizado por {count} producto(s).",
+      "bulkUpdateSuccess": "{count} producto(s) actualizados correctamente.",
+      "bulkUpdateError": "No se pudieron guardar todos los cambios."
+    },
+    "status": {
+      "active": "Activo",
+      "inactive": "Inactivo"
+    },
+    "confirmDeleteVariedadDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente el tipo de producto. Asegúrese de que no haya variedades asociadas a él.",
+    "confirmDeleteProductoDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente la variedad."
   },
   "consignatarios": {
     "title": "Consignatarios",

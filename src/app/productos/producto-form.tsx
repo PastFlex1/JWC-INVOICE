@@ -11,6 +11,7 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { Producto, Variedad } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from '@/context/i18n-context';
 
 const formSchema = z.object({
   variedad: z.string().min(1, "Variedad es requerida."),
@@ -32,6 +33,7 @@ type ProductoFormProps = {
 };
 
 export function ProductoForm({ onSubmit, onClose, initialData, isSubmitting, variedades }: ProductoFormProps) {
+  const { t } = useTranslation();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -77,11 +79,11 @@ export function ProductoForm({ onSubmit, onClose, initialData, isSubmitting, var
           name="variedad"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Producto</FormLabel>
+              <FormLabel>{t('productos.form.product')}</FormLabel>
               <Select onValueChange={field.onChange} defaultValue={field.value}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Seleccione un producto" />
+                      <SelectValue placeholder={t('productos.form.productPlaceholder')} />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
@@ -101,9 +103,9 @@ export function ProductoForm({ onSubmit, onClose, initialData, isSubmitting, var
           name="nombre"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Variedad</FormLabel>
+              <FormLabel>{t('productos.form.variety')}</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., ABSOLUT IN PINK" {...field} />
+                <Input placeholder={t('productos.form.varietyPlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -114,7 +116,7 @@ export function ProductoForm({ onSubmit, onClose, initialData, isSubmitting, var
             name="color"
             render={({ field }) => (
                 <FormItem>
-                <FormLabel>Color (Paleta)</FormLabel>
+                <FormLabel>{t('productos.form.colorPicker')}</FormLabel>
                 <FormControl>
                     <div className="flex items-center gap-2">
                     <input
@@ -124,7 +126,7 @@ export function ProductoForm({ onSubmit, onClose, initialData, isSubmitting, var
                         className="p-1 h-10 w-14 block bg-white border border-gray-200 cursor-pointer rounded-lg disabled:opacity-50 disabled:pointer-events-none dark:bg-slate-900 dark:border-gray-700"
                     />
                     <Input
-                        placeholder="e.g., #FF0000"
+                        placeholder="#FF0000"
                         value={field.value}
                         onChange={field.onChange}
                         className="w-full"
@@ -140,9 +142,9 @@ export function ProductoForm({ onSubmit, onClose, initialData, isSubmitting, var
           name="nombreColor"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre del Color</FormLabel>
+              <FormLabel>{t('productos.form.colorName')}</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Rojo Pasión" {...field} />
+                <Input placeholder={t('productos.form.colorNamePlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -153,7 +155,7 @@ export function ProductoForm({ onSubmit, onClose, initialData, isSubmitting, var
           name="tallosPorRamo"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>N° de Tallos</FormLabel>
+              <FormLabel>{t('productos.form.stems')}</FormLabel>
               <FormControl>
                 <Input type="number" step="1" placeholder="25" {...field} />
               </FormControl>
@@ -163,11 +165,11 @@ export function ProductoForm({ onSubmit, onClose, initialData, isSubmitting, var
         />
         <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
-                Cancelar
+                {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isSubmitting ? 'Guardando...' : (initialData ? 'Guardar Cambios' : 'Añadir Variedad')}
+                {isSubmitting ? t('common.saving') : (initialData ? t('common.saveChanges') : t('productos.form.addButton'))}
             </Button>
         </div>
       </form>

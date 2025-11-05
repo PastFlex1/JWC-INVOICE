@@ -112,10 +112,10 @@ export function ProductosClient() {
       if (productoData.id) {
         const { id, ...dataToUpdate } = productoData;
         await updateProducto(id, dataToUpdate);
-        toast({ title: 'Éxito', description: 'Producto actualizado correctamente.' });
+        toast({ title: t('common.success'), description: t('productos.toast.updateSuccess') });
       } else {
         await addProducto(productoData);
-        toast({ title: 'Éxito', description: 'Producto añadido correctamente.' });
+        toast({ title: t('common.success'), description: t('productos.toast.addSuccess') });
       }
       await refreshData();
       handleCloseProductoDialog();
@@ -125,10 +125,10 @@ export function ProductosClient() {
       }
     } catch (error) {
       console.error("Error submitting product:", error);
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      const errorMessage = error instanceof Error ? error.message : t('common.unknownError');
       toast({
-        title: 'Error al Guardar',
-        description: `No se pudo guardar el producto: ${'errorMessage'}.`,
+        title: t('common.errorSaving'),
+        description: t('productos.toast.saveError', {error: errorMessage}),
         variant: 'destructive',
         duration: 10000,
       });
@@ -141,15 +141,15 @@ export function ProductosClient() {
     setIsSubmitting(true);
     try {
       await addVariedad(variedadData);
-      toast({ title: 'Éxito', description: 'Variedad añadida correctamente.' });
+      toast({ title: t('common.success'), description: t('productos.toast.addVariedadSuccess') });
       await refreshData();
       handleCloseVariedadDialog();
     } catch (error) {
       console.error("Error submitting variety:", error);
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      const errorMessage = error instanceof Error ? error.message : t('common.unknownError');
       toast({
-        title: 'Error al Guardar',
-        description: `No se pudo guardar la variedad: ${'errorMessage'}.`,
+        title: t('common.errorSaving'),
+        description: t('productos.toast.saveVariedadError', {error: errorMessage}),
         variant: 'destructive',
         duration: 10000,
       });
@@ -171,13 +171,13 @@ export function ProductosClient() {
     try {
       await deleteProducto(productoToDelete.id);
       await refreshData();
-      toast({ title: 'Éxito', description: 'Producto eliminado correctamente.' });
+      toast({ title: t('common.success'), description: t('productos.toast.deleteSuccess') });
     } catch (error) {
       console.error("Error deleting product:", error);
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      const errorMessage = error instanceof Error ? error.message : t('common.unknownError');
       toast({
-        title: 'Error al Eliminar',
-        description: `No se pudo eliminar el producto: ${'errorMessage'}.`,
+        title: t('common.errorDeleting'),
+        description: t('productos.toast.deleteError', {error: errorMessage}),
         variant: 'destructive',
         duration: 10000,
       });
@@ -188,12 +188,11 @@ export function ProductosClient() {
 
   const handleDeleteVariedadConfirm = async () => {
     if (!variedadToDelete) return;
-    // Check if there are any products using this variety
     const productsUsingVariety = productos.filter(p => p.variedad === variedadToDelete.nombre);
     if (productsUsingVariety.length > 0) {
       toast({
-        title: 'Error al Eliminar',
-        description: `No se puede eliminar la variedad "${variedadToDelete.nombre}" porque está siendo utilizada por ${productsUsingVariety.length} producto(s).`,
+        title: t('common.errorDeleting'),
+        description: t('productos.toast.deleteVariedadErrorInUse', { count: productsUsingVariety.length, name: variedadToDelete.nombre }),
         variant: 'destructive',
         duration: 10000,
       });
@@ -204,13 +203,13 @@ export function ProductosClient() {
     try {
       await deleteVariedad(variedadToDelete.id);
       await refreshData();
-      toast({ title: 'Éxito', description: 'Variedad eliminada correctamente.' });
+      toast({ title: t('common.success'), description: t('productos.toast.deleteVariedadSuccess') });
     } catch (error) {
       console.error("Error deleting variety:", error);
-      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      const errorMessage = error instanceof Error ? error.message : t('common.unknownError');
       toast({
-        title: 'Error al Eliminar',
-        description: `No se pudo eliminar la variedad: ${'errorMessage'}.`,
+        title: t('common.errorDeleting'),
+        description: t('productos.toast.deleteVariedadError', {error: errorMessage}),
         variant: 'destructive',
         duration: 10000,
       });
@@ -240,10 +239,10 @@ export function ProductosClient() {
         
         await refreshData();
         setPendingChanges({});
-        toast({ title: 'Éxito', description: `${changesToSave.length} producto(s) actualizados.` });
+        toast({ title: t('common.success'), description: t('productos.toast.bulkUpdateSuccess', { count: changesToSave.length }) });
 
     } catch (error) {
-        toast({ title: 'Error', description: 'No se pudieron guardar todos los cambios.', variant: 'destructive' });
+        toast({ title: t('common.error'), description: t('productos.toast.bulkUpdateError'), variant: 'destructive' });
         await refreshData();
     } finally {
         setIsSubmitting(false);
@@ -260,15 +259,15 @@ export function ProductosClient() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight font-headline">VARIEDADES</h2>
-            <p className="text-muted-foreground">Administra tus productos y variedades.</p>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">{t('productos.title')}</h2>
+            <p className="text-muted-foreground">{t('productos.description')}</p>
           </div>
           <div className="flex gap-2">
             <Button onClick={handleOpenVariedadDialog}>
-              <Plus className="mr-2 h-4 w-4" /> Añadir Producto
+              <Plus className="mr-2 h-4 w-4" /> {t('productos.addProductType')}
             </Button>
             <Button onClick={() => handleOpenProductoDialog()}>
-              <Plus className="mr-2 h-4 w-4" /> Añadir Variedad
+              <Plus className="mr-2 h-4 w-4" /> {t('productos.addVariety')}
             </Button>
           </div>
         </div>
@@ -276,7 +275,7 @@ export function ProductosClient() {
         <Dialog open={isProductoDialogOpen} onOpenChange={(open) => !open && handleCloseProductoDialog()}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>{editingProducto ? 'Editar Variedad' : 'Añadir Nueva Variedad'}</DialogTitle>
+              <DialogTitle>{editingProducto ? t('productos.form.editTitle') : t('productos.form.addTitle')}</DialogTitle>
             </DialogHeader>
             <ProductoForm 
               onSubmit={handleProductoFormSubmit}
@@ -291,7 +290,7 @@ export function ProductosClient() {
         <Dialog open={isVariedadDialogOpen} onOpenChange={(open) => !open && handleCloseVariedadDialog()}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Añadir Nuevo Producto</DialogTitle>
+              <DialogTitle>{t('productos.variedadForm.addTitle')}</DialogTitle>
             </DialogHeader>
             <VariedadForm 
               onSubmit={handleVariedadFormSubmit}
@@ -304,18 +303,18 @@ export function ProductosClient() {
         <Card>
             <CardHeader>
                 <div className="flex justify-between items-center">
-                    <CardTitle>Lista de Productos</CardTitle>
+                    <CardTitle>{t('productos.list.title')}</CardTitle>
                     <div className="relative">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                            placeholder="Buscar producto..."
+                            placeholder={t('productos.searchPlaceholder')}
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
                             className="pl-10 w-64"
                         />
                     </div>
                 </div>
-                <CardDescription>Una lista de todos tus productos y sus variedades.</CardDescription>
+                <CardDescription>{t('productos.list.description')}</CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
@@ -331,13 +330,13 @@ export function ProductosClient() {
                     </CardHeader>
                     <CardContent>
                       <div className="text-sm text-muted-foreground">
-                        {productos.filter(p => p.variedad === variedad.nombre).length} variedades
+                        {t('productos.varietyCount', { count: productos.filter(p => p.variedad === variedad.nombre).length })}
                       </div>
                     </CardContent>
                     <CardFooter>
                        <Button variant="outline" className="w-full" onClick={() => handleViewProducts(variedad)}>
                         <Eye className="mr-2 h-4 w-4" />
-                        Ver Variedades
+                        {t('productos.viewVarieties')}
                       </Button>
                     </CardFooter>
                   </Card>
@@ -353,18 +352,18 @@ export function ProductosClient() {
           onPointerDownOutside={(e) => e.preventDefault()}
         >
           <DialogHeader>
-            <DialogTitle>Variedades del Producto: {selectedVariedad?.nombre}</DialogTitle>
+            <DialogTitle>{t('productos.viewDialog.title', { productName: selectedVariedad?.nombre || '' })}</DialogTitle>
           </DialogHeader>
           <div className="max-h-[60vh] overflow-y-auto">
             <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>VARIEDAD</TableHead>
-                    <TableHead>COLOR</TableHead>
-                    <TableHead>N° TALLOS</TableHead>
-                    <TableHead>BARRAS</TableHead>
-                    <TableHead>ESTADO</TableHead>
-                    <TableHead className="text-right">ACCIONES</TableHead>
+                    <TableHead>{t('productos.viewDialog.variety')}</TableHead>
+                    <TableHead>{t('productos.viewDialog.color')}</TableHead>
+                    <TableHead>{t('productos.viewDialog.stems')}</TableHead>
+                    <TableHead>{t('productos.viewDialog.barcode')}</TableHead>
+                    <TableHead>{t('productos.viewDialog.status')}</TableHead>
+                    <TableHead className="text-right">{t('common.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -395,7 +394,7 @@ export function ProductosClient() {
                           className="cursor-pointer"
                           onClick={() => handleStageChange(producto.id, 'estado', producto.estado === 'Activo' ? 'Inactivo' : 'Activo')}
                         >
-                          {producto.estado}
+                          {producto.estado === 'Activo' ? t('productos.status.active') : t('productos.status.inactive')}
                         </Badge>
                       </TableCell>
                       <TableCell className="text-right space-x-0">
@@ -414,7 +413,7 @@ export function ProductosClient() {
            <DialogFooter>
                 <Button onClick={handleSaveChanges} disabled={isSubmitting || Object.keys(pendingChanges).length === 0}>
                     <Save className="mr-2 h-4 w-4" />
-                    {isSubmitting ? 'Guardando...' : 'Guardar Cambios'}
+                    {isSubmitting ? t('common.saving') : t('productos.viewDialog.saveChanges')}
                 </Button>
             </DialogFooter>
         </DialogContent>
@@ -423,14 +422,14 @@ export function ProductosClient() {
       <AlertDialog open={!!variedadToDelete} onOpenChange={(open) => !open && setVariedadToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás totalmente seguro?</AlertDialogTitle>
+            <AlertDialogTitle>{t('common.confirmDeleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Esto eliminará permanentemente el producto.
+              {t('productos.confirmDeleteVariedadDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setVariedadToDelete(null)}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteVariedadConfirm} variant="destructive">Eliminar</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setVariedadToDelete(null)}>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteVariedadConfirm} variant="destructive">{t('common.delete')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -438,14 +437,14 @@ export function ProductosClient() {
       <AlertDialog open={!!productoToDelete} onOpenChange={(open) => !open && setProductoToDelete(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>¿Estás totalmente seguro?</AlertDialogTitle>
+            <AlertDialogTitle>{t('common.confirmDeleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Esto eliminará permanentemente la variedad.
+              {t('productos.confirmDeleteProductoDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setProductoToDelete(null)}>Cancelar</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteProductoConfirm} variant="destructive">Eliminar</AlertDialogAction>
+            <AlertDialogCancel onClick={() => setProductoToDelete(null)}>{t('common.cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteProductoConfirm} variant="destructive">{t('common.delete')}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>

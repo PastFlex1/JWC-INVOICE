@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Input } from '@/components/ui/input';
 import { Loader2 } from 'lucide-react';
+import { useTranslation } from '@/context/i18n-context';
 
 const formSchema = z.object({
   nombre: z.string().min(2, { message: "El nombre del producto debe tener al menos 2 caracteres." }),
@@ -20,6 +21,7 @@ type VariedadFormProps = {
 };
 
 export function VariedadForm({ onSubmit, onClose, isSubmitting }: VariedadFormProps) {
+  const { t } = useTranslation();
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -36,9 +38,9 @@ export function VariedadForm({ onSubmit, onClose, isSubmitting }: VariedadFormPr
           name="nombre"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Nombre del Producto</FormLabel>
+              <FormLabel>{t('productos.variedadForm.name')}</FormLabel>
               <FormControl>
-                <Input placeholder="e.g., Rosas" {...field} />
+                <Input placeholder={t('productos.variedadForm.namePlaceholder')} {...field} />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -46,11 +48,11 @@ export function VariedadForm({ onSubmit, onClose, isSubmitting }: VariedadFormPr
         />
         <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={onClose} disabled={isSubmitting}>
-                Cancelar
+                {t('common.cancel')}
             </Button>
             <Button type="submit" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                {isSubmitting ? 'Guardando...' : 'Añadir Producto'}
+                {isSubmitting ? t('common.saving') : t('productos.variedadForm.addButton')}
             </Button>
         </div>
       </form>
