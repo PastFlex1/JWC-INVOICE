@@ -55,7 +55,14 @@
     "flightDate": "Fecha Vuelo",
     "amount": "Monto",
     "status": "Estado",
-    "actions": "Acciones",
+    "actions": {
+      "title": "Acciones",
+      "back": "Volver",
+      "downloadPdf": "Descargar PDF",
+      "downloadExcel": "Descargar Excel",
+      "sendByEmail": "Enviar por Correo",
+      "generating": "Generando..."
+    },
     "editTooltip": "Editar Factura",
     "sendTooltip": "Enviar por Correo",
     "deleteTooltip": "Eliminar Factura",
@@ -66,7 +73,43 @@
     "confirmDeleteDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente la factura.",
     "toast": {
       "deleted": "Factura eliminada correctamente.",
-      "deleteError": "No se pudo eliminar la factura: {error}."
+      "deleteError": "No se pudo eliminar la factura: {error}.",
+      "pdfError": "No se pudo encontrar el contenido para generar el PDF.",
+      "pdfUnexpectedError": "Ocurrió un error inesperado al procesar el PDF.",
+      "pdfFileName": "Factura",
+      "excelFileName": "Factura"
+    },
+    "view": {
+      "email": "E-MAIL",
+      "phone": "TELÉFONO",
+      "address": "DIRECCIÓN",
+      "invoiceTitle": "FACTURA",
+      "date": "FECHA",
+      "no": "No",
+      "awb": "GUÍA MADRE",
+      "hawb": "GUÍA HIJA",
+      "nameClient": "Nombre Cliente",
+      "agency": "Agencia",
+      "clientAddress": "Dirección",
+      "country": "País",
+      "table": {
+        "boxes": "CAJAS",
+        "type": "TIPO",
+        "fullBox": "FULL BOX",
+        "brand": "MARCA",
+        "product": "PRODUCTO",
+        "variety": "VARIEDAD",
+        "length": "LONG.",
+        "stems": "TALLOS",
+        "bunches": "BUNCHES",
+        "price": "P. VENTA",
+        "total": "TOTAL",
+        "totals": "TOTALES"
+      },
+      "footerNote": "Todos los precios son FOB Quito. Por favor recuerde que tiene 10 días después de la fecha de la factura para realizar un reclamo y que no aceptamos créditos por flete o manejo de carga en ningún caso.",
+      "subtotal": "SUBTOTAL",
+      "iva": "IVA 15%",
+      "total": "TOTAL"
     },
     "new": {
       "title": "Nueva Factura",
@@ -624,7 +667,7 @@
   },
   "sendInvoiceDialog": {
     "title": "Enviar Factura por Correo",
-    "description": "Se enviará la factura {invoiceNumber} a {customerName}.",
+    "description": "La factura {invoiceNumber} será enviada a {customerName}. Puede añadir múltiples correos separados por comas.",
     "to": "Para",
     "subject": "Asunto",
     "body": "Cuerpo del Mensaje",

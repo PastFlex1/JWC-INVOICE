@@ -55,7 +55,14 @@
     "flightDate": "Flight Date",
     "amount": "Amount",
     "status": "Status",
-    "actions": "Actions",
+    "actions": {
+      "title": "Actions",
+      "back": "Back",
+      "downloadPdf": "Download PDF",
+      "downloadExcel": "Download Excel",
+      "sendByEmail": "Send via Email",
+      "generating": "Generating..."
+    },
     "editTooltip": "Edit Invoice",
     "sendTooltip": "Send via Email",
     "deleteTooltip": "Delete Invoice",
@@ -66,7 +73,43 @@
     "confirmDeleteDescription": "This action cannot be undone. This will permanently delete the invoice.",
     "toast": {
       "deleted": "Invoice deleted successfully.",
-      "deleteError": "Could not delete the invoice: {error}."
+      "deleteError": "Could not delete the invoice: {error}.",
+      "pdfError": "Could not find content to generate PDF.",
+      "pdfUnexpectedError": "An unexpected error occurred while processing the PDF.",
+      "pdfFileName": "Invoice",
+      "excelFileName": "Invoice"
+    },
+    "view": {
+      "email": "E-MAIL",
+      "phone": "PHONE",
+      "address": "ADDRESS",
+      "invoiceTitle": "INVOICE",
+      "date": "DATE",
+      "no": "No",
+      "awb": "AWB",
+      "hawb": "HAWB",
+      "nameClient": "Name Client",
+      "agency": "Agency",
+      "clientAddress": "Address",
+      "country": "Country",
+      "table": {
+        "boxes": "BOXES",
+        "type": "TYPE",
+        "fullBox": "FULL BOX",
+        "brand": "BRAND",
+        "product": "PRODUCT",
+        "variety": "VARIETY",
+        "length": "LENGTH",
+        "stems": "STEMS",
+        "bunches": "BUNCHES",
+        "price": "PRICE",
+        "total": "TOTAL",
+        "totals": "TOTALS"
+      },
+      "footerNote": "All prices are FOB Quito. Please remember that you have 10 days after the date on the invoice to make a claim and that we do not accept credits for freight or handling charges in any case.",
+      "subtotal": "SUBTOTAL",
+      "iva": "IVA 15%",
+      "total": "TOTAL"
     },
     "new": {
       "title": "New Invoice",
@@ -624,7 +667,7 @@
   },
   "sendInvoiceDialog": {
     "title": "Send Invoice via Email",
-    "description": "Invoice {invoiceNumber} will be sent to {customerName}.",
+    "description": "Invoice {invoiceNumber} will be sent to {customerName}. You can add multiple comma-separated emails.",
     "to": "To",
     "subject": "Subject",
     "body": "Message Body",

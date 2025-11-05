@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState, useEffect, useTransition } from 'react';
@@ -78,13 +77,13 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
   const onSubmit = (values: z.infer<typeof formSchema>) => {
     setError(null);
     startTransition(async () => {
-      const subject = `INVOICE ${invoice.invoiceNumber} JWC FLOWERS`;
-      const defaultBody = `Dear Client,\nAttached you will find your invoice\nThanks for prefer us product`;
+      const subject = t('sendInvoiceDialog.defaultSubject', { invoiceNumber: invoice.invoiceNumber });
+      const defaultBody = t('sendInvoiceDialog.defaultBody', { customerName: customer.name });
       const body = values.body ? `${defaultBody}\n\n${values.body}` : defaultBody;
       
       const invoiceElement = document.getElementById('invoice-to-print');
       if (!invoiceElement) {
-        setError("Could not find invoice content to generate PDF.");
+        setError(t('invoices.toast.pdfError'));
         return;
       }
       
@@ -131,7 +130,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
                 subject,
                 body,
                 attachments: [{
-                    filename: `Factura-${invoice.invoiceNumber.trim()}.pdf`,
+                    filename: `${t('invoices.toast.pdfFileName')}-${invoice.invoiceNumber.trim()}.pdf`,
                     content: pdfBase64,
                 }],
             }),
@@ -153,7 +152,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
          const errorMessage = e.message || 'An unknown error occurred.';
          setError(errorMessage);
          toast({
-           title: "Error al Enviar",
+           title: t('sendInvoiceDialog.errorTitle'),
            description: errorMessage,
            variant: "destructive",
          });
@@ -167,15 +166,15 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
-              <DialogTitle>Enviar Factura por Correo</DialogTitle>
+              <DialogTitle>{t('sendInvoiceDialog.title')}</DialogTitle>
               <DialogDescription>
-                La factura {invoice.invoiceNumber} será enviada a {customer.name}. Puede añadir múltiples correos separados por comas.
+                {t('sendInvoiceDialog.description', { invoiceNumber: invoice.invoiceNumber, customerName: customer.name })}
               </DialogDescription>
             </DialogHeader>
 
             {error && (
               <Alert variant="destructive" className="my-4">
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{t('common.error')}</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -186,7 +185,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
                 name="to"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Para</FormLabel>
+                    <FormLabel>{t('sendInvoiceDialog.to')}</FormLabel>
                     <FormControl>
                       <Input {...field} />
                     </FormControl>
@@ -199,9 +198,9 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
                 name="body"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Mensaje Personalizado (Opcional)</FormLabel>
+                    <FormLabel>{t('sendInvoiceDialog.body')}</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Escriba un mensaje para añadir al correo..." {...field} />
+                      <Textarea placeholder={t('sendInvoiceDialog.bodyPlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -211,7 +210,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
             
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose} disabled={isPending}>
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={isPending}>
                 {isPending ? (
@@ -219,7 +218,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
                 ) : (
                   <Send className="mr-2 h-4 w-4" />
                 )}
-                {isPending ? 'Enviando...' : 'Enviar Correo'}
+                {isPending ? t('sendInvoiceDialog.sending') : t('sendInvoiceDialog.send')}
               </Button>
             </DialogFooter>
           </form>

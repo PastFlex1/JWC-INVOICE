@@ -7,6 +7,7 @@ import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { format, parseISO } from 'date-fns';
 import type { Invoice, Customer, Consignatario, Carguera, Pais, Financials } from '@/lib/types';
+import { useTranslation } from '@/context/i18n-context';
 
 type InvoiceDownloadExcelButtonProps = {
   invoice: Invoice;
@@ -20,6 +21,7 @@ type InvoiceDownloadExcelButtonProps = {
 export default function InvoiceDownloadExcelButton({ invoice, customer, consignatario, carguera, pais, financials }: InvoiceDownloadExcelButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const isNational = customer?.type === 'National';
   const boxTypeValues: { [key: string]: number } = { eb: 0.13, qb: 0.25, hb: 0.50, jhb: 0.50 };
@@ -60,18 +62,30 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
     setIsGenerating(true);
     try {
       const ws_data: (string | number)[][] = [
-        ["INVOICE"],
+        [t('invoices.view.invoiceTitle')],
         [],
-        ["DATE:", format(parseISO(invoice.farmDepartureDate), 'dd/MM/yyyy'), "", "No.", invoice.invoiceNumber],
-        ["AWB:", invoice.masterAWB],
-        ["HAWB:", invoice.houseAWB],
+        [t('invoices.view.date'), format(parseISO(invoice.farmDepartureDate), 'dd/MM/yyyy'), "", t('invoices.view.no'), invoice.invoiceNumber],
+        [t('invoices.view.awb'), invoice.masterAWB],
+        [t('invoices.view.hawb'), invoice.houseAWB],
         [],
-        ["Name Client:", consignatario?.nombreConsignatario || customer?.name || ''],
-        ["Agency:", carguera?.nombreCarguera || ''],
-        ["Address:", consignatario?.direccion || customer?.address || ''],
-        ["Country:", consignatario?.pais || pais?.nombre || ''],
+        [t('invoices.view.nameClient'), consignatario?.nombreConsignatario || customer?.name || ''],
+        [t('invoices.view.agency'), carguera?.nombreCarguera || ''],
+        [t('invoices.view.clientAddress'), consignatario?.direccion || customer?.address || ''],
+        [t('invoices.view.country'), consignatario?.pais || pais?.nombre || ''],
         [],
-        ["CAJAS", "TIPO", "FULL BOX", "MARCA", "PRODUCTO", "VARIEDAD", "LONG.", "TALLOS", "BUNCHES", "P. VENTA", "TOTAL"]
+        [
+          t('invoices.view.table.boxes'), 
+          t('invoices.view.table.type'), 
+          t('invoices.view.table.fullBox'), 
+          t('invoices.view.table.brand'), 
+          t('invoices.view.table.product'), 
+          t('invoices.view.table.variety'), 
+          t('invoices.view.table.length'), 
+          t('invoices.view.table.stems'), 
+          t('invoices.view.table.bunches'), 
+          t('invoices.view.table.price'), 
+          t('invoices.view.table.total')
+        ]
       ];
 
       invoice.items.forEach((item, itemIndex) => {
@@ -102,13 +116,13 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
       
       ws_data.push([]);
       ws_data.push(
-        [totals.totalBoxes, "", totals.totalBoxTypeValue.toFixed(2), "TOTALES", "", "", "", totals.totalStems, totals.totalBunches, "", `$${totals.totalFob.toFixed(2)}`]
+        [totals.totalBoxes, "", totals.totalBoxTypeValue.toFixed(2), t('invoices.view.table.totals'), "", "", "", totals.totalStems, totals.totalBunches, "", `$${totals.totalFob.toFixed(2)}`]
       );
 
       ws_data.push([]);
-      ws_data.push(["", "", "", "", "", "", "", "", "", "SUBTOTAL", `$${totals.totalFob.toFixed(2)}`]);
-      ws_data.push(["", "", "", "", "", "", "", "", "", "IVA 15%", `$${totals.iva.toFixed(2)}`]);
-      ws_data.push(["", "", "", "", "", "", "", "", "", "TOTAL", `$${totals.totalConIva.toFixed(2)}`]);
+      ws_data.push(["", "", "", "", "", "", "", "", "", t('invoices.view.subtotal'), `$${totals.totalFob.toFixed(2)}`]);
+      ws_data.push(["", "", "", "", "", "", "", "", "", t('invoices.view.iva'), `$${totals.iva.toFixed(2)}`]);
+      ws_data.push(["", "", "", "", "", "", "", "", "", t('invoices.view.total'), `$${totals.totalConIva.toFixed(2)}`]);
 
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
 
@@ -120,19 +134,19 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
       const wb = XLSX.utils.book_new();
       XLSX.utils.book_append_sheet(wb, ws, `Invoice ${invoice.invoiceNumber}`);
 
-      const fileName = `Factura-${invoice.invoiceNumber.trim()}.xlsx`;
+      const fileName = `${t('invoices.toast.excelFileName')}-${invoice.invoiceNumber.trim()}.xlsx`;
       XLSX.writeFile(wb, fileName);
       
       toast({
-        title: "Éxito",
-        description: `El archivo ${fileName} se ha descargado.`,
+        title: t('common.success'),
+        description: t('common.downloadSuccess', { fileName }),
       });
 
     } catch (error) {
       console.error("Error generating Excel:", error);
       toast({
-        title: "Error",
-        description: "Ocurrió un error inesperado al generar el archivo Excel.",
+        title: t('common.error'),
+        description: t('common.excelError'),
         variant: "destructive",
       });
     } finally {
@@ -143,7 +157,7 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
   return (
     <Button onClick={handleDownloadExcel} disabled={isGenerating} variant="outline">
       {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-      Descargar Excel
+      {t('invoices.actions.downloadExcel')}
     </Button>
   );
 }

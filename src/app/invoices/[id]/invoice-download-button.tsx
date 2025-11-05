@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { Invoice } from '@/lib/types';
+import { useTranslation } from '@/context/i18n-context';
 
 type InvoiceDownloadButtonProps = {
   invoice: Invoice;
@@ -15,14 +16,15 @@ type InvoiceDownloadButtonProps = {
 export default function InvoiceDownloadButton({ invoice }: InvoiceDownloadButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleDownloadPdf = async () => {
     const invoiceElement = document.getElementById('invoice-to-print');
 
     if (!invoiceElement) {
       toast({
-        title: "Error",
-        description: "No se pudo encontrar el contenido para generar el PDF.",
+        title: t('common.error'),
+        description: t('invoices.toast.pdfError'),
         variant: "destructive",
       });
       return;
@@ -68,18 +70,18 @@ export default function InvoiceDownloadButton({ invoice }: InvoiceDownloadButton
         remainingHeight -= pdfHeight;
       }
       
-      const fileName = `Factura-${invoice.invoiceNumber.trim()}.pdf`;
+      const fileName = `${t('invoices.toast.pdfFileName')}-${invoice.invoiceNumber.trim()}.pdf`;
       pdf.save(fileName);
 
       toast({
-        title: 'Éxito',
-        description: `El archivo ${fileName} se ha descargado.`,
+        title: t('common.success'),
+        description: t('common.downloadSuccess', { fileName }),
       });
     } catch (error) {
       console.error("Error al procesar el PDF:", error);
       toast({
-        title: "Error",
-        description: "Ocurrió un error inesperado al procesar el PDF.",
+        title: t('common.error'),
+        description: t('invoices.toast.pdfUnexpectedError'),
         variant: "destructive",
       });
     } finally {
@@ -91,7 +93,7 @@ export default function InvoiceDownloadButton({ invoice }: InvoiceDownloadButton
   return (
     <Button onClick={handleDownloadPdf} disabled={isGenerating}>
       {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-      {isGenerating ? 'Generando...' : 'Descargar PDF'}
+      {isGenerating ? t('invoices.actions.generating') : t('invoices.actions.downloadPdf')}
     </Button>
   );
 }
