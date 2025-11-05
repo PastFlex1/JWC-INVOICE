@@ -287,19 +287,69 @@
       "policyNote": "El no cumplimiento de estas políticas puede resultar en la suspensión de su crédito."
     }
   },
+  "farmAccountStatement": {
+    "title": "Estado de Cuenta de Finca",
+    "description": "Seleccione una finca para ver su estado de cuenta detallado.",
+    "sendDocuments": "Enviar Documentos",
+    "selectFarm": "Seleccionar Finca",
+    "selectFarmDescription": "Elija una finca/proveedor de la lista para generar su estado de cuenta.",
+    "selectFarmPlaceholder": "Seleccione una finca...",
+    "filterByCustomer": "Filtrar por cliente...",
+    "allCustomers": "Todos los Clientes",
+    "filterByConsignee": "Filtrar por consignatario...",
+    "allConsignees": "Todos los Consignatarios",
+    "filterByMonth": "Filtrar por mes...",
+    "allMonths": "Todos los Meses",
+    "noInvoices": "No se encontraron facturas para el período seleccionado.",
+    "pleaseSelectFarm": "Por favor, seleccione una finca para continuar.",
+    "downloadExcel": "Descargar Excel",
+    "downloadPdf": "Descargar PDF",
+    "view": {
+      "title": "ESTADO DE CUENTA {farmName}",
+      "balanceTitle": "SALDO DE CUENTA",
+      "urgentPayment": "PAGO URGENTE FACTURAS",
+      "supplier": "PROVEEDOR",
+      "address": "DIRECCIÓN",
+      "taxId": "RUC",
+      "date": "FECHA",
+      "invoiceNo": "FACTURA #",
+      "consignee": "CONSIGNATARIO",
+      "charges": "CARGOS",
+      "creditsDebits": "CRÉDITOS/DÉBITOS",
+      "payments": "PAGOS",
+      "balance": "SALDO",
+      "pendingMonth": "PENDIENTE {month}",
+      "totalForMonth": "TOTAL {month}",
+      "totalPending": "TOTAL PENDIENTE"
+    },
+    "excel": {
+      "sheetName": "Estado de Cuenta Finca",
+      "fileName": "Estado-de-Cuenta-Finca"
+    },
+    "pdf": {
+      "fileName": "Estado-de-Cuenta-Finca"
+    },
+    "sendDocumentsDialog": {
+      "title": "Enviar Estado de Cuenta de Finca",
+      "description": "Se enviará el estado de cuenta por correo para {farmName}. Puede añadir múltiples correos separados por comas."
+    }
+  },
   "sendInvoiceDialog": {
     "title": "Enviar Factura por Correo",
     "description": "Se enviará la factura {invoiceNumber} a {customerName}.",
     "to": "Para",
     "subject": "Asunto",
     "body": "Cuerpo del Mensaje",
+    "bodyPlaceholder": "Escriba un mensaje para añadir al correo...",
     "cancel": "Cancelar",
     "send": "Enviar Correo",
     "sending": "Enviando...",
     "defaultSubject": "Factura {invoiceNumber} de JCW Flowers",
     "defaultBody": "Estimado/a {customerName},\n\nAdjunto encontrará la factura de su reciente pedido.\n\nGracias por su compra.\n\nSaludos cordiales,\nEl equipo de JCW Flowers",
     "successTitle": "Correo Enviado",
-    "successDescription": "La factura {invoiceNumber} ha sido enviada a {email}."
+    "successDescription": "La factura {invoiceNumber} ha sido enviada a {email}.",
+    "successDescriptionGeneric": "El correo ha sido enviado a {email}.",
+    "errorTitle": "Error al Enviar"
   },
   "common": {
     "actions": "Acciones",
@@ -312,8 +362,11 @@
     "next": "Siguiente",
     "confirmDeleteTitle": "¿Estás totalmente seguro?",
     "success": "Éxito",
+    "error": "Error",
     "errorSaving": "Error al Guardar",
     "errorDeleting": "Error al Eliminar",
-    "unknownError": "Error desconocido"
+    "unknownError": "Error desconocido",
+    "downloadSuccess": "El archivo {fileName} se ha descargado.",
+    "excelError": "Ocurrió un error inesperado al generar el archivo Excel."
   }
 }

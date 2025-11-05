@@ -8,6 +8,7 @@ import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { StatementData } from './farm-account-statement-client';
 import { format, parseISO } from 'date-fns';
+import { useTranslation } from '@/context/i18n-context';
 
 type FarmAccountStatementExcelButtonProps = {
   data: StatementData;
@@ -16,18 +17,28 @@ type FarmAccountStatementExcelButtonProps = {
 export default function FarmAccountStatementExcelButton({ data }: FarmAccountStatementExcelButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleDownloadExcel = () => {
     setIsGenerating(true);
     try {
       const ws_data = [
-        ["ESTADO DE CUENTA", data.finca.name.toUpperCase()],
+        [t('farmAccountStatement.view.title', { farmName: data.finca.name.toUpperCase() })],
         [],
-        ["PROVEEDOR:", data.finca.name],
-        ["DIRECCIÓN:", data.finca.address],
-        ["RUC:", data.finca.taxId],
+        [t('farmAccountStatement.view.supplier'), data.finca.name],
+        [t('farmAccountStatement.view.address'), data.finca.address],
+        [t('farmAccountStatement.view.taxId'), data.finca.taxId],
         [],
-        ["FECHA", "FACTURA #", "PROVEEDOR", "CONSIGNATARIO", "CARGOS", "CRÉDITOS/DÉBITOS", "PAGOS", "SALDO"]
+        [
+          t('farmAccountStatement.view.date'), 
+          t('farmAccountStatement.view.invoiceNo'), 
+          t('farmAccountStatement.view.supplier'),
+          t('farmAccountStatement.view.consignee'),
+          t('farmAccountStatement.view.charges'), 
+          t('farmAccountStatement.view.creditsDebits'), 
+          t('farmAccountStatement.view.payments'), 
+          t('farmAccountStatement.view.balance')
+        ]
       ];
 
       const groupedInvoices = data.invoices.reduce((acc, invoice) => {
@@ -40,7 +51,7 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
       }, {} as Record<string, typeof data.invoices>);
 
       Object.entries(groupedInvoices).forEach(([month, invoices]) => {
-        ws_data.push([`PENDIENTE ${month.toUpperCase()}`]);
+        ws_data.push([t('farmAccountStatement.view.pendingMonth', { month: month.toUpperCase() })]);
         invoices.forEach(invoice => {
           ws_data.push([
             format(parseISO(invoice.flightDate), 'dd/MM/yyyy'),
@@ -64,7 +75,7 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
             { total: 0, creditsDebits: 0, payments: 0, balance: 0 }
         );
         ws_data.push([
-            "", "", "", `TOTAL ${month.toUpperCase()}`,
+            "", "", "", t('farmAccountStatement.view.totalForMonth', { month: month.toUpperCase() }),
             monthlyTotals.total,
             monthlyTotals.creditsDebits,
             monthlyTotals.payments,
@@ -74,7 +85,7 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
 
       ws_data.push([]);
       ws_data.push([
-        "", "", "", "TOTAL PENDIENTE",
+        "", "", "", t('farmAccountStatement.view.totalPending'),
         data.invoices.reduce((acc, inv) => acc + inv.total, 0),
         data.totalCredits - data.totalDebits,
         data.totalPayments,
@@ -89,21 +100,21 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
       ];
       
       const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, "Estado de Cuenta Finca");
+      XLSX.utils.book_append_sheet(wb, ws, t('farmAccountStatement.excel.sheetName'));
 
-      const fileName = `Estado-de-Cuenta-Finca-${data.finca.name.replace(/ /g, '_')}.xlsx`;
+      const fileName = `${t('farmAccountStatement.excel.fileName')}-${data.finca.name.replace(/ /g, '_')}.xlsx`;
       XLSX.writeFile(wb, fileName);
       
       toast({
-        title: "Éxito",
-        description: `El archivo ${fileName} se ha descargado.`,
+        title: t('common.success'),
+        description: t('common.downloadSuccess', { fileName }),
       });
 
     } catch (error) {
       console.error("Error generating Excel:", error);
       toast({
-        title: "Error",
-        description: "Ocurrió un error inesperado al generar el archivo Excel.",
+        title: t('common.error'),
+        description: t('common.excelError'),
         variant: "destructive",
       });
     } finally {
@@ -114,7 +125,7 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
   return (
     <Button onClick={handleDownloadExcel} disabled={isGenerating} variant="outline">
       {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-      Descargar Excel
+      {t('farmAccountStatement.downloadExcel')}
     </Button>
   );
 }

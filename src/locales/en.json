@@ -287,19 +287,69 @@
         "policyNote": "Failure to comply with these policies may result in the suspension of your credit."
     }
   },
+  "farmAccountStatement": {
+    "title": "Farm Account Statement",
+    "description": "Select a farm to view its detailed account statement.",
+    "sendDocuments": "Send Documents",
+    "selectFarm": "Select Farm",
+    "selectFarmDescription": "Choose a farm/supplier from the list to generate their statement.",
+    "selectFarmPlaceholder": "Select a farm...",
+    "filterByCustomer": "Filter by customer...",
+    "allCustomers": "All Customers",
+    "filterByConsignee": "Filter by consignee...",
+    "allConsignees": "All Consignees",
+    "filterByMonth": "Filter by month...",
+    "allMonths": "All Months",
+    "noInvoices": "No invoices found for the selected period.",
+    "pleaseSelectFarm": "Please select a farm to continue.",
+    "downloadExcel": "Download Excel",
+    "downloadPdf": "Download PDF",
+    "view": {
+      "title": "ACCOUNT STATEMENT {farmName}",
+      "balanceTitle": "ACCOUNT BALANCE",
+      "urgentPayment": "URGENT PAYMENT FOR INVOICES",
+      "supplier": "SUPPLIER",
+      "address": "ADDRESS",
+      "taxId": "TAX ID",
+      "date": "DATE",
+      "invoiceNo": "INVOICE #",
+      "consignee": "CONSIGNEE",
+      "charges": "CHARGES",
+      "creditsDebits": "CREDITS/DEBITS",
+      "payments": "PAYMENTS",
+      "balance": "BALANCE",
+      "pendingMonth": "PENDING {month}",
+      "totalForMonth": "TOTAL {month}",
+      "totalPending": "TOTAL PENDING"
+    },
+    "excel": {
+      "sheetName": "Farm Account Statement",
+      "fileName": "Farm-Account-Statement"
+    },
+    "pdf": {
+      "fileName": "Farm-Account-Statement"
+    },
+    "sendDocumentsDialog": {
+      "title": "Send Farm Account Statement",
+      "description": "The account statement for {farmName} will be sent by email. You can add multiple emails separated by commas."
+    }
+  },
   "sendInvoiceDialog": {
     "title": "Send Invoice via Email",
     "description": "Invoice {invoiceNumber} will be sent to {customerName}.",
     "to": "To",
     "subject": "Subject",
     "body": "Message Body",
+    "bodyPlaceholder": "Write a message to add to the email...",
     "cancel": "Cancel",
     "send": "Send Email",
     "sending": "Sending...",
     "defaultSubject": "Invoice {invoiceNumber} from JCW Flowers",
     "defaultBody": "Dear {customerName},\n\nPlease find your invoice attached.\n\nThank you for your business.\n\nBest regards,\nThe JCW Flowers Team",
     "successTitle": "Email Sent",
-    "successDescription": "Invoice {invoiceNumber} has been sent to {email}."
+    "successDescription": "Invoice {invoiceNumber} has been sent to {email}.",
+    "successDescriptionGeneric": "The email has been sent to {email}.",
+    "errorTitle": "Error Sending"
   },
   "common": {
     "actions": "Actions",
@@ -312,8 +362,11 @@
     "next": "Next",
     "confirmDeleteTitle": "Are you absolutely sure?",
     "success": "Success",
+    "error": "Error",
     "errorSaving": "Error Saving",
     "errorDeleting": "Error Deleting",
-    "unknownError": "Unknown error"
+    "unknownError": "Unknown error",
+    "downloadSuccess": "The file {fileName} has been downloaded.",
+    "excelError": "An unexpected error occurred while generating the Excel file."
   }
 }

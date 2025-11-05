@@ -11,7 +11,8 @@ import FarmAccountStatementDownloadButton from './farm-account-statement-downloa
 import FarmAccountStatementExcelButton from './farm-account-statement-download-excel';
 import SendFarmDocumentsDialog from './send-documents-dialog';
 import { format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { es, enUS } from 'date-fns/locale';
+import { useTranslation } from '@/context/i18n-context';
 
 export type StatementData = {
   finca: Finca;
@@ -31,6 +32,8 @@ export function FarmAccountStatementClient() {
   const [selectedConsignatarioId, setSelectedConsignatarioId] = useState<string | null>(null);
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [isSendDialogOpen, setIsSendDialogOpen] = useState(false);
+  const { t, locale } = useTranslation();
+  const dateLocale = useMemo(() => (locale === 'es' ? es : enUS), [locale]);
 
   const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
   const consignatarioMap = useMemo(() => new Map(consignatarios.map(c => [c.id, c.nombreConsignatario])), [consignatarios]);
@@ -162,27 +165,27 @@ export function FarmAccountStatementClient() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight font-headline">Estado de Cuenta de Finca</h2>
-            <p className="text-muted-foreground">Seleccione una finca para ver su estado de cuenta detallado.</p>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">{t('farmAccountStatement.title')}</h2>
+            <p className="text-muted-foreground">{t('farmAccountStatement.description')}</p>
           </div>
           {statementData && (
              <div className="flex gap-2">
                 <FarmAccountStatementDownloadButton data={statementData} />
                 <FarmAccountStatementExcelButton data={statementData} />
-                <Button variant="outline" onClick={() => setIsSendDialogOpen(true)}>Enviar Documentos</Button>
+                <Button variant="outline" onClick={() => setIsSendDialogOpen(true)}>{t('farmAccountStatement.sendDocuments')}</Button>
             </div>
           )}
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Seleccionar Finca</CardTitle>
-            <CardDescription>Elija una finca/proveedor de la lista para generar su estado de cuenta.</CardDescription>
+            <CardTitle>{t('farmAccountStatement.selectFarm')}</CardTitle>
+            <CardDescription>{t('farmAccountStatement.selectFarmDescription')}</CardDescription>
           </CardHeader>
           <CardContent className="flex flex-wrap gap-4">
             <Select onValueChange={setSelectedFincaId}>
               <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
-                <SelectValue placeholder="Seleccione una finca..." />
+                <SelectValue placeholder={t('farmAccountStatement.selectFarmPlaceholder')} />
               </SelectTrigger>
               <SelectContent>
                 {fincas.map(finca => (
@@ -194,12 +197,12 @@ export function FarmAccountStatementClient() {
             </Select>
 
             {selectedFincaId && (
-              <Select onValueChange={setSelectedCustomerId} value={selectedCustomerId || ''}>
+              <Select onValueChange={(value) => setSelectedCustomerId(value === 'all' ? null : value)} value={selectedCustomerId || 'all'}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
-                  <SelectValue placeholder="Filtrar por cliente..." />
+                  <SelectValue placeholder={t('farmAccountStatement.filterByCustomer')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos los Clientes</SelectItem>
+                  <SelectItem value="all">{t('farmAccountStatement.allCustomers')}</SelectItem>
                   {availableCustomers.map(customer => (
                     <SelectItem key={customer.id} value={customer.id}>
                       {customer.name}
@@ -209,13 +212,13 @@ export function FarmAccountStatementClient() {
               </Select>
             )}
 
-            {selectedCustomerId && (
-              <Select onValueChange={(value) => setSelectedConsignatarioId(value === 'all' ? null : value)} value={selectedConsignatarioId || ''}>
+            {selectedCustomerId && availableConsignatarios.length > 0 && (
+              <Select onValueChange={(value) => setSelectedConsignatarioId(value === 'all' ? null : value)} value={selectedConsignatarioId || 'all'}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
-                  <SelectValue placeholder="Filtrar por consignatario..." />
+                  <SelectValue placeholder={t('farmAccountStatement.filterByConsignee')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos los Consignatarios</SelectItem>
+                  <SelectItem value="all">{t('farmAccountStatement.allConsignees')}</SelectItem>
                   {availableConsignatarios.map(consignatario => (
                     <SelectItem key={consignatario.id} value={consignatario.id}>
                       {consignatario.nombreConsignatario}
@@ -228,13 +231,13 @@ export function FarmAccountStatementClient() {
             {selectedFincaId && availableMonths.length > 0 && (
               <Select onValueChange={setSelectedMonth} value={selectedMonth}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[200px]">
-                  <SelectValue placeholder="Filtrar por mes..." />
+                  <SelectValue placeholder={t('farmAccountStatement.filterByMonth')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos los Meses</SelectItem>
+                  <SelectItem value="all">{t('farmAccountStatement.allMonths')}</SelectItem>
                   {availableMonths.map(month => (
                     <SelectItem key={month} value={month}>
-                      {format(parseISO(`${month}-02`), "MMMM yyyy", { locale: es })}
+                      {format(parseISO(`${month}-02`), "MMMM yyyy", { locale: dateLocale })}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -249,13 +252,13 @@ export function FarmAccountStatementClient() {
 
         {selectedFincaId && (!statementData || statementData.invoices.length === 0) && (
             <div className="text-center py-12 text-muted-foreground">
-                <p>No se encontraron facturas para el período seleccionado.</p>
+                <p>{t('farmAccountStatement.noInvoices')}</p>
             </div>
         )}
 
         {!selectedFincaId && (
           <div className="text-center py-12 text-muted-foreground">
-            <p>Por favor, seleccione una finca para continuar.</p>
+            <p>{t('farmAccountStatement.pleaseSelectFarm')}</p>
           </div>
         )}
       </div>

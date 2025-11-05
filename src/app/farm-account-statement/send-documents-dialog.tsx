@@ -23,6 +23,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import { Textarea } from '@/components/ui/textarea';
+import { useTranslation } from '@/context/i18n-context';
 
 const formSchema = z.object({
   to: z.string()
@@ -90,6 +91,7 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
   const { toast } = useToast();
   const [isSending, setIsSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { t } = useTranslation();
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -125,7 +127,7 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
         }
 
         const attachments = [{
-            filename: `Estado-de-Cuenta-Finca-${finca.name.replace(/ /g, '_')}.pdf`,
+            filename: `${t('farmAccountStatement.pdf.fileName')}-${finca.name.replace(/ /g, '_')}.pdf`,
             content: statementPdfBase64,
         }];
 
@@ -149,8 +151,8 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
         }
 
         toast({
-            title: "Correo Enviado",
-            description: `Se han enviado los documentos a ${values.to}.`,
+            title: t('sendInvoiceDialog.successTitle'),
+            description: t('sendInvoiceDialog.successDescriptionGeneric', { email: values.to }),
         });
         onClose();
         
@@ -158,7 +160,7 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
         const errorMessage = e.message || 'An unknown error occurred.';
         setError(errorMessage);
         toast({
-            title: "Error al Enviar",
+            title: t('sendInvoiceDialog.errorTitle'),
             description: errorMessage,
             variant: "destructive",
         });
@@ -174,15 +176,15 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
-              <DialogTitle>Enviar Estado de Cuenta de Finca</DialogTitle>
+              <DialogTitle>{t('farmAccountStatement.sendDocumentsDialog.title')}</DialogTitle>
               <DialogDescription>
-                Se enviará el estado de cuenta por correo para {finca.name}. Puede añadir múltiples correos separados por comas.
+                {t('farmAccountStatement.sendDocumentsDialog.description', { farmName: finca.name })}
               </DialogDescription>
             </DialogHeader>
 
             {error && (
               <Alert variant="destructive" className="my-4">
-                <AlertTitle>Error</AlertTitle>
+                <AlertTitle>{t('common.error')}</AlertTitle>
                 <AlertDescription>{error}</AlertDescription>
               </Alert>
             )}
@@ -193,7 +195,7 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
                 name="to"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Para</FormLabel>
+                    <FormLabel>{t('sendInvoiceDialog.to')}</FormLabel>
                     <FormControl>
                       <Input placeholder="proveedor@email.com" {...field} />
                     </FormControl>
@@ -206,9 +208,9 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
                 name="body"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Mensaje Personalizado (Opcional)</FormLabel>
+                    <FormLabel>{t('sendInvoiceDialog.body')}</FormLabel>
                     <FormControl>
-                      <Textarea placeholder="Escriba un mensaje para añadir al correo..." {...field} />
+                      <Textarea placeholder={t('sendInvoiceDialog.bodyPlaceholder')} {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -218,7 +220,7 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
             
             <DialogFooter>
               <Button type="button" variant="outline" onClick={onClose} disabled={isSending}>
-                Cancelar
+                {t('common.cancel')}
               </Button>
               <Button type="submit" disabled={isSending}>
                 {isSending ? (
@@ -226,7 +228,7 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
                 ) : (
                   <Send className="mr-2 h-4 w-4" />
                 )}
-                {isSending ? 'Enviando...' : `Enviar`}
+                {isSending ? t('sendInvoiceDialog.sending') : t('sendInvoiceDialog.send')}
               </Button>
             </DialogFooter>
           </form>
