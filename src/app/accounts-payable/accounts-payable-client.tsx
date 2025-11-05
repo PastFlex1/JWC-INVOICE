@@ -249,7 +249,7 @@ export function AccountsPayableClient() {
                     <TableHead>{t('accountsPayable.table.supplier')}</TableHead>
                     <TableHead>{t('accountsPayable.table.departureDate')}</TableHead>
                     <TableHead>{t('accountsPayable.table.outstandingAmount')}</TableHead>
-                    <TableHead className="text-right">{t('common.actions')}</TableHead>
+                    <TableHead className="text-right">{t('common.actions.title')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>

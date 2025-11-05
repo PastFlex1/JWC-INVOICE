@@ -432,35 +432,35 @@
     "pdfFileName": "Debit-Note-Report",
     "excelFileName": "Debit-Note-Report",
     "list": {
-        "title": "Debit Note List",
-        "description": "A list of all your customer debit notes.",
-        "date": "Date",
-        "invoice": "Invoice #",
-        "consignee": "Consignee",
-        "amount": "Amount",
-        "reason": "Reason"
+      "title": "Debit Note List",
+      "description": "A list of all your customer debit notes.",
+      "date": "Date",
+      "invoice": "Invoice #",
+      "consignee": "Consignee",
+      "amount": "Amount",
+      "reason": "Reason"
     },
     "form": {
-        "customer": "Customer",
-        "customerPlaceholder": "Select a customer",
-        "invoice": "Invoice to Debit",
-        "invoicePlaceholder": "Select an invoice",
-        "consignee": "Consignee",
-        "amount": "Amount to Debit",
-        "reason": "Reason",
-        "reasonPlaceholder": "e.g., Price adjustment",
-        "date": "Debit Note Date"
+      "customer": "Customer",
+      "customerPlaceholder": "Select a customer",
+      "invoice": "Invoice to Debit",
+      "invoicePlaceholder": "Select an invoice",
+      "consignee": "Consignee",
+      "amount": "Amount to Debit",
+      "reason": "Reason",
+      "reasonPlaceholder": "e.g., Price adjustment",
+      "date": "Debit Note Date"
     },
     "toast": {
-        "added": "Debit note added successfully.",
-        "deleted": "Debit note deleted successfully.",
-        "error": "Could not save the debit note: {error}.",
-        "deleteError": "Could not delete the debit note: {error}."
+      "added": "Debit note added successfully.",
+      "deleted": "Debit note deleted successfully.",
+      "error": "Could not save the debit note: {error}.",
+      "deleteError": "Could not delete the debit note: {error}."
     },
     "confirmDeleteDescription": "This action cannot be undone. This will permanently delete the debit note.",
     "email": {
-        "reportTitle": "Debit Note Report",
-        "reportDescription": "The attached report contains a summary of debit notes for the selected period."
+      "reportTitle": "Debit Note Report",
+      "reportDescription": "The attached report contains a summary of debit notes for the selected period."
     },
     "farm": {
       "title": "Debit Notes (Farm)",
@@ -683,7 +683,9 @@
     "errorTitle": "Error Sending"
   },
   "common": {
-    "actions": "Actions",
+    "actions": {
+      "title": "Actions"
+    },
     "cancel": "Cancel",
     "delete": "Delete",
     "saveChanges": "Save Changes",

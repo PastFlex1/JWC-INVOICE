@@ -683,7 +683,9 @@
     "errorTitle": "Error al Enviar"
   },
   "common": {
-    "actions": "Acciones",
+    "actions": {
+      "title": "Acciones"
+    },
     "cancel": "Cancelar",
     "delete": "Eliminar",
     "saveChanges": "Guardar Cambios",

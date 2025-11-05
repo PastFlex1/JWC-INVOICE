@@ -221,7 +221,7 @@ export function InvoicesClient() {
                         format(dateRange.from, "LLL dd, y")
                       )
                     ) : (
-                      <span>Todas las fechas</span>
+                      <span>{t('common.allDates')}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -247,9 +247,9 @@ export function InvoicesClient() {
                   <TableRow>
                     <TableHead>{t('invoices.invoiceNumber')}</TableHead>
                     <TableHead>{t('invoices.customer')}</TableHead>
-                    <TableHead>Fecha Salida</TableHead>
+                    <TableHead>{t('invoices.flightDate')}</TableHead>
                     <TableHead>{t('invoices.amount')}</TableHead>
-                    <TableHead className="text-right">{t('invoices.actions')}</TableHead>
+                    <TableHead className="text-right">{t('invoices.actions.title')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
