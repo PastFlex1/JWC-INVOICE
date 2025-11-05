@@ -17,6 +17,7 @@ import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Textarea } from '@/components/ui/textarea';
 import type { AggregatedPayment } from './view-payments-client';
 import { PaymentReceiptView } from './payment-receipt-view';
+import { useTranslation } from '@/context/i18n-context';
 
 const formSchema = z.object({
   to: z.string()
@@ -42,6 +43,7 @@ type SendPaymentReceiptDialogProps = {
 
 export function SendPaymentReceiptDialog({ payment, isOpen, onClose }: SendPaymentReceiptDialogProps) {
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isPending, startTransition] = useTransition();
   const [error, setError] = useState<string | null>(null);
 
@@ -166,7 +168,7 @@ export function SendPaymentReceiptDialog({ payment, isOpen, onClose }: SendPayme
 
         <div className="h-[60vh] overflow-y-auto border rounded-md p-4 bg-gray-50/50 mt-4">
             <div id={`payment-receipt-${payment.id}-modal`}>
-            <PaymentReceiptView payment={payment} />
+            <PaymentReceiptView payment={payment} t={t} />
             </div>
         </div>
         
