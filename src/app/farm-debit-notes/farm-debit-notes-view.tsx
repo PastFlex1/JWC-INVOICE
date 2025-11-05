@@ -46,7 +46,7 @@ export function FarmDebitNotesView({ notes, onDelete }: FarmDebitNotesViewProps)
             <div className="p-1 border-r border-black">{t('debitNotes.farm.list.farm')}</div>
             <div className="p-1 border-r border-black">{t('debitNotes.farm.list.reason')}</div>
             <div className="p-1 border-r border-black">{t('debitNotes.farm.list.amount')}</div>
-            <div className="p-1">{t('common.actions')}</div>
+            <div className="p-1">{t('common.actions.title')}</div>
           </div>
           <div className="border-l border-r border-b border-black text-xs">
             {notes.length === 0 && (
