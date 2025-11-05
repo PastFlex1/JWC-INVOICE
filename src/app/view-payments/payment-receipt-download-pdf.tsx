@@ -33,10 +33,10 @@ export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentRece
     const { createRoot } = await import('react-dom/client');
     const root = createRoot(tempContainer);
     
-    // Render the component inside the temporary container
+    // Render the component inside the temporary container, passing the `t` function
     root.render(
       <div id={`printable-receipt-${payment.id}`} style={{ width: '8.5in', padding: '0.5in' }}>
-        <PaymentReceiptView payment={payment} />
+        <PaymentReceiptView payment={payment} t={t} />
       </div>
     );
     

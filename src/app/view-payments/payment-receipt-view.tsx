@@ -9,10 +9,12 @@ import { useTranslation } from '@/context/i18n-context';
 
 type PaymentReceiptViewProps = {
   payment: AggregatedPayment;
+  t?: (key: string) => string;
 };
 
-export function PaymentReceiptView({ payment }: PaymentReceiptViewProps) {
-  const { t } = useTranslation();
+export function PaymentReceiptView({ payment, t: tProp }: PaymentReceiptViewProps) {
+  const { t: tHook } = useTranslation();
+  const t = tProp || tHook;
 
   return (
     <Card className="p-6 bg-white text-black shadow-lg border print:shadow-none print:border-0" id={`payment-receipt-${payment.id}`}>
