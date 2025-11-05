@@ -25,9 +25,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
     }
 
-    // Read logo file
+    // Read logo file and convert to Base64 string
     const logoPath = path.join(process.cwd(), 'public', 'logo.png');
-    const logoBuffer = fs.readFileSync(logoPath);
+    const logoBase64 = fs.readFileSync(logoPath).toString('base64');
     
     const emailHtml = `
       <html>
@@ -50,7 +50,7 @@ export async function POST(request: Request) {
     // Add the logo as an embedded attachment with a Content-ID
     attachments.push({
       filename: 'logo.png',
-      content: logoBuffer,
+      content: logoBase64,
       contentId: 'jcw-logo-id',
     });
 
