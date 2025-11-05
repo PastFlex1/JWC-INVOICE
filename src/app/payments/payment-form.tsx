@@ -16,7 +16,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import type { Payment, Invoice, CreditNote, DebitNote, BunchItem, Customer, Finca, Consignatario } from '@/lib/types';
 import { Loader2, CalendarIcon } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { format, toDate } from 'date-fns';
+import { format, toDate, parseISO } from 'date-fns';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -40,7 +40,7 @@ const paymentInvoiceSchema = z.object({
   invoiceId: z.string(),
   invoiceNumber: z.string(),
   consigneeName: z.string().optional(),
-  flightDate: z.string(),
+  farmDepartureDate: z.string(),
   balance: z.number(),
   isSelected: z.boolean(),
   amountToPay: z.coerce.number().min(0, "El abono debe ser positivo.").optional(),
@@ -70,7 +70,7 @@ type PaymentFormData = z.infer<typeof formSchema>;
 type FormSubmitData = Omit<Payment, 'id' | 'invoiceId' | 'amount'>;
 
 type PaymentFormProps = {
-  onSubmit: (paymentDetails: FormSubmitData, selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', flightDate: string, amountToPay: number }[]) => Promise<boolean>;
+  onSubmit: (paymentDetails: FormSubmitData, selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', farmDepartureDate: string, amountToPay: number }[]) => Promise<boolean>;
   isSubmitting: boolean;
   customers: Customer[];
   fincas: Finca[];
@@ -167,7 +167,7 @@ export function PaymentForm({
             return { 
                 invoiceId: invoice.id,
                 invoiceNumber: invoice.invoiceNumber,
-                flightDate: invoice.flightDate,
+                farmDepartureDate: invoice.farmDepartureDate,
                 balance, 
                 total, 
                 consigneeName,
@@ -176,7 +176,7 @@ export function PaymentForm({
             };
         }).filter(inv => inv.balance > 0.01);
         
-        const sorted = calculatedInvoices.sort((a,b) => new Date(a.flightDate).getTime() - new Date(b.flightDate).getTime())
+        const sorted = calculatedInvoices.sort((a,b) => new Date(a.farmDepartureDate).getTime() - new Date(b.farmDepartureDate).getTime())
         replace(sorted);
     } else {
         replace([]);
@@ -212,7 +212,7 @@ export function PaymentForm({
               balance: inv.balance,
               amountToPay: inv.amountToPay!,
               type: originalInvoice.type,
-              flightDate: originalInvoice.flightDate,
+              farmDepartureDate: originalInvoice.farmDepartureDate,
           };
       });
 
@@ -331,7 +331,7 @@ export function PaymentForm({
                                             </TableCell>
                                             <TableCell>{field.invoiceNumber}</TableCell>
                                             <TableCell>{field.consigneeName}</TableCell>
-                                            <TableCell>{format(new Date(field.flightDate), 'dd/MM/yyyy')}</TableCell>
+                                            <TableCell>{format(parseISO(field.farmDepartureDate), 'dd/MM/yyyy')}</TableCell>
                                             <TableCell>${field.balance.toFixed(2)}</TableCell>
                                             <TableCell className="text-right">
                                                 <Controller

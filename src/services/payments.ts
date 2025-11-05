@@ -97,7 +97,7 @@ export async function addPayment(paymentData: Omit<Payment, 'id'>): Promise<stri
     const newBalance = totalCharge - newTotalPaid;
     
     const isPaid = newBalance <= 0.01;
-    const dueDate = new Date(invoiceData.flightDate);
+    const dueDate = new Date(invoiceData.farmDepartureDate);
     dueDate.setDate(dueDate.getDate() + 30);
     const isOverdue = new Date() > dueDate;
     
@@ -131,7 +131,7 @@ export async function addPayment(paymentData: Omit<Payment, 'id'>): Promise<stri
 
 export async function addBulkPayment(
   paymentData: Omit<Payment, 'id' | 'invoiceId' | 'amount'>, 
-  invoicesToPay: { invoiceId: string; balance: number; amountToPay: number; type: 'sale' | 'purchase' | 'both', flightDate: string }[],
+  invoicesToPay: { invoiceId: string; balance: number; amountToPay: number; type: 'sale' | 'purchase' | 'both', farmDepartureDate: string }[],
 ): Promise<void> {
   if (!db) throw new Error("Firebase is not configured. Check your .env file.");
 
@@ -151,7 +151,7 @@ export async function addBulkPayment(
 
     const newBalance = invoice.balance - invoice.amountToPay;
     const isPaid = newBalance <= 0.01;
-    const dueDate = new Date(invoice.flightDate);
+    const dueDate = new Date(invoice.farmDepartureDate);
     dueDate.setDate(dueDate.getDate() + 30); // Assuming 30 days payment term
     const newStatus = isPaid ? 'Paid' : (new Date() > dueDate ? 'Overdue' : 'Pending');
 
