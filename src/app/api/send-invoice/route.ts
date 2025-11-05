@@ -51,7 +51,7 @@ export async function POST(request: Request) {
     attachments.push({
       filename: 'logo.png',
       content: logoBuffer,
-      cid: 'logo'
+      contentId: 'logo'
     });
 
     await resend.emails.send({
