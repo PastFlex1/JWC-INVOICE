@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useState } from 'react';
@@ -9,6 +8,7 @@ import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { AggregatedPayment } from './view-payments-client';
 import { PaymentReceiptView } from './payment-receipt-view';
+import { useTranslation } from '@/context/i18n-context';
 
 type PaymentReceiptDownloadPdfButtonProps = {
   payment: AggregatedPayment;
@@ -17,6 +17,7 @@ type PaymentReceiptDownloadPdfButtonProps = {
 export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentReceiptDownloadPdfButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleDownloadPdf = async () => {
     setIsGenerating(true);
@@ -46,8 +47,8 @@ export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentRece
 
     if (!printableElement) {
       toast({
-        title: "Error",
-        description: "No se pudo encontrar el contenido para generar el PDF.",
+        title: t('common.error'),
+        description: t('viewPayments.pdfError'),
         variant: "destructive",
       });
       setIsGenerating(false);
@@ -94,19 +95,19 @@ export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentRece
         remainingHeight -= pdfHeight;
       }
       
-      const fileName = `Recibo-de-Pago-${payment.entityName.replace(/ /g, '_')}.pdf`;
+      const fileName = `${t('viewPayments.receipt.pdfFileName')}-${payment.entityName.replace(/ /g, '_')}.pdf`;
       pdf.save(fileName);
       
       toast({
-        title: "Éxito",
-        description: `El archivo ${fileName} se ha descargado.`,
+        title: t('common.success'),
+        description: t('common.downloadSuccess', { fileName }),
       });
 
     } catch (error) {
       console.error("Error processing PDF:", error);
       toast({
-        title: "Error",
-        description: "Ocurrió un error inesperado al procesar el PDF.",
+        title: t('common.error'),
+        description: t('viewPayments.pdfUnexpectedError'),
         variant: "destructive",
       });
     } finally {
@@ -117,9 +118,9 @@ export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentRece
   };
 
   return (
-    <Button onClick={handleDownloadPdf} disabled={isGenerating}>
+    <button onClick={handleDownloadPdf} disabled={isGenerating} className="w-full flex items-center justify-start text-sm p-2 hover:bg-accent rounded-sm">
       {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-      Descargar PDF
-    </Button>
+      {t('viewPayments.receipt.downloadPdf')}
+    </button>
   );
 }

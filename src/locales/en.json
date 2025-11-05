@@ -367,6 +367,63 @@
     "errorDeleting": "Error Deleting",
     "unknownError": "Unknown error",
     "downloadSuccess": "The file {fileName} has been downloaded.",
-    "excelError": "An unexpected error occurred while generating the Excel file."
+    "excelError": "An unexpected error occurred while generating the Excel file.",
+    "allDates": "All Dates"
+  },
+  "accountsPayable": {
+    "title": "Accounts Payable",
+    "description": "Manage your purchase invoices and supplier payments.",
+    "historyTitle": "Purchase History",
+    "historyDescription": "A list of all your purchase invoices.",
+    "searchPlaceholder": "Search by #, supplier, or status...",
+    "table": {
+      "invoiceNo": "Invoice #",
+      "supplier": "Supplier",
+      "departureDate": "Departure Date",
+      "outstandingAmount": "Outstanding Amount"
+    }
+  },
+  "viewPayments": {
+    "title": "Payment History",
+    "description": "View all payments registered in the system.",
+    "registeredPayments": "Registered Payments",
+    "registeredPaymentsDescription": "A list of all customer and supplier payments, grouped by day and entity.",
+    "searchPlaceholder": "Search by invoice #, customer, method...",
+    "pdfError": "Could not find content to generate PDF.",
+    "pdfUnexpectedError": "An unexpected error occurred while processing the PDF.",
+    "table": {
+      "date": "Date",
+      "entity": "Customer/Supplier",
+      "totalAmount": "Total Amount",
+      "invoicesPaid": "Invoices Paid",
+      "method": "Method",
+      "bank": "Bank",
+      "paidToInvoices": "Paid to {count} invoice(s)",
+      "viewDetails": "View Details",
+      "sendEmail": "Send via Email",
+      "download": "Download"
+    },
+    "receipt": {
+      "title": "Payment Receipt",
+      "description": "This is a summary of the payment made by {entityName}.",
+      "close": "Close",
+      "downloadPdf": "Download PDF",
+      "downloadExcel": "Download Excel",
+      "paymentDate": "Payment Date",
+      "totalAmount": "Total Amount",
+      "paidBy": "Paid by",
+      "paymentMethod": "Payment Method",
+      "reference": "Reference/Bank",
+      "notes": "Notes",
+      "breakdown": "Payment Breakdown",
+      "invoiceNo": "Invoice #",
+      "customer": "Customer",
+      "consignee": "Consignee",
+      "amountApplied": "Amount Applied",
+      "totalPaid": "TOTAL PAID",
+      "sheetName": "Payment Receipt",
+      "pdfFileName": "Payment-Receipt",
+      "excelFileName": "Payment-Receipt"
+    }
   }
 }

@@ -367,6 +367,63 @@
     "errorDeleting": "Error al Eliminar",
     "unknownError": "Error desconocido",
     "downloadSuccess": "El archivo {fileName} se ha descargado.",
-    "excelError": "Ocurrió un error inesperado al generar el archivo Excel."
+    "excelError": "Ocurrió un error inesperado al generar el archivo Excel.",
+    "allDates": "Todas las fechas"
+  },
+  "accountsPayable": {
+    "title": "Cuentas por Pagar",
+    "description": "Gestiona tus facturas de compra y pagos a proveedores.",
+    "historyTitle": "Historial de Compras",
+    "historyDescription": "Una lista de todas tus facturas de compra.",
+    "searchPlaceholder": "Buscar por N°, proveedor o estado...",
+    "table": {
+      "invoiceNo": "Factura #",
+      "supplier": "Proveedor",
+      "departureDate": "Fecha Salida",
+      "outstandingAmount": "Monto Pendiente"
+    }
+  },
+  "viewPayments": {
+    "title": "Historial de Pagos",
+    "description": "Consulte todos los pagos registrados en el sistema.",
+    "registeredPayments": "Pagos Registrados",
+    "registeredPaymentsDescription": "Una lista de todos los pagos de clientes y a proveedores, agrupados por día y entidad.",
+    "searchPlaceholder": "Buscar por N° factura, cliente, método...",
+    "pdfError": "No se pudo encontrar el contenido para generar el PDF.",
+    "pdfUnexpectedError": "Ocurrió un error inesperado al procesar el PDF.",
+    "table": {
+      "date": "Fecha",
+      "entity": "Cliente/Proveedor",
+      "totalAmount": "Monto Total",
+      "invoicesPaid": "Facturas Pagadas",
+      "method": "Método",
+      "bank": "Banco",
+      "paidToInvoices": "Pago a {count} factura(s)",
+      "viewDetails": "Ver Detalle",
+      "sendEmail": "Enviar por Correo",
+      "download": "Descargar"
+    },
+    "receipt": {
+      "title": "Recibo de Pago",
+      "description": "Este es un resumen del pago realizado por {entityName}.",
+      "close": "Cerrar",
+      "downloadPdf": "Descargar PDF",
+      "downloadExcel": "Descargar Excel",
+      "paymentDate": "Fecha de Pago",
+      "totalAmount": "Monto Total",
+      "paidBy": "Pagado por",
+      "paymentMethod": "Método de Pago",
+      "reference": "Referencia/Banco",
+      "notes": "Notas",
+      "breakdown": "Desglose de Pago",
+      "invoiceNo": "N° Factura",
+      "customer": "Cliente",
+      "consignee": "Consignatario",
+      "amountApplied": "Monto Aplicado",
+      "totalPaid": "TOTAL PAGADO",
+      "sheetName": "Recibo de Pago",
+      "pdfFileName": "Recibo-de-Pago",
+      "excelFileName": "Recibo-de-Pago"
+    }
   }
 }

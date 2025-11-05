@@ -46,13 +46,13 @@ export function ViewPaymentsView({ payments, onViewPayment, onSendPayment }: Vie
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>Fecha</TableHead>
-              <TableHead>Cliente/Proveedor</TableHead>
-              <TableHead>Monto Total</TableHead>
-              <TableHead>Facturas Pagadas</TableHead>
-              <TableHead>Método</TableHead>
-              <TableHead>Banco</TableHead>
-              <TableHead className="text-right">Acciones</TableHead>
+              <TableHead>{t('viewPayments.table.date')}</TableHead>
+              <TableHead>{t('viewPayments.table.entity')}</TableHead>
+              <TableHead>{t('viewPayments.table.totalAmount')}</TableHead>
+              <TableHead>{t('viewPayments.table.invoicesPaid')}</TableHead>
+              <TableHead>{t('viewPayments.table.method')}</TableHead>
+              <TableHead>{t('viewPayments.table.bank')}</TableHead>
+              <TableHead className="text-right">{t('common.actions')}</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -63,21 +63,21 @@ export function ViewPaymentsView({ payments, onViewPayment, onSendPayment }: Vie
                 <TableCell className="font-bold">${payment.amount.toFixed(2)}</TableCell>
                 <TableCell>
                   <Badge variant="secondary">
-                    Pago a {payment.details.length} factura(s)
+                    {t('viewPayments.table.paidToInvoices', { count: payment.details.length })}
                   </Badge>
                 </TableCell>
                 <TableCell>{payment.paymentMethod}</TableCell>
                 <TableCell>{payment.reference}</TableCell>
                 <TableCell className="text-right">
-                  <Button variant="ghost" size="icon" title="Ver Detalle" onClick={() => onViewPayment(payment)}>
+                  <Button variant="ghost" size="icon" title={t('viewPayments.table.viewDetails')} onClick={() => onViewPayment(payment)}>
                     <Eye className="h-4 w-4" />
                   </Button>
-                  <Button variant="ghost" size="icon" title="Enviar por Correo" onClick={() => onSendPayment(payment)}>
+                  <Button variant="ghost" size="icon" title={t('viewPayments.table.sendEmail')} onClick={() => onSendPayment(payment)}>
                     <Mail className="h-4 w-4" />
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button variant="ghost" size="icon" title="Descargar">
+                      <Button variant="ghost" size="icon" title={t('viewPayments.table.download')}>
                         <Download className="h-4 w-4" />
                       </Button>
                     </DropdownMenuTrigger>

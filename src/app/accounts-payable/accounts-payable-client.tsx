@@ -180,22 +180,22 @@ export function AccountsPayableClient() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight font-headline">Cuentas por Pagar</h2>
-            <p className="text-muted-foreground">Gestiona tus facturas de compra y pagos a proveedores.</p>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">{t('accountsPayable.title')}</h2>
+            <p className="text-muted-foreground">{t('accountsPayable.description')}</p>
           </div>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Historial de Compras</CardTitle>
-            <CardDescription>Una lista de todas tus facturas de compra.</CardDescription>
+            <CardTitle>{t('accountsPayable.historyTitle')}</CardTitle>
+            <CardDescription>{t('accountsPayable.historyDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
              <div className="mb-4 flex flex-wrap gap-4">
                <div className="relative flex-grow">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                 <Input
-                  placeholder="Buscar por N°, proveedor o estado..."
+                  placeholder={t('accountsPayable.searchPlaceholder')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="pl-10"
@@ -221,7 +221,7 @@ export function AccountsPayableClient() {
                         format(dateRange.from, "LLL dd, y")
                       )
                     ) : (
-                      <span>Todas las fechas</span>
+                      <span>{t('common.allDates')}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -245,11 +245,11 @@ export function AccountsPayableClient() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead>Factura #</TableHead>
-                    <TableHead>Proveedor</TableHead>
-                    <TableHead>Fecha Salida</TableHead>
-                    <TableHead>Monto Pendiente</TableHead>
-                    <TableHead className="text-right">Acciones</TableHead>
+                    <TableHead>{t('accountsPayable.table.invoiceNo')}</TableHead>
+                    <TableHead>{t('accountsPayable.table.supplier')}</TableHead>
+                    <TableHead>{t('accountsPayable.table.departureDate')}</TableHead>
+                    <TableHead>{t('accountsPayable.table.outstandingAmount')}</TableHead>
+                    <TableHead className="text-right">{t('common.actions')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -262,26 +262,26 @@ export function AccountsPayableClient() {
                             {invoice.invoiceNumber}
                           </Link>
                         </TableCell>
-                        <TableCell>{getFinca(invoice.farmId)?.name || 'Desconocido'}</TableCell>
+                        <TableCell>{getFinca(invoice.farmId)?.name || t('invoices.unknownCustomer')}</TableCell>
                         <TableCell>{format(parseISO(invoice.farmDepartureDate), 'PPP')}</TableCell>
                         <TableCell>${balance.toFixed(2)}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
                             <Link href={`/invoices/${invoice.id}`} passHref>
-                              <Button variant="ghost" size="icon" title="Ver/Editar Factura">
+                              <Button variant="ghost" size="icon" title={t('invoices.editTooltip')}>
                                 <Edit className="h-4 w-4" />
-                                <span className="sr-only">Ver/Editar Factura</span>
+                                <span className="sr-only">{t('invoices.editTooltip')}</span>
                               </Button>
                             </Link>
-                            <Link href={`/invoices/duplicate/${invoice.id}`} passHref>
+                            <Link href={`/invoices/new?duplicate=${invoice.id}`} passHref>
                               <Button variant="ghost" size="icon" title="Duplicar Factura">
                                 <Copy className="h-4 w-4" />
                                 <span className="sr-only">Duplicar Factura</span>
                               </Button>
                             </Link>
-                            <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(invoice)} title="Eliminar Factura">
+                            <Button variant="ghost" size="icon" onClick={() => handleDeleteClick(invoice)} title={t('invoices.deleteTooltip')}>
                               <Trash2 className="h-4 w-4 text-destructive" />
-                              <span className="sr-only">Eliminar Factura</span>
+                              <span className="sr-only">{t('invoices.deleteTooltip')}</span>
                             </Button>
                           </div>
                         </TableCell>
@@ -295,7 +295,7 @@ export function AccountsPayableClient() {
           {totalPages > 1 && (
             <CardFooter className="flex items-center justify-between">
               <div className="text-sm text-muted-foreground">
-                Página {currentPage} de {totalPages}
+                {t('common.page', { currentPage: currentPage, totalPages: totalPages })}
               </div>
               <div className="flex items-center gap-2">
                 <Button
@@ -304,7 +304,7 @@ export function AccountsPayableClient() {
                   onClick={handlePrevPage}
                   disabled={currentPage === 1}
                 >
-                  Anterior
+                  {t('common.previous')}
                 </Button>
                 <Button
                   variant="outline"
@@ -312,7 +312,7 @@ export function AccountsPayableClient() {
                   onClick={handleNextPage}
                   disabled={currentPage >= totalPages}
                 >
-                  Siguiente
+                  {t('common.next')}
                 </Button>
               </div>
             </CardFooter>
@@ -325,7 +325,7 @@ export function AccountsPayableClient() {
           <AlertDialogHeader>
             <AlertDialogTitle>{t('common.confirmDeleteTitle')}</AlertDialogTitle>
             <AlertDialogDescription>
-              Esta acción no se puede deshacer. Esto eliminará permanentemente la factura de compra.
+              {t('invoices.confirmDeleteDescription')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

@@ -113,7 +113,7 @@ export function ViewPaymentsClient() {
               };
           }
 
-          const customerName = customerMap.get(invoice.customerId)?.name || 'Cliente Desconocido';
+          const customerName = customerMap.get(invoice.customerId)?.name || t('invoices.unknownCustomer');
           const consigneeName = invoice.consignatarioId ? (consignatarioMap.get(invoice.consignatarioId) || 'Consignatario Desconocido') : customerName;
 
           groupedPayments[groupKey].amount += p.amount;
@@ -126,7 +126,7 @@ export function ViewPaymentsClient() {
       });
 
       return Object.values(groupedPayments).sort((a,b) => parseISO(b.paymentDate).getTime() - parseISO(a.paymentDate).getTime());
-  }, [payments, invoices, customerMap, fincaMap, invoiceMap, consignatarioMap]);
+  }, [payments, invoices, customerMap, fincaMap, invoiceMap, consignatarioMap, t]);
 
   const filteredPayments = useMemo(() => {
     let filtered = aggregatedPayments;
@@ -157,21 +157,21 @@ export function ViewPaymentsClient() {
     <>
         <div className="space-y-6">
             <div>
-                <h2 className="text-3xl font-bold tracking-tight font-headline">Historial de Pagos</h2>
-                <p className="text-muted-foreground">Consulte todos los pagos registrados en el sistema.</p>
+                <h2 className="text-3xl font-bold tracking-tight font-headline">{t('viewPayments.title')}</h2>
+                <p className="text-muted-foreground">{t('viewPayments.description')}</p>
             </div>
 
             <Card>
                 <CardHeader>
-                    <CardTitle>Pagos Registrados</CardTitle>
-                    <CardDescription>Una lista de todos los pagos de clientes y a proveedores, agrupados por día y entidad.</CardDescription>
+                    <CardTitle>{t('viewPayments.registeredPayments')}</CardTitle>
+                    <CardDescription>{t('viewPayments.registeredPaymentsDescription')}</CardDescription>
                 </CardHeader>
                 <CardContent>
                     <div className="mb-4 flex flex-wrap gap-4">
                     <div className="relative flex-grow">
                         <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                         <Input
-                        placeholder="Buscar por N° factura, cliente, método..."
+                        placeholder={t('viewPayments.searchPlaceholder')}
                         value={searchTerm}
                         onChange={(e) => setSearchTerm(e.target.value)}
                         className="pl-10"
@@ -197,7 +197,7 @@ export function ViewPaymentsClient() {
                                 format(dateRange.from, "LLL dd, y")
                             )
                             ) : (
-                            <span>Todas las fechas</span>
+                            <span>{t('common.allDates')}</span>
                             )}
                         </Button>
                         </PopoverTrigger>
@@ -230,9 +230,9 @@ export function ViewPaymentsClient() {
         <AlertDialog open={!!selectedPayment} onOpenChange={() => setSelectedPayment(null)}>
             <AlertDialogContent className="sm:max-w-4xl">
                  <AlertDialogHeader>
-                    <AlertDialogTitle>Detalle del Recibo de Pago</AlertDialogTitle>
+                    <AlertDialogTitle>{t('viewPayments.receipt.title')}</AlertDialogTitle>
                     <AlertDialogDescription>
-                        Este es un resumen del pago realizado por {selectedPayment?.entityName}.
+                        {t('viewPayments.receipt.description', { entityName: selectedPayment?.entityName || '' })}
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                  {selectedPayment && (
@@ -241,11 +241,10 @@ export function ViewPaymentsClient() {
                     </div>
                  )}
                 <AlertDialogFooter>
-                    <AlertDialogCancel onClick={() => setSelectedPayment(null)}>Cerrar</AlertDialogCancel>
+                    <AlertDialogCancel onClick={() => setSelectedPayment(null)}>{t('viewPayments.receipt.close')}</AlertDialogCancel>
                      {selectedPayment && (
                         <>
                            <PaymentReceiptDownloadPdfButton payment={selectedPayment} />
-                           <PaymentReceiptDownloadExcelButton payment={selectedPayment} />
                         </>
                     )}
                 </AlertDialogFooter>
