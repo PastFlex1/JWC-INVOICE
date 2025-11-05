@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { createRoot } from 'react-dom/client';
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -30,7 +31,6 @@ export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentRece
     
     // This is a bit of a hack: React can't render to a detached element.
     // So we render a hidden element, use it for PDF generation, then remove it.
-    const { createRoot } = await import('react-dom/client');
     const root = createRoot(tempContainer);
     
     // Render the component inside the temporary container, passing the `t` function
