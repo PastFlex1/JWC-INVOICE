@@ -99,7 +99,7 @@ export function FarmCreditNotesClient() {
     
     try {
       await addCreditNote(formData);
-      toast({ title: t('common.success'), description: 'Nota de crédito añadida correctamente.' });
+      toast({ title: t('common.success'), description: t('creditNotes.toast.added_farm') });
       await refreshData();
       handleCloseDialog();
     } catch (error) {
@@ -107,7 +107,7 @@ export function FarmCreditNotesClient() {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: t('common.errorSaving'),
-        description: `No se pudo guardar la nota de crédito: ${errorMessage}.`,
+        description: t('creditNotes.toast.error_farm', { error: errorMessage }),
         variant: 'destructive',
         duration: 10000,
       });
@@ -126,13 +126,13 @@ export function FarmCreditNotesClient() {
     try {
       await deleteCreditNote(noteToDelete.id);
       await refreshData();
-      toast({ title: t('common.success'), description: 'Nota de crédito eliminada correctamente.' });
+      toast({ title: t('common.success'), description: t('creditNotes.toast.deleted_farm') });
     } catch (error) {
       console.error("Error deleting note:", error);
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: t('common.errorDeleting'),
-        description: `No se pudo eliminar la nota de crédito: ${errorMessage}.`,
+        description: t('creditNotes.toast.deleteError_farm', { error: errorMessage }),
         variant: 'destructive',
         duration: 10000,
       });
@@ -146,18 +146,18 @@ export function FarmCreditNotesClient() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight font-headline">Notas de Crédito (Finca)</h2>
-            <p className="text-muted-foreground">Gestiona notas de crédito para tus facturas de compra.</p>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">{t('creditNotes.farm.title')}</h2>
+            <p className="text-muted-foreground">{t('creditNotes.farm.description')}</p>
           </div>
           <Button onClick={() => handleOpenDialog()}>
-            <Plus className="mr-2 h-4 w-4" /> Nueva Nota de Crédito
+            <Plus className="mr-2 h-4 w-4" /> {t('creditNotes.farm.add')}
           </Button>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={(open) => !open && handleCloseDialog()}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Añadir Nueva Nota de Crédito (Finca)</DialogTitle>
+              <DialogTitle>{t('creditNotes.farm.addTitle')}</DialogTitle>
             </DialogHeader>
             <FarmCreditNoteForm 
               onSubmit={handleFormSubmit}
@@ -171,17 +171,17 @@ export function FarmCreditNotesClient() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Lista de Notas de Crédito</CardTitle>
-            <CardDescription>Una lista de todas tus notas de crédito de fincas.</CardDescription>
+            <CardTitle>{t('creditNotes.farm.list.title')}</CardTitle>
+            <CardDescription>{t('creditNotes.farm.list.description')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-4 flex flex-wrap items-center gap-4">
               <Select onValueChange={(value) => setSelectedFincaId(value === 'all' ? null : value)}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
-                  <SelectValue placeholder="Filtrar por finca..." />
+                  <SelectValue placeholder={t('creditNotes.farm.filterByFarm')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todas las Fincas</SelectItem>
+                  <SelectItem value="all">{t('creditNotes.farm.allFarms')}</SelectItem>
                   {fincas.map(finca => (
                     <SelectItem key={finca.id} value={finca.id}>
                       {finca.name}
@@ -209,7 +209,7 @@ export function FarmCreditNotesClient() {
                         format(dateRange.from, "LLL dd, y")
                       )
                     ) : (
-                      <span>Todas las fechas</span>
+                      <span>{t('common.allDates')}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -236,7 +236,7 @@ export function FarmCreditNotesClient() {
                   <FarmCreditNotesDownloadExcelButton notes={localCreditNotes} />
                   <Button variant="outline" onClick={() => setIsSendDialogOpen(true)}>
                     <Mail className="mr-2 h-4 w-4" />
-                    Enviar por Correo
+                    {t('creditNotes.sendByEmail')}
                   </Button>
                 </div>
               )}
@@ -267,8 +267,8 @@ export function FarmCreditNotesClient() {
       <SendReportDialog
         isOpen={isSendDialogOpen}
         onClose={() => setIsSendDialogOpen(false)}
-        reportTitle="Reporte de Notas de Crédito (Finca)"
-        reportDescription="El reporte adjunto contiene un resumen de las notas de crédito de finca para el período seleccionado."
+        reportTitle={t('creditNotes.farm.email.reportTitle')}
+        reportDescription={t('creditNotes.farm.email.reportDescription')}
         attachmentFileName="Reporte-Notas-de-Credito-Finca.pdf"
         elementIdToPrint="farm-credit-notes-to-print"
       />

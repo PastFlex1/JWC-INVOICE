@@ -224,17 +224,40 @@
     "confirmDeleteDescription": "This action cannot be undone. This will permanently delete the carrier."
   },
   "creditNotes": {
-    "title": "Credit Notes",
-    "description": "Manage credit notes for your invoices.",
+    "title": "Credit Notes (Client)",
+    "description": "Manage credit notes for your sales invoices.",
     "add": "New Credit Note",
     "addTitle": "Add New Credit Note",
+    "filterByCustomer": "Filter by customer...",
+    "allCustomers": "All Customers",
+    "sendByEmail": "Send by Email",
+    "downloadPdf": "Download PDF",
+    "downloadExcel": "Download Excel",
+    "reportTitle": "CREDIT NOTE REPORT",
+    "noNotesFound": "No credit notes found.",
+    "total": "TOTAL",
+    "sheetName": "Credit Notes",
+    "pdfFileName": "Credit-Note-Report",
+    "excelFileName": "Credit-Note-Report",
     "list": {
         "title": "Credit Note List",
-        "description": "A list of all your credit notes.",
+        "description": "A list of all your customer credit notes.",
         "date": "Date",
         "invoice": "Invoice #",
+        "consignee": "Consignee",
         "amount": "Amount",
         "reason": "Reason"
+    },
+    "form": {
+        "customer": "Customer",
+        "customerPlaceholder": "Select a customer",
+        "invoice": "Invoice to Credit",
+        "invoicePlaceholder": "Select an invoice",
+        "consignee": "Consignee",
+        "amount": "Amount to Credit",
+        "reason": "Reason",
+        "reasonPlaceholder": "e.g., Flower quality",
+        "date": "Credit Note Date"
     },
     "toast": {
         "added": "Credit note added successfully.",
@@ -242,20 +265,92 @@
         "error": "Could not save the credit note: {error}.",
         "deleteError": "Could not delete the credit note: {error}."
     },
-    "confirmDeleteDescription": "This action cannot be undone. This will permanently delete the credit note."
-  },
-  "debitNotes": {
-    "title": "Debit Notes",
-    "description": "Manage debit notes for your invoices.",
-    "add": "New Debit Note",
-    "addTitle": "Add New Debit Note",
-    "list": {
-        "title": "Debit Note List",
-        "description": "A list of all your debit notes.",
+    "confirmDeleteDescription": "This action cannot be undone. This will permanently delete the credit note.",
+    "email": {
+        "reportTitle": "Credit Note Report",
+        "reportDescription": "The attached report contains a summary of credit notes for the selected period."
+    },
+    "farm": {
+      "title": "Credit Notes (Farm)",
+      "description": "Manage credit notes for your purchase invoices.",
+      "add": "New Credit Note",
+      "addTitle": "Add New Credit Note (Farm)",
+      "filterByFarm": "Filter by farm...",
+      "allFarms": "All Farms",
+      "reportTitle": "CREDIT NOTE REPORT (FARM)",
+      "noNotesFound": "No credit notes found.",
+      "total": "TOTAL",
+      "sheetName": "Farm Credit Notes",
+      "pdfFileName": "Farm-Credit-Note-Report",
+      "excelFileName": "Farm-Credit-Note-Report",
+      "downloadPdf": "Download PDF",
+      "downloadExcel": "Download Excel",
+      "list": {
+        "title": "Farm Credit Note List",
+        "description": "A list of all your farm credit notes.",
         "date": "Date",
         "invoice": "Invoice #",
+        "farm": "Farm",
         "amount": "Amount",
         "reason": "Reason"
+      },
+      "form": {
+        "farm": "Farm/Supplier",
+        "farmPlaceholder": "Select a farm",
+        "invoice": "Invoice to Credit",
+        "invoicePlaceholder": "Select an invoice",
+        "amount": "Amount to Credit",
+        "reason": "Reason",
+        "reasonPlaceholder": "e.g., Flower quality",
+        "date": "Credit Note Date"
+      },
+      "toast": {
+        "added_farm": "Farm credit note added successfully.",
+        "deleted_farm": "Farm credit note deleted successfully.",
+        "error_farm": "Could not save the farm credit note: {error}.",
+        "deleteError_farm": "Could not delete the farm credit note: {error}."
+      },
+      "email": {
+        "reportTitle": "Farm Credit Note Report",
+        "reportDescription": "The attached report contains a summary of farm credit notes for the selected period."
+      }
+    }
+  },
+  "debitNotes": {
+    "title": "Debit Notes (Client)",
+    "description": "Manage debit notes for your sales invoices.",
+    "add": "New Debit Note",
+    "addTitle": "Add New Debit Note",
+    "filterByCustomer": "Filter by customer...",
+    "allCustomers": "All Customers",
+    "sendByEmail": "Send by Email",
+    "downloadPdf": "Download PDF",
+    "downloadExcel": "Download Excel",
+    "reportTitle": "DEBIT NOTE REPORT",
+    "noNotesFound": "No debit notes found.",
+    "total": "TOTAL",
+    "sheetName": "Debit Notes",
+    "pdfFileName": "Debit-Note-Report",
+    "excelFileName": "Debit-Note-Report",
+    "list": {
+        "title": "Debit Note List",
+        "description": "A list of all your customer debit notes.",
+        "date": "Date",
+        "invoice": "Invoice #",
+        "consignee": "Consignee",
+        "amount": "Amount",
+        "reason": "Reason"
+    },
+    "form": {
+        "customer": "Customer",
+        "customerPlaceholder": "Select a customer",
+        "invoice": "Invoice to Debit",
+        "invoicePlaceholder": "Select an invoice",
+        "consignee": "Consignee",
+        "amount": "Amount to Debit",
+        "reason": "Reason",
+        "reasonPlaceholder": "e.g., Price adjustment",
+        "date": "Debit Note Date"
     },
     "toast": {
         "added": "Debit note added successfully.",
@@ -263,7 +358,56 @@
         "error": "Could not save the debit note: {error}.",
         "deleteError": "Could not delete the debit note: {error}."
     },
-    "confirmDeleteDescription": "This action cannot be undone. This will permanently delete the debit note."
+    "confirmDeleteDescription": "This action cannot be undone. This will permanently delete the debit note.",
+    "email": {
+        "reportTitle": "Debit Note Report",
+        "reportDescription": "The attached report contains a summary of debit notes for the selected period."
+    },
+    "farm": {
+      "title": "Debit Notes (Farm)",
+      "description": "Manage debit notes for your purchase invoices.",
+      "add": "New Debit Note",
+      "addTitle": "Add New Debit Note (Farm)",
+      "filterByFarm": "Filter by farm...",
+      "allFarms": "All Farms",
+      "reportTitle": "DEBIT NOTE REPORT (FARM)",
+      "noNotesFound": "No debit notes found.",
+      "total": "TOTAL",
+      "sheetName": "Farm Debit Notes",
+      "pdfFileName": "Farm-Debit-Note-Report",
+      "excelFileName": "Farm-Debit-Note-Report",
+      "downloadPdf": "Download PDF",
+      "downloadExcel": "Download Excel",
+      "list": {
+        "title": "Farm Debit Note List",
+        "description": "A list of all your farm debit notes.",
+        "date": "Date",
+        "invoice": "Invoice #",
+        "farm": "Farm",
+        "amount": "Amount",
+        "reason": "Reason"
+      },
+      "form": {
+        "farm": "Farm/Supplier",
+        "farmPlaceholder": "Select a farm",
+        "invoice": "Invoice to Debit",
+        "invoicePlaceholder": "Select an invoice",
+        "amount": "Amount to Debit",
+        "reason": "Reason",
+        "reasonPlaceholder": "e.g., Price adjustment",
+        "date": "Debit Note Date"
+      },
+      "toast": {
+        "added_farm": "Farm debit note added successfully.",
+        "deleted_farm": "Farm debit note deleted successfully.",
+        "error_farm": "Could not save the farm debit note: {error}.",
+        "deleteError_farm": "Could not delete the farm debit note: {error}."
+      },
+      "email": {
+        "reportTitle": "Farm Debit Note Report",
+        "reportDescription": "The attached report contains a summary of farm debit notes for the selected period."
+      }
+    }
   },
   "accountStatement": {
     "title": "Customer Account Statement",

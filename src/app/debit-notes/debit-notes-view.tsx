@@ -35,7 +35,7 @@ export function DebitNotesView({ notes, onDelete }: DebitNotesViewProps) {
             </div>
           </div>
           <div className="w-1/2 flex flex-col items-end">
-            <h1 className="text-xl font-bold mb-4 tracking-wider">REPORTE DE NOTAS DE DÉBITO</h1>
+            <h1 className="text-xl font-bold mb-4 tracking-wider">{t('debitNotes.reportTitle')}</h1>
           </div>
         </header>
 
@@ -43,13 +43,13 @@ export function DebitNotesView({ notes, onDelete }: DebitNotesViewProps) {
           <div className="grid grid-cols-[120px,120px,1fr,200px,120px] font-bold text-center bg-gray-200 border-t border-l border-r border-black text-xs">
             <div className="p-1 border-r border-black">{t('debitNotes.list.date')}</div>
             <div className="p-1 border-r border-black">{t('debitNotes.list.invoice')}</div>
-            <div className="p-1 border-r border-black">CONSIGNATARIO</div>
+            <div className="p-1 border-r border-black">{t('debitNotes.list.consignee')}</div>
             <div className="p-1 border-r border-black">{t('debitNotes.list.reason')}</div>
             <div className="p-1 border-r border-black">{t('debitNotes.list.amount')}</div>
           </div>
           <div className="border-l border-r border-b border-black text-xs">
             {notes.length === 0 && (
-                <div className="text-center p-4 text-muted-foreground">No se encontraron notas de débito.</div>
+                <div className="text-center p-4 text-muted-foreground">{t('debitNotes.noNotesFound')}</div>
             )}
             {notes.map(note => (
               <div key={note.id} className="grid grid-cols-[120px,120px,1fr,200px,120px] border-b border-gray-300">
@@ -62,7 +62,7 @@ export function DebitNotesView({ notes, onDelete }: DebitNotesViewProps) {
             ))}
           </div>
           <div className="grid grid-cols-[120px,120px,1fr,200px,120px] font-bold text-xs bg-gray-200 border-b border-l border-r border-black">
-              <div className="p-1 border-r border-black col-span-4 text-center">TOTAL</div>
+              <div className="p-1 border-r border-black col-span-4 text-center">{t('debitNotes.total')}</div>
               <div className="p-1 text-right border-r border-black">${totalAmount.toFixed(2)}</div>
           </div>
         </section>

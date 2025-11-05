@@ -147,7 +147,7 @@ export function DebitNotesClient() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight font-headline">Notas de Débito (Cliente)</h2>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">{t('debitNotes.title')}</h2>
             <p className="text-muted-foreground">{t('debitNotes.description')}</p>
           </div>
           <Button onClick={() => handleOpenDialog()}>
@@ -180,10 +180,10 @@ export function DebitNotesClient() {
             <div className="mb-4 flex flex-wrap items-center gap-4">
                <Select onValueChange={(value) => setSelectedCustomerId(value === 'all' ? null : value)}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
-                  <SelectValue placeholder="Filtrar por cliente..." />
+                  <SelectValue placeholder={t('debitNotes.filterByCustomer')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todos los Clientes</SelectItem>
+                  <SelectItem value="all">{t('debitNotes.allCustomers')}</SelectItem>
                   {customers.map(customer => (
                     <SelectItem key={customer.id} value={customer.id}>
                       {customer.name}
@@ -211,7 +211,7 @@ export function DebitNotesClient() {
                         format(dateRange.from, "LLL dd, y")
                       )
                     ) : (
-                      <span>Todas las fechas</span>
+                      <span>{t('common.allDates')}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -238,7 +238,7 @@ export function DebitNotesClient() {
                     <DebitNotesDownloadExcelButton notes={localDebitNotes} />
                     <Button variant="outline" onClick={() => setIsSendDialogOpen(true)}>
                       <Mail className="mr-2 h-4 w-4" />
-                      Enviar por Correo
+                      {t('debitNotes.sendByEmail')}
                     </Button>
                 </div>
                 )}
@@ -269,8 +269,8 @@ export function DebitNotesClient() {
        <SendReportDialog
         isOpen={isSendDialogOpen}
         onClose={() => setIsSendDialogOpen(false)}
-        reportTitle="Reporte de Notas de Débito"
-        reportDescription="El reporte adjunto contiene un resumen de las notas de débito para el período seleccionado."
+        reportTitle={t('debitNotes.email.reportTitle')}
+        reportDescription={t('debitNotes.email.reportDescription')}
         attachmentFileName="Reporte-Notas-de-Debito.pdf"
         elementIdToPrint="debit-notes-to-print"
       />

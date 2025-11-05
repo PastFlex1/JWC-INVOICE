@@ -6,6 +6,7 @@ import { format, parseISO } from 'date-fns';
 import { Button } from '@/components/ui/button';
 import { Trash2 } from 'lucide-react';
 import type { CreditNote } from '@/lib/types';
+import { useTranslation } from '@/context/i18n-context';
 
 type CreditNoteWithDetails = CreditNote & { farmName?: string };
 
@@ -15,6 +16,7 @@ type FarmCreditNotesViewProps = {
 };
 
 export function FarmCreditNotesView({ notes, onDelete }: FarmCreditNotesViewProps) {
+    const { t } = useTranslation();
     const totalAmount = notes.reduce((sum, note) => sum + note.amount, 0);
 
   return (
@@ -33,22 +35,22 @@ export function FarmCreditNotesView({ notes, onDelete }: FarmCreditNotesViewProp
             </div>
           </div>
           <div className="w-1/2 flex flex-col items-end">
-            <h1 className="text-xl font-bold mb-4 tracking-wider">REPORTE DE NOTAS DE CRÉDITO (FINCA)</h1>
+            <h1 className="text-xl font-bold mb-4 tracking-wider">{t('creditNotes.farm.reportTitle')}</h1>
           </div>
         </header>
 
         <section>
           <div className="grid grid-cols-[120px,120px,1fr,200px,120px,80px] font-bold text-center bg-gray-200 border-t border-l border-r border-black text-xs">
-            <div className="p-1 border-r border-black">Fecha</div>
-            <div className="p-1 border-r border-black">Factura #</div>
-            <div className="p-1 border-r border-black">FINCA</div>
-            <div className="p-1 border-r border-black">Motivo</div>
-            <div className="p-1 border-r border-black">Monto</div>
-            <div className="p-1">Acciones</div>
+            <div className="p-1 border-r border-black">{t('creditNotes.farm.list.date')}</div>
+            <div className="p-1 border-r border-black">{t('creditNotes.farm.list.invoice')}</div>
+            <div className="p-1 border-r border-black">{t('creditNotes.farm.list.farm')}</div>
+            <div className="p-1 border-r border-black">{t('creditNotes.farm.list.reason')}</div>
+            <div className="p-1 border-r border-black">{t('creditNotes.farm.list.amount')}</div>
+            <div className="p-1">{t('common.actions')}</div>
           </div>
           <div className="border-l border-r border-b border-black text-xs">
             {notes.length === 0 && (
-                <div className="text-center p-4 text-muted-foreground">No se encontraron notas de crédito.</div>
+                <div className="text-center p-4 text-muted-foreground">{t('creditNotes.farm.noNotesFound')}</div>
             )}
             {notes.map(note => (
               <div key={note.id} className="grid grid-cols-[120px,120px,1fr,200px,120px,80px] border-b border-gray-300">
@@ -66,7 +68,7 @@ export function FarmCreditNotesView({ notes, onDelete }: FarmCreditNotesViewProp
             ))}
           </div>
           <div className="grid grid-cols-[120px,120px,1fr,200px,120px,80px] font-bold text-xs bg-gray-200 border-b border-l border-r border-black">
-              <div className="p-1 border-r border-black col-span-4 text-center">TOTAL</div>
+              <div className="p-1 border-r border-black col-span-4 text-center">{t('creditNotes.farm.total')}</div>
               <div className="p-1 text-right border-r border-black">${totalAmount.toFixed(2)}</div>
               <div className="p-1 border-r border-black"></div>
           </div>

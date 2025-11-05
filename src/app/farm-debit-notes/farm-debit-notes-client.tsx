@@ -99,7 +99,7 @@ export function FarmDebitNotesClient() {
     
     try {
       await addDebitNote(formData);
-      toast({ title: t('common.success'), description: 'Nota de débito añadida correctamente.' });
+      toast({ title: t('common.success'), description: t('debitNotes.toast.added_farm') });
       await refreshData();
       handleCloseDialog();
     } catch (error) {
@@ -107,7 +107,7 @@ export function FarmDebitNotesClient() {
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: t('common.errorSaving'),
-        description: `No se pudo guardar la nota de débito: ${errorMessage}.`,
+        description: t('debitNotes.toast.error_farm', { error: errorMessage }),
         variant: 'destructive',
         duration: 10000,
       });
@@ -126,13 +126,13 @@ export function FarmDebitNotesClient() {
     try {
       await deleteDebitNote(noteToDelete.id);
       await refreshData();
-      toast({ title: t('common.success'), description: 'Nota de débito eliminada correctamente.' });
+      toast({ title: t('common.success'), description: t('debitNotes.toast.deleted_farm') });
     } catch (error) {
       console.error("Error deleting note:", error);
       const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
       toast({
         title: t('common.errorDeleting'),
-        description: `No se pudo eliminar la nota de débito: ${errorMessage}.`,
+        description: t('debitNotes.toast.deleteError_farm', { error: errorMessage }),
         variant: 'destructive',
         duration: 10000,
       });
@@ -146,18 +146,18 @@ export function FarmDebitNotesClient() {
       <div className="space-y-6">
         <div className="flex justify-between items-center">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight font-headline">Notas de Débito (Finca)</h2>
-            <p className="text-muted-foreground">Gestiona notas de débito para tus facturas de compra.</p>
+            <h2 className="text-3xl font-bold tracking-tight font-headline">{t('debitNotes.farm.title')}</h2>
+            <p className="text-muted-foreground">{t('debitNotes.farm.description')}</p>
           </div>
           <Button onClick={() => handleOpenDialog()}>
-            <Plus className="mr-2 h-4 w-4" /> Nueva Nota de Débito
+            <Plus className="mr-2 h-4 w-4" /> {t('debitNotes.farm.add')}
           </Button>
         </div>
 
         <Dialog open={isDialogOpen} onOpenChange={(open) => !open && handleCloseDialog()}>
           <DialogContent className="sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Añadir Nueva Nota de Débito (Finca)</DialogTitle>
+              <DialogTitle>{t('debitNotes.farm.addTitle')}</DialogTitle>
             </DialogHeader>
             <FarmDebitNoteForm
               onSubmit={handleFormSubmit}
@@ -171,17 +171,17 @@ export function FarmDebitNotesClient() {
 
         <Card>
           <CardHeader>
-            <CardTitle>Lista de Notas de Débito</CardTitle>
-            <CardDescription>Una lista de todas tus notas de débito de fincas.</CardDescription>
+            <CardTitle>{t('debitNotes.farm.list.title')}</CardTitle>
+            <CardDescription>{t('debitNotes.farm.list.description')}</CardDescription>
           </CardHeader>
           <CardContent>
             <div className="mb-4 flex flex-wrap items-center gap-4">
                <Select onValueChange={(value) => setSelectedFincaId(value === 'all' ? null : value)}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[300px]">
-                  <SelectValue placeholder="Filtrar por finca..." />
+                  <SelectValue placeholder={t('debitNotes.farm.filterByFarm')} />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="all">Todas las Fincas</SelectItem>
+                  <SelectItem value="all">{t('debitNotes.farm.allFarms')}</SelectItem>
                   {fincas.map(finca => (
                     <SelectItem key={finca.id} value={finca.id}>
                       {finca.name}
@@ -209,7 +209,7 @@ export function FarmDebitNotesClient() {
                         format(dateRange.from, "LLL dd, y")
                       )
                     ) : (
-                      <span>Todas las fechas</span>
+                      <span>{t('common.allDates')}</span>
                     )}
                   </Button>
                 </PopoverTrigger>
@@ -236,7 +236,7 @@ export function FarmDebitNotesClient() {
                   <FarmDebitNotesDownloadExcelButton notes={localDebitNotes} />
                   <Button variant="outline" onClick={() => setIsSendDialogOpen(true)}>
                     <Mail className="mr-2 h-4 w-4" />
-                    Enviar por Correo
+                    {t('debitNotes.sendByEmail')}
                   </Button>
                 </div>
               )}
@@ -267,8 +267,8 @@ export function FarmDebitNotesClient() {
       <SendReportDialog
         isOpen={isSendDialogOpen}
         onClose={() => setIsSendDialogOpen(false)}
-        reportTitle="Reporte de Notas de Débito (Finca)"
-        reportDescription="El reporte adjunto contiene un resumen de las notas de débito de finca para el período seleccionado."
+        reportTitle={t('debitNotes.farm.email.reportTitle')}
+        reportDescription={t('debitNotes.farm.email.reportDescription')}
         attachmentFileName="Reporte-Notas-de-Debito-Finca.pdf"
         elementIdToPrint="farm-debit-notes-to-print"
       />

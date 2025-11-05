@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import type { DebitNote } from '@/lib/types';
+import { useTranslation } from '@/context/i18n-context';
 
 type DebitNotesDownloadPdfButtonProps = {
   notes: DebitNote[];
@@ -15,14 +16,15 @@ type DebitNotesDownloadPdfButtonProps = {
 export default function DebitNotesDownloadPdfButton({ notes }: DebitNotesDownloadPdfButtonProps) {
   const [isGenerating, setIsGenerating] = useState(false);
   const { toast } = useToast();
+  const { t } = useTranslation();
 
   const handleDownloadPdf = async () => {
     const reportElement = document.getElementById('debit-notes-to-print');
 
     if (!reportElement) {
       toast({
-        title: "Error",
-        description: "No se pudo encontrar el contenido para generar el PDF.",
+        title: t('common.error'),
+        description: t('accountStatement.pdfError'),
         variant: "destructive",
       });
       return;
@@ -48,19 +50,19 @@ export default function DebitNotesDownloadPdfButton({ notes }: DebitNotesDownloa
       
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth * ratio, imgHeight * ratio);
       
-      const fileName = `Reporte-Notas-de-Debito.pdf`;
+      const fileName = `${t('debitNotes.pdfFileName')}.pdf`;
       pdf.save(fileName);
       
       toast({
-        title: "Éxito",
-        description: `El archivo ${fileName} se ha descargado.`,
+        title: t('common.success'),
+        description: t('common.downloadSuccess', { fileName }),
       });
 
     } catch (error) {
       console.error("Error processing PDF:", error);
       toast({
-        title: "Error",
-        description: "Ocurrió un error inesperado al procesar el PDF.",
+        title: t('common.error'),
+        description: t('accountStatement.pdfUnexpectedError'),
         variant: "destructive",
       });
     } finally {
@@ -71,7 +73,7 @@ export default function DebitNotesDownloadPdfButton({ notes }: DebitNotesDownloa
   return (
     <Button onClick={handleDownloadPdf} disabled={isGenerating}>
       {isGenerating ? <Loader2 className="mr-2 h-4 w-4 animate-spin" /> : <Download className="mr-2 h-4 w-4" />}
-      Descargar PDF
+      {t('debitNotes.downloadPdf')}
     </Button>
   );
 }
