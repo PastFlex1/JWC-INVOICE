@@ -28,6 +28,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog"
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { useTranslation } from '@/context/i18n-context';
 
 type InvoiceWithBalance = Invoice & { 
     balance: number; 
@@ -94,6 +95,7 @@ export function PaymentForm({
     consignatarios,
     paymentType,
 }: PaymentFormProps) {
+  const { t } = useTranslation();
   const [paymentPreview, setPaymentPreview] = useState<{ invoiceNumber: string; amountToApply: number }[] | null>(null);
 
   const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
@@ -252,8 +254,8 @@ export function PaymentForm({
   };
   
   const entities = paymentType === 'purchase' ? fincas : customers;
-  const entityLabel = paymentType === 'purchase' ? 'Proveedor (Finca)' : 'Cliente';
-  const entityPlaceholder = paymentType === 'purchase' ? 'Seleccione un proveedor' : 'Seleccione un cliente';
+  const entityLabel = paymentType === 'purchase' ? t('payments.form.supplierLabel') : t('payments.form.customerLabel');
+  const entityPlaceholder = paymentType === 'purchase' ? t('payments.form.supplierPlaceholder') : t('payments.form.customerPlaceholder');
   
   return (
     <>
@@ -287,8 +289,8 @@ export function PaymentForm({
           {fields.length > 0 && (
             <Card>
               <CardHeader>
-                <CardTitle>Facturas Pendientes</CardTitle>
-                <CardDescription>Seleccione las facturas e ingrese el monto a abonar en cada una.</CardDescription>
+                <CardTitle>{t('payments.form.pendingInvoicesTitle')}</CardTitle>
+                <CardDescription>{t('payments.form.pendingInvoicesDescription')}</CardDescription>
               </CardHeader>
               <CardContent>
                 <FormField
@@ -306,11 +308,11 @@ export function PaymentForm({
                                             onCheckedChange={(checked) => handleSelectAll(checked === true)}
                                         />
                                         </TableHead>
-                                        <TableHead>N° Factura</TableHead>
-                                        <TableHead>Consignatario</TableHead>
-                                        <TableHead>Fecha</TableHead>
-                                        <TableHead>Saldo</TableHead>
-                                        <TableHead className="w-40 text-right">Abono</TableHead>
+                                        <TableHead>{t('payments.form.table.invoiceNo')}</TableHead>
+                                        <TableHead>{t('payments.form.table.consignee')}</TableHead>
+                                        <TableHead>{t('payments.form.table.date')}</TableHead>
+                                        <TableHead>{t('payments.form.table.balance')}</TableHead>
+                                        <TableHead className="w-40 text-right">{t('payments.form.table.payment')}</TableHead>
                                     </TableRow>
                                     </TableHeader>
                                     <TableBody>
@@ -374,13 +376,13 @@ export function PaymentForm({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <FormField control={form.control} name="paymentDate" render={({ field }) => (
                         <FormItem className="flex flex-col">
-                        <FormLabel>Fecha de Pago</FormLabel>
+                        <FormLabel>{t('payments.form.paymentDate')}</FormLabel>
                         <Popover>
                             <PopoverTrigger asChild>
                             <FormControl>
                                 <Button variant={"outline"} className={cn("w-full justify-start text-left font-normal", !field.value && "text-muted-foreground")}>
                                 <CalendarIcon className="mr-2 h-4 w-4" />
-                                {field.value ? format(toDate(field.value), "PPP") : <span>Seleccionar fecha</span>}
+                                {field.value ? format(toDate(field.value), "PPP") : <span>{t('invoices.new.selectDate')}</span>}
                                 </Button>
                             </FormControl>
                             </PopoverTrigger>
@@ -396,20 +398,20 @@ export function PaymentForm({
                     name="paymentMethod"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Método de Pago</FormLabel>
+                        <FormLabel>{t('payments.form.paymentMethod')}</FormLabel>
                         <Select onValueChange={field.onChange} defaultValue={field.value}>
                             <FormControl>
                                 <SelectTrigger>
-                                <SelectValue placeholder="Seleccione un método" />
+                                <SelectValue placeholder={t('payments.form.paymentMethodPlaceholder')} />
                                 </SelectTrigger>
                             </FormControl>
                             <SelectContent>
-                                <SelectItem value="Efectivo">Efectivo</SelectItem>
-                                <SelectItem value="Transferencia">Transferencia</SelectItem>
-                                <SelectItem value="Transferencia Internacional">Transferencia Internacional</SelectItem>
-                                <SelectItem value="Cheque">Cheque</SelectItem>
-                                <SelectItem value="Tarjeta de Crédito">Tarjeta de Crédito</SelectItem>
-                                <SelectItem value="Tarjeta de Débito">Tarjeta de Débito</SelectItem>
+                                <SelectItem value="Efectivo">{t('payments.methods.cash')}</SelectItem>
+                                <SelectItem value="Transferencia">{t('payments.methods.transfer')}</SelectItem>
+                                <SelectItem value="Transferencia Internacional">{t('payments.methods.internationalTransfer')}</SelectItem>
+                                <SelectItem value="Cheque">{t('payments.methods.check')}</SelectItem>
+                                <SelectItem value="Tarjeta de Crédito">{t('payments.methods.creditCard')}</SelectItem>
+                                <SelectItem value="Tarjeta de Débito">{t('payments.methods.debitCard')}</SelectItem>
                             </SelectContent>
                             </Select>
                         <FormMessage />
@@ -423,9 +425,9 @@ export function PaymentForm({
                     name="reference"
                     render={({ field }) => (
                         <FormItem>
-                        <FormLabel>Referencia / Banco</FormLabel>
+                        <FormLabel>{t('payments.form.reference')}</FormLabel>
                         <FormControl>
-                            <Input placeholder="Ej: Banco Pichincha" {...field} value={field.value || ''}/>
+                            <Input placeholder={t('payments.form.referencePlaceholder')} {...field} value={field.value || ''}/>
                         </FormControl>
                         <FormMessage />
                         </FormItem>
@@ -437,9 +439,9 @@ export function PaymentForm({
                     name="notes"
                     render={({ field }) => (
                     <FormItem>
-                        <FormLabel>Notas Adicionales</FormLabel>
+                        <FormLabel>{t('payments.form.notes')}</FormLabel>
                         <FormControl>
-                        <Textarea placeholder="Ej: Pago masivo de facturas de Septiembre" {...field} value={field.value || ''}/>
+                        <Textarea placeholder={t('payments.form.notesPlaceholder')} {...field} value={field.value || ''}/>
                         </FormControl>
                         <FormMessage />
                     </FormItem>
@@ -450,7 +452,7 @@ export function PaymentForm({
           
           <div className="flex justify-end gap-2 pt-4">
               <Button type="button" variant="outline" onClick={handlePreview} disabled={isSubmitting || !watchedPaymentInvoices.some(inv => inv.isSelected)}>
-                Previsualizar Pago
+                {t('payments.form.previewButton')}
               </Button>
           </div>
         </form>
@@ -459,17 +461,17 @@ export function PaymentForm({
        <AlertDialog open={!!paymentPreview} onOpenChange={() => setPaymentPreview(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirmar Distribución de Pago</AlertDialogTitle>
+            <AlertDialogTitle>{t('payments.dialog.title')}</AlertDialogTitle>
             <AlertDialogDescription>
-                El monto total se aplicará a las facturas seleccionadas de la siguiente manera. ¿Desea continuar?
+                {t('payments.dialog.description')}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <div className="max-h-60 overflow-y-auto">
              <Table>
                 <TableHeader>
                     <TableRow>
-                        <TableHead>N° Factura</TableHead>
-                        <TableHead className="text-right">Monto a Aplicar</TableHead>
+                        <TableHead>{t('payments.dialog.invoiceNo')}</TableHead>
+                        <TableHead className="text-right">{t('payments.dialog.amountToApply')}</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -480,7 +482,7 @@ export function PaymentForm({
                         </TableRow>
                     ))}
                      <TableRow className="font-bold bg-muted/50">
-                        <TableCell>Total</TableCell>
+                        <TableCell>{t('payments.dialog.total')}</TableCell>
                         <TableCell className="text-right">
                            ${(paymentPreview?.reduce((acc, p) => acc + p.amountToApply, 0) || 0).toFixed(2)}
                         </TableCell>
@@ -489,10 +491,10 @@ export function PaymentForm({
             </Table>
           </div>
           <AlertDialogFooter>
-            <AlertDialogCancel onClick={() => setPaymentPreview(null)}>Cancelar</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setPaymentPreview(null)}>{t('common.cancel')}</AlertDialogCancel>
             <AlertDialogAction onClick={form.handleSubmit(handleSubmit)} disabled={isSubmitting}>
               {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Confirmar y Guardar
+              {t('payments.dialog.confirmButton')}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

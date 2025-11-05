@@ -7,10 +7,12 @@ import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import type { Payment } from '@/lib/types';
 import { addBulkPayment } from '@/services/payments';
+import { useTranslation } from '@/context/i18n-context';
 
 export function PaymentClient() {
   const { customers, fincas, invoices, creditNotes, debitNotes, payments, consignatarios, refreshData } = useAppData();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddBulkPayment = async (
@@ -21,16 +23,16 @@ export function PaymentClient() {
     try {
       await addBulkPayment(paymentDetails, selectedInvoices);
       toast({
-        title: "Éxito",
-        description: "El pago ha sido registrado y las facturas actualizadas.",
+        title: t('common.success'),
+        description: t('payments.toast.successDescription'),
       });
       await refreshData();
       return true; // Indicate success
     } catch (error) {
       console.error("Error registering bulk payment:", error);
       toast({
-        title: "Error",
-        description: "No se pudo registrar el pago.",
+        title: t('common.error'),
+        description: t('payments.toast.errorDescription'),
         variant: "destructive",
       });
       return false; // Indicate failure
@@ -42,15 +44,15 @@ export function PaymentClient() {
   return (
     <div className="space-y-6">
       <div>
-          <h2 className="text-3xl font-bold tracking-tight font-headline">Registrar Pago a Clientes</h2>
-          <p className="text-muted-foreground">Seleccione un cliente y las facturas a las que desea aplicar un pago.</p>
+          <h2 className="text-3xl font-bold tracking-tight font-headline">{t('payments.client.title')}</h2>
+          <p className="text-muted-foreground">{t('payments.client.description')}</p>
       </div>
 
       <div className="grid grid-cols-1">
         <Card>
           <CardHeader>
-            <CardTitle>Detalles del Pago</CardTitle>
-            <CardDescription>Complete el formulario para registrar un pago y distribuirlo entre una o varias facturas.</CardDescription>
+            <CardTitle>{t('payments.detailsTitle')}</CardTitle>
+            <CardDescription>{t('payments.detailsDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <PaymentForm 

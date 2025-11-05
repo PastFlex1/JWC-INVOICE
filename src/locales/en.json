@@ -673,5 +673,64 @@
       "title": "License & Billing",
       "description": "View your license details and manage billing. (Coming soon)"
     }
+  },
+  "payments": {
+    "client": {
+      "title": "Register Customer Payment",
+      "description": "Select a customer and the invoices to apply a payment to."
+    },
+    "purchase": {
+      "title": "Register Purchase Payment",
+      "description": "Select a supplier and the purchase invoices to apply a payment to.",
+      "detailsTitle": "Purchase Payment Details",
+      "detailsDescription": "Complete the form to register a payment to a supplier."
+    },
+    "detailsTitle": "Payment Details",
+    "detailsDescription": "Complete the form to register a payment and distribute it among one or more invoices.",
+    "toast": {
+      "successDescription": "The payment has been registered and the invoices updated.",
+      "errorDescription": "Could not register the payment.",
+      "successDescriptionPurchase": "The purchase payment has been registered and the invoice(s) updated.",
+      "errorDescriptionPurchase": "Could not register the purchase payment."
+    },
+    "form": {
+      "customerLabel": "Customer",
+      "customerPlaceholder": "Select a customer",
+      "supplierLabel": "Supplier (Farm)",
+      "supplierPlaceholder": "Select a supplier",
+      "pendingInvoicesTitle": "Pending Invoices",
+      "pendingInvoicesDescription": "Select the invoices and enter the amount to pay for each.",
+      "paymentDate": "Payment Date",
+      "paymentMethod": "Payment Method",
+      "paymentMethodPlaceholder": "Select a method",
+      "reference": "Reference / Bank",
+      "referencePlaceholder": "e.g., Bank of America",
+      "notes": "Additional Notes",
+      "notesPlaceholder": "e.g., Bulk payment for September invoices",
+      "previewButton": "Preview Payment",
+      "table": {
+        "invoiceNo": "Invoice #",
+        "consignee": "Consignee",
+        "date": "Date",
+        "balance": "Balance",
+        "payment": "Payment"
+      }
+    },
+    "methods": {
+      "cash": "Cash",
+      "transfer": "Transfer",
+      "internationalTransfer": "International Transfer",
+      "check": "Check",
+      "creditCard": "Credit Card",
+      "debitCard": "Debit Card"
+    },
+    "dialog": {
+      "title": "Confirm Payment Distribution",
+      "description": "The total amount will be applied to the selected invoices as follows. Do you want to continue?",
+      "invoiceNo": "Invoice #",
+      "amountToApply": "Amount to Apply",
+      "total": "Total",
+      "confirmButton": "Confirm and Save"
+    }
   }
 }

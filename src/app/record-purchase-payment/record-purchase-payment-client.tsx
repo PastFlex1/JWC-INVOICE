@@ -7,10 +7,12 @@ import { useToast } from '@/hooks/use-toast';
 import { useState } from 'react';
 import type { Payment } from '@/lib/types';
 import { addBulkPayment } from '@/services/payments';
+import { useTranslation } from '@/context/i18n-context';
 
 export function RecordPurchasePaymentClient() {
   const { customers, fincas, invoices, creditNotes, debitNotes, payments, consignatarios, refreshData } = useAppData();
   const { toast } = useToast();
+  const { t } = useTranslation();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleAddBulkPayment = async (
@@ -21,16 +23,16 @@ export function RecordPurchasePaymentClient() {
     try {
       await addBulkPayment(paymentDetails, selectedInvoices);
       toast({
-        title: "Éxito",
-        description: "El pago de la compra ha sido registrado y la(s) factura(s) actualizada(s).",
+        title: t('common.success'),
+        description: t('payments.toast.successDescriptionPurchase'),
       });
       await refreshData();
       return true; // Indicate success
     } catch (error) {
       console.error("Error registering purchase payment:", error);
       toast({
-        title: "Error",
-        description: "No se pudo registrar el pago de la compra.",
+        title: t('common.error'),
+        description: t('payments.toast.errorDescriptionPurchase'),
         variant: "destructive",
       });
        return false; // Indicate failure
@@ -42,15 +44,15 @@ export function RecordPurchasePaymentClient() {
   return (
     <div className="space-y-6">
       <div>
-          <h2 className="text-3xl font-bold tracking-tight font-headline">Registrar Pago de Compra</h2>
-          <p className="text-muted-foreground">Seleccione un proveedor y las facturas de compra a las que desea aplicar un pago.</p>
+          <h2 className="text-3xl font-bold tracking-tight font-headline">{t('payments.purchase.title')}</h2>
+          <p className="text-muted-foreground">{t('payments.purchase.description')}</p>
       </div>
 
       <div className="grid grid-cols-1">
         <Card>
           <CardHeader>
-            <CardTitle>Detalles del Pago de Compra</CardTitle>
-            <CardDescription>Complete el formulario para registrar un pago a un proveedor.</CardDescription>
+            <CardTitle>{t('payments.purchase.detailsTitle')}</CardTitle>
+            <CardDescription>{t('payments.purchase.detailsDescription')}</CardDescription>
           </CardHeader>
           <CardContent>
             <PaymentForm 
