@@ -40,18 +40,18 @@ export async function POST(request: Request) {
           <p>Team: JCW FLOWERS</p>
           <p>Teams: Alexa JCW FLOWERS</p>
           <p>Email: jcwf@outlook.es</p>
-          <img src="cid:logo" alt="JCW Flowers Logo" width="200" />
+          <img src="cid:jcw-logo-id" alt="JCW Flowers Logo" width="200" />
         </body>
       </html>
     `;
 
     const attachments = pdfAttachments || [];
     
-    // Add the logo as an attachment with a Content-ID
+    // Add the logo as an embedded attachment with a Content-ID
     attachments.push({
       filename: 'logo.png',
       content: logoBuffer,
-      contentId: 'logo'
+      contentId: 'jcw-logo-id',
     });
 
     await resend.emails.send({
