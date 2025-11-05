@@ -2,26 +2,29 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Info, Shield, Award } from 'lucide-react';
+import { useTranslation } from '@/context/i18n-context';
 
 export function SettingsClient() {
+  const { t } = useTranslation();
+
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-3xl font-bold tracking-tight font-headline">Configuración del Sistema</h2>
+        <h2 className="text-3xl font-bold tracking-tight font-headline">{t('settings.title')}</h2>
         <p className="text-muted-foreground">
-          Administre la configuración general, los permisos y la información de la licencia.
+          {t('settings.description')}
         </p>
       </div>
 
       <div className="space-y-6">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Información General</CardTitle>
+            <CardTitle className="text-sm font-medium">{t('settings.generalInfo.title')}</CardTitle>
             <Info className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              Este sistema está diseñado para la gestión integral de facturación en la industria florícola. Permite crear facturas de compra y venta, gestionar clientes y proveedores, registrar pagos, y generar estados de cuenta detallados para un control financiero completo.
+              {t('settings.generalInfo.description')}
             </p>
           </CardContent>
         </Card>
@@ -29,24 +32,24 @@ export function SettingsClient() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Permisos y Roles</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('settings.permissions.title')}</CardTitle>
                 <Shield className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <p className="text-xs text-muted-foreground">
-                Gestionar los roles de usuario y los permisos de acceso. (Próximamente)
+                {t('settings.permissions.description')}
                 </p>
             </CardContent>
             </Card>
 
             <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Licencia y Facturación</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('settings.licensing.title')}</CardTitle>
                 <Award className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
                 <p className="text-xs text-muted-foreground">
-                Ver detalles de su licencia y administrar la facturación. (Próximamente)
+                {t('settings.licensing.description')}
                 </p>
             </CardContent>
             </Card>

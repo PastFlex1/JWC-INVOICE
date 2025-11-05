@@ -425,5 +425,21 @@
       "pdfFileName": "Recibo-de-Pago",
       "excelFileName": "Recibo-de-Pago"
     }
+  },
+  "settings": {
+    "title": "Configuración del Sistema",
+    "description": "Administre la configuración general, los permisos y la información de la licencia.",
+    "generalInfo": {
+      "title": "Información General",
+      "description": "Este sistema está diseñado para la gestión integral de facturación en la industria florícola. Permite crear facturas de compra y venta, gestionar clientes y proveedores, registrar pagos, y generar estados de cuenta detallados para un control financiero completo."
+    },
+    "permissions": {
+      "title": "Permisos y Roles",
+      "description": "Gestionar los roles de usuario y los permisos de acceso. (Próximamente)"
+    },
+    "licensing": {
+      "title": "Licencia y Facturación",
+      "description": "Ver detalles de su licencia y administrar la facturación. (Próximamente)"
+    }
   }
 }

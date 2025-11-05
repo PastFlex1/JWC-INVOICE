@@ -425,5 +425,21 @@
       "pdfFileName": "Payment-Receipt",
       "excelFileName": "Payment-Receipt"
     }
+  },
+  "settings": {
+    "title": "System Settings",
+    "description": "Manage general settings, permissions, and license information.",
+    "generalInfo": {
+      "title": "General Information",
+      "description": "This system is designed for comprehensive invoicing management in the floriculture industry. It allows creating purchase and sales invoices, managing customers and suppliers, recording payments, and generating detailed account statements for complete financial control."
+    },
+    "permissions": {
+      "title": "Permissions & Roles",
+      "description": "Manage user roles and access permissions. (Coming soon)"
+    },
+    "licensing": {
+      "title": "License & Billing",
+      "description": "View your license details and manage billing. (Coming soon)"
+    }
   }
 }
