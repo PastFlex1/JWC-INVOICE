@@ -363,7 +363,7 @@ export function ProductosClient() {
                     <TableHead>{t('productos.viewDialog.stems')}</TableHead>
                     <TableHead>{t('productos.viewDialog.barcode')}</TableHead>
                     <TableHead>{t('productos.viewDialog.status')}</TableHead>
-                    <TableHead className="text-right">{t('common.actions')}</TableHead>
+                    <TableHead className="text-right">{t('common.actions.title')}</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
