@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useMemo } from 'react';
-import { Eye, Download, Mail, MoreVertical } from 'lucide-react';
+import { Eye, Download, Mail, MoreVertical, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CardFooter } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -24,9 +24,10 @@ type ViewPaymentsViewProps = {
   payments: AggregatedPayment[];
   onViewPayment: (payment: AggregatedPayment) => void;
   onSendPayment: (payment: AggregatedPayment) => void;
+  onDeletePayment: (payment: AggregatedPayment) => void;
 };
 
-export function ViewPaymentsView({ payments, onViewPayment, onSendPayment }: ViewPaymentsViewProps) {
+export function ViewPaymentsView({ payments, onViewPayment, onSendPayment, onDeletePayment }: ViewPaymentsViewProps) {
   const { t } = useTranslation();
   const [currentPage, setCurrentPage] = useState(1);
 
@@ -74,6 +75,9 @@ export function ViewPaymentsView({ payments, onViewPayment, onSendPayment }: Vie
                   </Button>
                   <Button variant="ghost" size="icon" title={t('viewPayments.table.sendEmail')} onClick={() => onSendPayment(payment)}>
                     <Mail className="h-4 w-4" />
+                  </Button>
+                  <Button variant="ghost" size="icon" title={t('common.delete')} onClick={() => onDeletePayment(payment)}>
+                    <Trash2 className="h-4 w-4 text-destructive" />
                   </Button>
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>

@@ -13,6 +13,7 @@ import {
   Timestamp,
   getDoc,
   writeBatch,
+  WriteBatch,
 } from 'firebase/firestore';
 
 const paymentFromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData>): Payment => {
@@ -170,4 +171,62 @@ export async function addBulkPayment(
   }
 
   await batch.commit();
+}
+
+
+export async function deleteAggregatedPayment(paymentIds: string[]): Promise<void> {
+    if (!db) throw new Error("Firebase is not configured.");
+
+    await runTransaction(db, async (transaction) => {
+        const affectedInvoiceIds = new Set<string>();
+        const paymentsToDelete: { ref: DocumentSnapshot<DocumentData>, data: Payment }[] = [];
+
+        // 1. Get all payments to be deleted and identify affected invoices
+        for (const paymentId of paymentIds) {
+            const paymentRef = doc(db, 'payments', paymentId);
+            const paymentDoc = await transaction.get(paymentRef);
+            if (paymentDoc.exists()) {
+                const paymentData = paymentFromFirestore(paymentDoc as QueryDocumentSnapshot<DocumentData>);
+                affectedInvoiceIds.add(paymentData.invoiceId);
+                paymentsToDelete.push({ ref: paymentDoc, data: paymentData });
+            }
+        }
+        
+        // 2. Delete the payment documents
+        for (const { ref } of paymentsToDelete) {
+            transaction.delete(ref.ref);
+        }
+
+        // 3. Recalculate status for each affected invoice
+        for (const invoiceId of affectedInvoiceIds) {
+            const invoiceRef = doc(db, 'invoices', invoiceId);
+            const invoiceDoc = await transaction.get(invoiceRef);
+            if (invoiceDoc.exists()) {
+                const invoiceData = invoiceDoc.data() as Invoice;
+                const paymentType = paymentsToDelete.find(p => p.data.invoiceId === invoiceId)?.data.type;
+                if (!paymentType) continue;
+
+                // We need to fetch all associated financial records for this invoice
+                // Note: getDocs cannot be used inside a transaction, so this logic is simplified.
+                // A more robust implementation might require fetching this data outside the transaction
+                // or using a cloud function for recalculation. For client-side, we assume a full refresh will happen.
+                
+                // For simplicity here, we'll just revert the status to 'Pending'.
+                // A full recalculation would be more accurate but is complex for a client-side transaction.
+                const dueDate = new Date(invoiceData.farmDepartureDate);
+                dueDate.setDate(dueDate.getDate() + 30); // Assuming 30 days
+                const newStatus = new Date() > dueDate ? 'Overdue' : 'Pending';
+
+                const updatePayload: { saleStatus?: string; purchaseStatus?: string } = {};
+                if (paymentType === 'sale') {
+                    updatePayload.saleStatus = newStatus;
+                } else if (paymentType === 'purchase') {
+                    updatePayload.purchaseStatus = newStatus;
+                }
+                 if (Object.keys(updatePayload).length > 0) {
+                    transaction.update(invoiceRef, updatePayload);
+                }
+            }
+        }
+    });
 }

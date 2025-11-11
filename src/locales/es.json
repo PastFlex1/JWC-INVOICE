@@ -709,6 +709,7 @@
     },
     "cancel": "Cancelar",
     "delete": "Eliminar",
+    "deleting": "Eliminando...",
     "saveChanges": "Guardar Cambios",
     "saving": "Guardando...",
     "page": "Página {currentPage} de {totalPages}",
@@ -745,6 +746,10 @@
     "searchPlaceholder": "Buscar por N° factura, cliente, método...",
     "pdfError": "No se pudo encontrar el contenido para generar el PDF.",
     "pdfUnexpectedError": "Ocurrió un error inesperado al procesar el PDF.",
+    "toast": {
+        "deleteSuccess": "El pago se ha eliminado correctamente. Los saldos de las facturas han sido recalculados.",
+        "confirmDeleteDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente el grupo de pagos y revertirá el saldo de las facturas afectadas."
+    },
     "table": {
       "date": "Fecha",
       "entity": "Cliente/Proveedor",

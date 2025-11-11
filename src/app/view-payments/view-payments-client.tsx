@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
-import { Search, Calendar as CalendarIcon, X as XIcon, Eye, Download, Mail, MoreVertical } from 'lucide-react';
+import { Search, Calendar as CalendarIcon, X as XIcon, Trash2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription, CardFooter } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
 import type { Payment, Invoice, Customer, Finca } from '@/lib/types';
@@ -15,18 +15,19 @@ import { Calendar } from '@/components/ui/calendar';
 import { type DateRange } from 'react-day-picker';
 import {
   AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogDescription,
   AlertDialogFooter,
-  AlertDialogCancel,
 } from "@/components/ui/alert-dialog";
 import { PaymentReceiptView } from './payment-receipt-view';
 import { SendPaymentReceiptDialog } from './send-payment-receipt-dialog';
 import { ViewPaymentsView } from './view-payments-view';
-import PaymentReceiptDownloadPdfButton from './payment-receipt-download-pdf';
-import PaymentReceiptDownloadExcelButton from './payment-receipt-download-excel';
+import { deleteAggregatedPayment } from '@/services/payments';
+import { useToast } from '@/hooks/use-toast';
 
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -43,6 +44,7 @@ function useDebounce<T>(value: T, delay: number): T {
 }
 
 export type PaymentDetail = {
+    paymentId: string;
     invoiceNumber: string;
     amount: number;
     customerName: string;
@@ -62,12 +64,15 @@ export type AggregatedPayment = {
 };
 
 export function ViewPaymentsClient() {
-  const { payments, invoices, customers, fincas, consignatarios } = useAppData();
+  const { payments, invoices, customers, fincas, consignatarios, refreshData } = useAppData();
   const [searchTerm, setSearchTerm] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [selectedPayment, setSelectedPayment] = useState<AggregatedPayment | null>(null);
+  const [paymentToDelete, setPaymentToDelete] = useState<AggregatedPayment | null>(null);
   const [paymentToSend, setPaymentToSend] = useState<AggregatedPayment | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+  const { toast } = useToast();
 
   const { t } = useTranslation();
 
@@ -117,7 +122,8 @@ export function ViewPaymentsClient() {
           const consigneeName = invoice.consignatarioId ? (consignatarioMap.get(invoice.consignatarioId) || 'Consignatario Desconocido') : customerName;
 
           groupedPayments[groupKey].amount += p.amount;
-          groupedPayments[groupKey].details.push({ 
+          groupedPayments[groupKey].details.push({
+            paymentId: p.id,
             invoiceNumber: invoice.invoiceNumber, 
             amount: p.amount,
             customerName: customerName,
@@ -152,6 +158,33 @@ export function ViewPaymentsClient() {
         return searchFields.some(field => field.toLowerCase().includes(lowerCaseSearch));
     });
   }, [aggregatedPayments, debouncedSearchTerm, dateRange]);
+  
+  const handleDeletePayment = async () => {
+    if (!paymentToDelete) return;
+    setIsDeleting(true);
+
+    const paymentIds = paymentToDelete.details.map(d => d.paymentId);
+    
+    try {
+      await deleteAggregatedPayment(paymentIds);
+      toast({
+        title: t('common.success'),
+        description: t('viewPayments.toast.deleteSuccess'),
+      });
+      await refreshData();
+      setPaymentToDelete(null);
+    } catch (error) {
+      console.error('Error deleting payment:', error);
+      toast({
+        title: t('common.errorDeleting'),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
 
   return (
     <>
@@ -222,6 +255,7 @@ export function ViewPaymentsClient() {
                       payments={filteredPayments}
                       onViewPayment={setSelectedPayment}
                       onSendPayment={setPaymentToSend}
+                      onDeletePayment={setPaymentToDelete}
                     />
                 </CardContent>
             </Card>
@@ -242,11 +276,6 @@ export function ViewPaymentsClient() {
                  )}
                 <AlertDialogFooter>
                     <AlertDialogCancel onClick={() => setSelectedPayment(null)}>{t('viewPayments.receipt.close')}</AlertDialogCancel>
-                     {selectedPayment && (
-                        <>
-                           <PaymentReceiptDownloadPdfButton payment={selectedPayment} />
-                        </>
-                    )}
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
@@ -258,6 +287,23 @@ export function ViewPaymentsClient() {
                 payment={paymentToSend}
             />
         )}
+        
+        <AlertDialog open={!!paymentToDelete} onOpenChange={(open) => !open && setPaymentToDelete(null)}>
+            <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>{t('common.confirmDeleteTitle')}</AlertDialogTitle>
+                <AlertDialogDescription>
+                    {t('viewPayments.toast.confirmDeleteDescription')}
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setPaymentToDelete(null)}>{t('common.cancel')}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeletePayment} variant="destructive" disabled={isDeleting}>
+                    {isDeleting ? t('common.deleting') : t('common.delete')}
+                </AlertDialogAction>
+            </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </>
   );
 }

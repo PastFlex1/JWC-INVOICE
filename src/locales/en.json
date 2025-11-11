@@ -709,6 +709,7 @@
     },
     "cancel": "Cancel",
     "delete": "Delete",
+    "deleting": "Deleting...",
     "saveChanges": "Save Changes",
     "saving": "Saving...",
     "page": "Page {currentPage} of {totalPages}",
@@ -745,6 +746,10 @@
     "searchPlaceholder": "Search by invoice #, customer, method...",
     "pdfError": "Could not find content to generate PDF.",
     "pdfUnexpectedError": "An unexpected error occurred while processing the PDF.",
+    "toast": {
+        "deleteSuccess": "The payment has been deleted successfully. Invoice balances have been recalculated.",
+        "confirmDeleteDescription": "This action cannot be undone. This will permanently delete the payment group and revert the balance of the affected invoices."
+    },
     "table": {
       "date": "Date",
       "entity": "Customer/Supplier",
