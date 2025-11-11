@@ -45,6 +45,17 @@
     "dae": "DAE",
     "carriers": "Cargueras"
   },
+  "reports": {
+    "title": "Reportes",
+    "description": "Visualiza tus ventas, compras y ganancias mensuales.",
+    "monthlyProfit": "Ganancia Mensual",
+    "chartTitle": "Rendimiento Mensual",
+    "tableTitle": "Desglose Mensual",
+    "month": "Mes",
+    "sales": "Ventas",
+    "purchases": "Compras",
+    "profit": "Ganancia"
+  },
   "invoices": {
     "title": "Facturas",
     "description": "Gestiona y rastrea las facturas de tus clientes.",

@@ -40,6 +40,7 @@ import {
   Banknote,
   Archive,
   BookCheck,
+  LineChart,
 } from 'lucide-react';
 import { useTranslation } from '@/context/i18n-context';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -90,9 +91,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { href: '/invoices', label: t('sidebar.invoices'), icon: FileText },
     { href: '/accounts-payable', label: t('sidebar.accountsPayable'), icon: Receipt },
     { href: '/view-payments', label: t('sidebar.viewPayments'), icon: BookCheck },
+    { href: '/reports', label: t('sidebar.reports'), icon: LineChart },
   ];
   
-  const reportsNavItems = [
+  const documentsNavItems = [
     { href: '/credit-notes', label: t('documents.creditNotes_client'), icon: FileText },
     { href: '/debit-notes', label: t('documents.debitNotes_client'), icon: FileText },
     { href: '/farm-credit-notes', label: t('documents.creditNotes_farm'), icon: FileText },
@@ -133,26 +135,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <h3 className="mb-2 px-2 text-lg font-semibold tracking-tight transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">{t('sidebar.main')}</h3>
             <div className="space-y-1">
                {mainNavItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname.startsWith(item.href)}
-                    className="gap-3"
-                    tooltip={item.label}
-                  >
-                    <Link href={item.href} prefetch={true}>
-                      <item.icon className="h-5 w-5" />
-                      <span className='transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0'>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </div>
-          </div>
-          <div className="px-4 py-2">
-            <h3 className="mb-2 px-2 text-lg font-semibold tracking-tight transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">{t('sidebar.reports')}</h3>
-            <div className="space-y-1">
-               {reportsNavItems.map((item) => (
                 <SidebarMenuItem key={item.href}>
                   <SidebarMenuButton
                     asChild
@@ -212,6 +194,24 @@ export function AppShell({ children }: { children: React.ReactNode }) {
            </div>
            <div className="ml-auto flex items-center gap-2">
               
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className='px-2 sm:px-4'>
+                    <span className='hidden sm:inline'>{t('header.documents')}</span>
+                    <Notebook className='sm:hidden h-5 w-5'/>
+                    <ChevronDown className="ml-2 h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                   {documentsNavItems.map(link => (
+                    <DropdownMenuItem key={link.href} onClick={() => router.push(link.href)}>
+                      <link.icon className="mr-2 h-4 w-4" />
+                      <span>{link.label}</span>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" className='px-2 sm:px-4'>

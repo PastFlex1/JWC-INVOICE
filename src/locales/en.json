@@ -45,6 +45,17 @@
     "dae": "DAE",
     "carriers": "Carriers"
   },
+  "reports": {
+    "title": "Reports",
+    "description": "Visualize your monthly sales, purchases, and profits.",
+    "monthlyProfit": "Monthly Profit",
+    "chartTitle": "Monthly Performance",
+    "tableTitle": "Monthly Breakdown",
+    "month": "Month",
+    "sales": "Sales",
+    "purchases": "Purchases",
+    "profit": "Profit"
+  },
   "invoices": {
     "title": "Invoices",
     "description": "Manage and track your customer invoices.",
