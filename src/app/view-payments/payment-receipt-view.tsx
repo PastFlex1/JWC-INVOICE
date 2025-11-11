@@ -4,17 +4,22 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { format, parseISO } from 'date-fns';
-import type { AggregatedPayment } from './view-payments-client';
+import type { AggregatedPayment, PaymentDetail } from './view-payments-client';
 import { useTranslation } from '@/context/i18n-context';
+import { Button } from '@/components/ui/button';
+import { Edit, Trash2 } from 'lucide-react';
 
 type PaymentReceiptViewProps = {
   payment: AggregatedPayment;
   t?: (key: string) => string;
+  onEditPayment?: (paymentDetail: PaymentDetail) => void;
+  onDeletePayment?: (paymentDetail: PaymentDetail) => void;
 };
 
-export function PaymentReceiptView({ payment, t: tProp }: PaymentReceiptViewProps) {
+export function PaymentReceiptView({ payment, t: tProp, onEditPayment, onDeletePayment }: PaymentReceiptViewProps) {
   const { t: tHook } = useTranslation();
   const t = tProp || tHook;
+  const isActionable = !!(onEditPayment && onDeletePayment);
 
   return (
     <Card className="p-6 bg-white text-black shadow-lg border print:shadow-none print:border-0" id={`payment-receipt-${payment.id}`}>
@@ -76,15 +81,26 @@ export function PaymentReceiptView({ payment, t: tProp }: PaymentReceiptViewProp
                 <TableHead>{t('viewPayments.receipt.customer')}</TableHead>
                 <TableHead>{t('viewPayments.receipt.consignee')}</TableHead>
                 <TableHead className="text-right">{t('viewPayments.receipt.amountApplied')}</TableHead>
+                {isActionable && <TableHead className="text-right">{t('common.actions.title')}</TableHead>}
               </TableRow>
             </TableHeader>
             <TableBody>
-              {payment.details.map((detail, index) => (
-                <TableRow key={index}>
+              {payment.details.map((detail) => (
+                <TableRow key={detail.paymentId}>
                   <TableCell>{detail.invoiceNumber}</TableCell>
                   <TableCell>{detail.customerName}</TableCell>
                   <TableCell>{detail.consigneeName}</TableCell>
                   <TableCell className="text-right">${detail.amount.toFixed(2)}</TableCell>
+                  {isActionable && (
+                    <TableCell className="text-right">
+                      <Button variant="ghost" size="icon" onClick={() => onEditPayment(detail)}>
+                        <Edit className="h-4 w-4" />
+                      </Button>
+                      <Button variant="ghost" size="icon" onClick={() => onDeletePayment(detail)}>
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
+                    </TableCell>
+                  )}
                 </TableRow>
               ))}
             </TableBody>
@@ -95,3 +111,4 @@ export function PaymentReceiptView({ payment, t: tProp }: PaymentReceiptViewProp
     </Card>
   );
 }
+```

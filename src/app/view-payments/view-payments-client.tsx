@@ -26,8 +26,9 @@ import {
 import { PaymentReceiptView } from './payment-receipt-view';
 import { SendPaymentReceiptDialog } from './send-payment-receipt-dialog';
 import { ViewPaymentsView } from './view-payments-view';
-import { deleteAggregatedPayment } from '@/services/payments';
+import { deleteAggregatedPayment, deleteSinglePayment, updateSinglePayment } from '@/services/payments';
 import { useToast } from '@/hooks/use-toast';
+import { EditPaymentDialog } from './edit-payment-dialog';
 
 
 function useDebounce<T>(value: T, delay: number): T {
@@ -49,6 +50,7 @@ export type PaymentDetail = {
     amount: number;
     customerName: string;
     consigneeName: string;
+    invoiceId: string;
 };
 
 export type AggregatedPayment = {
@@ -70,6 +72,8 @@ export function ViewPaymentsClient() {
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
   const [selectedPayment, setSelectedPayment] = useState<AggregatedPayment | null>(null);
   const [paymentToDelete, setPaymentToDelete] = useState<AggregatedPayment | null>(null);
+  const [singlePaymentToDelete, setSinglePaymentToDelete] = useState<PaymentDetail | null>(null);
+  const [paymentToEdit, setPaymentToEdit] = useState<PaymentDetail | null>(null);
   const [paymentToSend, setPaymentToSend] = useState<AggregatedPayment | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const { toast } = useToast();
@@ -124,6 +128,7 @@ export function ViewPaymentsClient() {
           groupedPayments[groupKey].amount += p.amount;
           groupedPayments[groupKey].details.push({
             paymentId: p.id,
+            invoiceId: invoice.id,
             invoiceNumber: invoice.invoiceNumber, 
             amount: p.amount,
             customerName: customerName,
@@ -185,6 +190,46 @@ export function ViewPaymentsClient() {
     }
   };
 
+  const handleDeleteSinglePayment = async () => {
+    if (!singlePaymentToDelete) return;
+    setIsDeleting(true);
+    
+    try {
+      await deleteSinglePayment(singlePaymentToDelete.paymentId);
+      toast({ title: t('common.success'), description: t('viewPayments.toast.deleteSingleSuccess') });
+      await refreshData();
+      setSinglePaymentToDelete(null);
+      setSelectedPayment(null); // Close the detail view to force re-render with updated data
+    } catch (error) {
+      console.error('Error deleting single payment:', error);
+      toast({
+        title: t('common.errorDeleting'),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
+        variant: 'destructive',
+      });
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
+  const handleUpdateSinglePayment = async (newAmount: number) => {
+    if (!paymentToEdit) return;
+    
+    try {
+      await updateSinglePayment(paymentToEdit.paymentId, newAmount);
+      toast({ title: t('common.success'), description: t('viewPayments.toast.updateSingleSuccess') });
+      await refreshData();
+      setPaymentToEdit(null);
+      setSelectedPayment(null);
+    } catch (error) {
+       console.error('Error updating single payment:', error);
+       toast({
+        title: t('common.errorSaving'),
+        description: error instanceof Error ? error.message : t('common.unknownError'),
+        variant: 'destructive',
+      });
+    }
+  };
 
   return (
     <>
@@ -271,7 +316,11 @@ export function ViewPaymentsClient() {
                 </AlertDialogHeader>
                  {selectedPayment && (
                     <div id={`payment-receipt-container-${selectedPayment.id}`} className="max-h-[60vh] overflow-y-auto">
-                        <PaymentReceiptView payment={selectedPayment} />
+                        <PaymentReceiptView 
+                          payment={selectedPayment} 
+                          onEditPayment={setPaymentToEdit}
+                          onDeletePayment={setSinglePaymentToDelete}
+                        />
                     </div>
                  )}
                 <AlertDialogFooter>
@@ -280,6 +329,15 @@ export function ViewPaymentsClient() {
             </AlertDialogContent>
         </AlertDialog>
 
+        {paymentToEdit && (
+          <EditPaymentDialog
+            isOpen={!!paymentToEdit}
+            onClose={() => setPaymentToEdit(null)}
+            paymentDetail={paymentToEdit}
+            onSave={handleUpdateSinglePayment}
+          />
+        )}
+        
         {paymentToSend && (
             <SendPaymentReceiptDialog
                 isOpen={!!paymentToSend}
@@ -304,6 +362,24 @@ export function ViewPaymentsClient() {
             </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>
+
+        <AlertDialog open={!!singlePaymentToDelete} onOpenChange={(open) => !open && setSinglePaymentToDelete(null)}>
+            <AlertDialogContent>
+            <AlertDialogHeader>
+                <AlertDialogTitle>{t('common.confirmDeleteTitle')}</AlertDialogTitle>
+                <AlertDialogDescription>
+                    {t('viewPayments.toast.confirmDeleteSingleDescription', { amount: singlePaymentToDelete?.amount.toFixed(2), invoice: singlePaymentToDelete?.invoiceNumber })}
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setSinglePaymentToDelete(null)}>{t('common.cancel')}</AlertDialogCancel>
+                <AlertDialogAction onClick={handleDeleteSinglePayment} variant="destructive" disabled={isDeleting}>
+                    {isDeleting ? t('common.deleting') : t('common.delete')}
+                </AlertDialogAction>
+            </AlertDialogFooter>
+            </AlertDialogContent>
+        </AlertDialog>
     </>
   );
 }
+```

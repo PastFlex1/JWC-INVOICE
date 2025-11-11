@@ -748,7 +748,15 @@
     "pdfUnexpectedError": "Ocurrió un error inesperado al procesar el PDF.",
     "toast": {
         "deleteSuccess": "El pago se ha eliminado correctamente. Los saldos de las facturas han sido recalculados.",
-        "confirmDeleteDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente el grupo de pagos y revertirá el saldo de las facturas afectadas."
+        "deleteSingleSuccess": "El abono individual se ha eliminado correctamente.",
+        "updateSingleSuccess": "El abono individual se ha actualizado correctamente.",
+        "confirmDeleteDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente el grupo de pagos y revertirá el saldo de las facturas afectadas.",
+        "confirmDeleteSingleDescription": "Esta acción no se puede deshacer. Se eliminará el abono de ${amount} de la factura {invoice} y se recalculará el saldo."
+    },
+    "editDialog": {
+        "title": "Editar Abono de Pago",
+        "description": "Modificar el monto del abono para la factura {invoice}.",
+        "newAmount": "Nuevo Monto del Abono"
     },
     "table": {
       "date": "Fecha",
