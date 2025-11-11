@@ -1,14 +1,15 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import type { Invoice, CreditNote, DebitNote, BunchItem } from '@/lib/types';
-import { format, parseISO } from 'date-fns';
-import { es } from 'date-fns/locale';
+import { format, parseISO, getYear } from 'date-fns';
+import { es, enUS } from 'date-fns/locale';
 
 type MonthlyData = {
   month: string;
@@ -18,16 +19,55 @@ type MonthlyData = {
 };
 
 export function ReportsClient() {
-  const { invoices, creditNotes, debitNotes } = useAppData();
+  const { invoices, creditNotes, debitNotes, fincas, customers } = useAppData();
   const { t, locale } = useTranslation();
+  const dateLocale = useMemo(() => (locale === 'es' ? es : enUS), [locale]);
+
+  const [selectedFincaId, setSelectedFincaId] = useState<string>('all');
+  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('all');
+  const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [selectedMonth, setSelectedMonth] = useState<string>('all');
+
+  const availableYears = useMemo(() => {
+    const years = new Set(invoices.map(inv => getYear(parseISO(inv.farmDepartureDate))));
+    return Array.from(years).sort((a, b) => b - a);
+  }, [invoices]);
+  
+  const availableMonths = useMemo(() => {
+    if (selectedYear === 'all') return [];
+    const months = new Set(
+      invoices
+        .filter(inv => getYear(parseISO(inv.farmDepartureDate)) === parseInt(selectedYear))
+        .map(inv => format(parseISO(inv.farmDepartureDate), 'MM'))
+    );
+    return Array.from(months).sort();
+  }, [invoices, selectedYear]);
 
   const monthlyData = useMemo(() => {
-    const dataByMonth: Record<string, { sales: number; purchases: number }> = {};
+    let filteredInvoices = invoices;
 
-    invoices.forEach((invoice) => {
-      const month = format(parseISO(invoice.farmDepartureDate), 'yyyy-MM');
-      if (!dataByMonth[month]) {
-        dataByMonth[month] = { sales: 0, purchases: 0 };
+    if (selectedFincaId !== 'all') {
+      filteredInvoices = filteredInvoices.filter(inv => inv.farmId === selectedFincaId);
+    }
+    if (selectedCustomerId !== 'all') {
+      filteredInvoices = filteredInvoices.filter(inv => inv.customerId === selectedCustomerId);
+    }
+    if (selectedYear !== 'all') {
+        const year = parseInt(selectedYear);
+        filteredInvoices = filteredInvoices.filter(inv => getYear(parseISO(inv.farmDepartureDate)) === year);
+    }
+     if (selectedMonth !== 'all' && selectedYear !== 'all') {
+        const month = parseInt(selectedMonth) -1;
+        filteredInvoices = filteredInvoices.filter(inv => parseISO(inv.farmDepartureDate).getMonth() === month);
+    }
+
+    const dataByMonth: Record<string, { sales: number; purchases: number }> = {};
+    const filteredInvoiceIds = new Set(filteredInvoices.map(inv => inv.id));
+
+    filteredInvoices.forEach((invoice) => {
+      const monthKey = selectedYear === 'all' ? format(parseISO(invoice.farmDepartureDate), 'yyyy-MM') : format(parseISO(invoice.farmDepartureDate), 'MM');
+      if (!dataByMonth[monthKey]) {
+        dataByMonth[monthKey] = { sales: 0, purchases: 0 };
       }
 
       let saleValue = 0;
@@ -45,39 +85,44 @@ export function ReportsClient() {
         });
       });
 
-      dataByMonth[month].sales += saleValue;
-      dataByMonth[month].purchases += purchaseValue;
+      dataByMonth[monthKey].sales += saleValue;
+      dataByMonth[monthKey].purchases += purchaseValue;
     });
 
     creditNotes.forEach(note => {
+        if (!filteredInvoiceIds.has(note.invoiceId)) return;
         const invoice = invoices.find(inv => inv.id === note.invoiceId);
         if(!invoice) return;
-        const month = format(parseISO(invoice.farmDepartureDate), 'yyyy-MM');
-        if(dataByMonth[month]){
-            if(note.type === 'sale') dataByMonth[month].sales -= note.amount;
-            else dataByMonth[month].purchases -= note.amount;
+        const monthKey = selectedYear === 'all' ? format(parseISO(invoice.farmDepartureDate), 'yyyy-MM') : format(parseISO(invoice.farmDepartureDate), 'MM');
+        if(dataByMonth[monthKey]){
+            if(note.type === 'sale') dataByMonth[monthKey].sales -= note.amount;
+            else dataByMonth[monthKey].purchases -= note.amount;
         }
     });
 
     debitNotes.forEach(note => {
+        if (!filteredInvoiceIds.has(note.invoiceId)) return;
         const invoice = invoices.find(inv => inv.id === note.invoiceId);
         if(!invoice) return;
-        const month = format(parseISO(invoice.farmDepartureDate), 'yyyy-MM');
-        if(dataByMonth[month]){
-            if(note.type === 'sale') dataByMonth[month].sales += note.amount;
-            else dataByMonth[month].purchases += note.amount;
+        const monthKey = selectedYear === 'all' ? format(parseISO(invoice.farmDepartureDate), 'yyyy-MM') : format(parseISO(invoice.farmDepartureDate), 'MM');
+        if(dataByMonth[monthKey]){
+            if(note.type === 'sale') dataByMonth[monthKey].sales += note.amount;
+            else dataByMonth[monthKey].purchases += note.amount;
         }
     });
-
-    return Object.entries(dataByMonth)
-      .map(([month, values]) => ({
-        month,
+    
+    const finalData = Object.entries(dataByMonth)
+      .map(([monthKey, values]) => ({
+        month: monthKey,
         sales: values.sales,
         purchases: values.purchases,
         profit: values.sales - values.purchases,
       }))
       .sort((a, b) => a.month.localeCompare(b.month));
-  }, [invoices, creditNotes, debitNotes]);
+
+    return finalData;
+
+  }, [invoices, creditNotes, debitNotes, selectedFincaId, selectedCustomerId, selectedYear, selectedMonth]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -90,12 +135,69 @@ export function ReportsClient() {
   const totalPurchases = monthlyData.reduce((acc, data) => acc + data.purchases, 0);
   const totalProfit = monthlyData.reduce((acc, data) => acc + data.profit, 0);
 
+  const getMonthName = (monthNumber: string) => {
+      const year = selectedYear !== 'all' ? parseInt(selectedYear) : new Date().getFullYear();
+      const date = new Date(year, parseInt(monthNumber) - 1, 1);
+      return format(date, "MMMM", { locale: dateLocale });
+  };
+  
+  const getXAxisFormatter = (monthKey: string) => {
+    if (selectedYear === 'all') {
+      return format(parseISO(monthKey), "MMM yyyy", { locale: dateLocale });
+    }
+    return getMonthName(monthKey);
+  };
+
   return (
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold tracking-tight font-headline">{t('reports.title')}</h2>
         <p className="text-muted-foreground">{t('reports.description')}</p>
       </div>
+      
+       <Card>
+        <CardHeader>
+            <CardTitle>{t('reports.filters')}</CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-wrap gap-4">
+            <Select value={selectedFincaId} onValueChange={setSelectedFincaId}>
+                <SelectTrigger className="w-full md:w-auto md:min-w-[200px]">
+                    <SelectValue placeholder={t('reports.filterByFarm')} />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">{t('reports.allFarms')}</SelectItem>
+                    {fincas.map(f => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}
+                </SelectContent>
+            </Select>
+            <Select value={selectedCustomerId} onValueChange={setSelectedCustomerId}>
+                <SelectTrigger className="w-full md:w-auto md:min-w-[200px]">
+                    <SelectValue placeholder={t('reports.filterByCustomer')} />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">{t('reports.allCustomers')}</SelectItem>
+                    {customers.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+                </SelectContent>
+            </Select>
+            <Select value={selectedYear} onValueChange={(value) => {setSelectedYear(value); setSelectedMonth('all');}}>
+                <SelectTrigger className="w-full md:w-auto md:min-w-[150px]">
+                    <SelectValue placeholder={t('reports.filterByYear')} />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">{t('reports.allYears')}</SelectItem>
+                    {availableYears.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                </SelectContent>
+            </Select>
+             <Select value={selectedMonth} onValueChange={setSelectedMonth} disabled={selectedYear === 'all'}>
+                <SelectTrigger className="w-full md:w-auto md:min-w-[150px]">
+                    <SelectValue placeholder={t('reports.filterByMonth')} />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">{t('reports.allMonths')}</SelectItem>
+                    {availableMonths.map(m => <SelectItem key={m} value={m}>{getMonthName(m)}</SelectItem>)}
+                </SelectContent>
+            </Select>
+        </CardContent>
+       </Card>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <Card>
@@ -132,10 +234,7 @@ export function ReportsClient() {
           <ResponsiveContainer width="100%" height={350}>
             <BarChart data={monthlyData}>
               <CartesianGrid strokeDasharray="3 3" />
-              <XAxis 
-                dataKey="month" 
-                tickFormatter={(str) => format(parseISO(str), "MMM yyyy", { locale: locale === 'es' ? es : undefined })} 
-              />
+              <XAxis dataKey="month" tickFormatter={getXAxisFormatter} />
               <YAxis tickFormatter={(value) => `$${value / 1000}k`} />
               <Tooltip formatter={(value: number) => formatCurrency(value)} />
               <Legend />
@@ -164,7 +263,7 @@ export function ReportsClient() {
             <TableBody>
               {monthlyData.map((data) => (
                 <TableRow key={data.month}>
-                  <TableCell className="font-medium">{format(parseISO(data.month), "MMMM yyyy", { locale: locale === 'es' ? es : undefined })}</TableCell>
+                  <TableCell className="font-medium">{getXAxisFormatter(data.month)}</TableCell>
                   <TableCell className="text-right">{formatCurrency(data.sales)}</TableCell>
                   <TableCell className="text-right">{formatCurrency(data.purchases)}</TableCell>
                   <TableCell className="text-right font-semibold">{formatCurrency(data.profit)}</TableCell>

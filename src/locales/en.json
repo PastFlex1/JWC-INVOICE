@@ -54,7 +54,16 @@
     "month": "Month",
     "sales": "Sales",
     "purchases": "Purchases",
-    "profit": "Profit"
+    "profit": "Profit",
+    "filters": "Filters",
+    "filterByFarm": "Filter by Farm",
+    "allFarms": "All Farms",
+    "filterByCustomer": "Filter by Customer",
+    "allCustomers": "All Customers",
+    "filterByYear": "Filter by Year",
+    "allYears": "All Years",
+    "filterByMonth": "Filter by Month",
+    "allMonths": "All Months"
   },
   "invoices": {
     "title": "Invoices",

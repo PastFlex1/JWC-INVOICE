@@ -54,7 +54,16 @@
     "month": "Mes",
     "sales": "Ventas",
     "purchases": "Compras",
-    "profit": "Ganancia"
+    "profit": "Ganancia",
+    "filters": "Filtros",
+    "filterByFarm": "Filtrar por Finca",
+    "allFarms": "Todas las Fincas",
+    "filterByCustomer": "Filtrar por Cliente",
+    "allCustomers": "Todos los Clientes",
+    "filterByYear": "Filtrar por Año",
+    "allYears": "Todos los Años",
+    "filterByMonth": "Filtrar por Mes",
+    "allMonths": "Todos los Meses"
   },
   "invoices": {
     "title": "Facturas",
