@@ -34,7 +34,8 @@
     "historicalAccountStatement_client": "Historical Statement (Client)",
     "historicalAccountStatement_farm": "Historical Statement (Farm)",
     "registerPayment": "Register Payment",
-    "registerPurchasePayment": "Register Purchase Payment"
+    "registerPurchasePayment": "Register Purchase Payment",
+    "comparativeSalesReport": "Comparative Sales Report"
   },
   "masterTables": {
     "products": "Products",
@@ -79,6 +80,18 @@
       "chargeClient": "Sale Value",
       "profit": "Profit",
       "total": "Total"
+    }
+  },
+   "comparativeReport": {
+    "title": "Comparative Sales Report",
+    "description": "Compare sales data across different years.",
+    "tableTitle": "Comparative Data",
+    "table": {
+      "month": "Month",
+      "farm": "Farm",
+      "customer": "Customer",
+      "chargeFarm": "Purchase Value",
+      "chargeClient": "Sale Value"
     }
   },
   "invoices": {

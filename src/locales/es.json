@@ -34,7 +34,8 @@
     "historicalAccountStatement_client": "Estado Cuenta Histórico (Cliente)",
     "historicalAccountStatement_farm": "Estado Cuenta Histórico (Finca)",
     "registerPayment": "Registrar Pago",
-    "registerPurchasePayment": "Registrar Pago Compra"
+    "registerPurchasePayment": "Registrar Pago Compra",
+    "comparativeSalesReport": "Reporte Comparativo de Ventas"
   },
   "masterTables": {
     "products": "Productos",
@@ -79,6 +80,18 @@
       "chargeClient": "Valor Venta",
       "profit": "Utilidad",
       "total": "Total"
+    }
+  },
+  "comparativeReport": {
+    "title": "Reporte Comparativo de Ventas",
+    "description": "Compare datos de ventas a través de diferentes años.",
+    "tableTitle": "Datos Comparativos",
+    "table": {
+      "month": "Mes",
+      "farm": "Finca",
+      "customer": "Cliente",
+      "chargeFarm": "Valor Compra",
+      "chargeClient": "Valor Venta"
     }
   },
   "invoices": {
