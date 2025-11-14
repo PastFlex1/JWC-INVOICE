@@ -29,8 +29,6 @@ export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentRece
     tempContainer.style.left = '-9999px'; // Position it off-screen
     document.body.appendChild(tempContainer);
     
-    // This is a bit of a hack: React can't render to a detached element.
-    // So we render a hidden element, use it for PDF generation, then remove it.
     const root = createRoot(tempContainer);
     
     // Render the component inside the temporary container, passing the `t` function
@@ -72,7 +70,6 @@ export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentRece
       });
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = pdf.internal.pageSize.getHeight();
       
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;

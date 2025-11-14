@@ -11,7 +11,7 @@ import { Edit, Trash2 } from 'lucide-react';
 
 type PaymentReceiptViewProps = {
   payment: AggregatedPayment;
-  t?: (key: string) => string;
+  t?: (key: string, replacements?: Record<string, string | number>) => string;
   onEditPayment?: (paymentDetail: PaymentDetail) => void;
   onDeletePayment?: (paymentDetail: PaymentDetail) => void;
 };
@@ -91,7 +91,7 @@ export function PaymentReceiptView({ payment, t: tProp, onEditPayment, onDeleteP
                   <TableCell>{detail.customerName}</TableCell>
                   <TableCell>{detail.consigneeName}</TableCell>
                   <TableCell className="text-right">${detail.amount.toFixed(2)}</TableCell>
-                  {isActionable && (
+                  {isActionable && onEditPayment && onDeletePayment && (
                     <TableCell className="text-right">
                       <Button variant="ghost" size="icon" onClick={() => onEditPayment(detail)}>
                         <Edit className="h-4 w-4" />
