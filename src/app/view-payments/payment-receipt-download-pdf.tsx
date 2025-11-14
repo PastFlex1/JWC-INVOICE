@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -70,6 +71,7 @@ export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentRece
       });
       
       const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = pdf.internal.pageSize.getHeight();
       
       const canvasWidth = canvas.width;
       const canvasHeight = canvas.height;
