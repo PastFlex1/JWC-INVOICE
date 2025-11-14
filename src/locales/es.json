@@ -75,8 +75,8 @@
       "farm": "Finca",
       "customer": "Cliente",
       "totalStems": "Total Tallos",
-      "chargeFarm": "Cargo Finca",
-      "chargeClient": "Cargo Cliente",
+      "chargeFarm": "Valor Compra",
+      "chargeClient": "Valor Venta",
       "profit": "Utilidad",
       "total": "Total"
     }
@@ -376,35 +376,35 @@
     "pdfFileName": "Reporte-Notas-de-Credito",
     "excelFileName": "Reporte-Notas-de-Credito",
     "list": {
-      "title": "Lista de Notas de Crédito",
-      "description": "Una lista de todas tus notas de crédito de clientes.",
-      "date": "Fecha",
-      "invoice": "Factura #",
-      "consignee": "Consignatario",
-      "amount": "Monto",
-      "reason": "Motivo"
+        "title": "Lista de Notas de Crédito",
+        "description": "Una lista de todas tus notas de crédito de clientes.",
+        "date": "Fecha",
+        "invoice": "Factura #",
+        "consignee": "Consignatario",
+        "amount": "Monto",
+        "reason": "Motivo"
     },
     "form": {
-      "customer": "Cliente",
-      "customerPlaceholder": "Seleccione un cliente",
-      "invoice": "Factura a Acreditar",
-      "invoicePlaceholder": "Seleccione una factura",
-      "consignee": "Consignatario",
-      "amount": "Monto a Acreditar",
-      "reason": "Motivo",
-      "reasonPlaceholder": "Ej: Calidad de la flor",
-      "date": "Fecha de Nota de Crédito"
+        "customer": "Cliente",
+        "customerPlaceholder": "Seleccione un cliente",
+        "invoice": "Factura a Acreditar",
+        "invoicePlaceholder": "Seleccione una factura",
+        "consignee": "Consignatario",
+        "amount": "Monto a Acreditar",
+        "reason": "Motivo",
+        "reasonPlaceholder": "Ej: Calidad de la flor",
+        "date": "Fecha de Nota de Crédito"
     },
     "toast": {
-      "added": "Nota de crédito añadida correctamente.",
-      "deleted": "Nota de crédito eliminada correctamente.",
-      "error": "No se pudo guardar la nota de crédito: {error}.",
-      "deleteError": "No se pudo eliminar la nota de crédito: {error}."
+        "added": "Nota de crédito añadida correctamente.",
+        "deleted": "Nota de crédito eliminada correctamente.",
+        "error": "No se pudo guardar la nota de crédito: {error}.",
+        "deleteError": "No se pudo eliminar la nota de crédito: {error}."
     },
     "confirmDeleteDescription": "Esta acción no se puede deshacer. Esto eliminará permanentemente la nota de crédito.",
     "email": {
-      "reportTitle": "Reporte de Notas de Crédito",
-      "reportDescription": "El reporte adjunto contiene un resumen de las notas de crédito para el período seleccionado."
+        "reportTitle": "Reporte de Notas de Crédito",
+        "reportDescription": "El reporte adjunto contiene un resumen de las notas de crédito para el período seleccionado."
     },
     "farm": {
       "title": "Notas de Crédito (Finca)",

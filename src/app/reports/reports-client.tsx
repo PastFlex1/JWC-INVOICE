@@ -10,6 +10,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import type { Invoice, CreditNote, DebitNote, BunchItem, Producto } from '@/lib/types';
 import { format, parseISO, getYear } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
+import { Button } from '@/components/ui/button';
+import Link from 'next/link';
+import { Eye } from 'lucide-react';
 
 type MonthlyData = {
   month: string;
@@ -102,14 +105,14 @@ export function ReportsClient() {
         let totalStems = 0;
 
         invoice.items.forEach(item => {
-            item.bunches.forEach((bunch: BunchItem) => {
-                const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
+            (item.bunches || []).forEach((bunch: BunchItem) => {
+                const stems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0);
                 totalStems += stems;
                 if (invoice.type === 'sale' || invoice.type === 'both') {
-                    saleValue += stems * bunch.salePrice;
+                    saleValue += stems * (bunch.salePrice || 0);
                 }
                 if (invoice.type === 'purchase' || invoice.type === 'both') {
-                    purchaseValue += stems * bunch.purchasePrice;
+                    purchaseValue += stems * (bunch.purchasePrice || 0);
                 }
             });
         });
@@ -361,6 +364,7 @@ export function ReportsClient() {
                 <TableHead className="text-right">{t('reports.table.chargeFarm')}</TableHead>
                 <TableHead className="text-right">{t('reports.table.chargeClient')}</TableHead>
                 <TableHead className="text-right">{t('reports.table.profit')}</TableHead>
+                <TableHead className="text-right">{t('common.actions.title')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -374,6 +378,13 @@ export function ReportsClient() {
                   <TableCell className="text-right">{formatCurrency(data.chargeFarm)}</TableCell>
                   <TableCell className="text-right">{formatCurrency(data.chargeClient)}</TableCell>
                   <TableCell className="text-right font-semibold">{formatCurrency(data.profit)}</TableCell>
+                  <TableCell className="text-right">
+                    <Button asChild variant="ghost" size="icon" title={t('invoices.view.invoiceTitle')}>
+                      <Link href={`/invoices/${data.id}`}>
+                        <Eye className="h-4 w-4" />
+                      </Link>
+                    </Button>
+                  </TableCell>
                 </TableRow>
               ))}
             </TableBody>
@@ -384,6 +395,7 @@ export function ReportsClient() {
                     <TableCell className="text-right">{formatCurrency(totalPurchases)}</TableCell>
                     <TableCell className="text-right">{formatCurrency(totalSales)}</TableCell>
                     <TableCell className="text-right">{formatCurrency(totalProfit)}</TableCell>
+                    <TableCell />
                 </TableRow>
             </TableFooter>
           </Table>

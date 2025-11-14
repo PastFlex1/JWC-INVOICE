@@ -75,8 +75,8 @@
       "farm": "Farm",
       "customer": "Customer",
       "totalStems": "Total Stems",
-      "chargeFarm": "Charge Farm",
-      "chargeClient": "Charge Client",
+      "chargeFarm": "Purchase Value",
+      "chargeClient": "Sale Value",
       "profit": "Profit",
       "total": "Total"
     }
@@ -766,11 +766,11 @@
     "pdfError": "Could not find content to generate PDF.",
     "pdfUnexpectedError": "An unexpected error occurred while processing the PDF.",
     "toast": {
-      "deleteSuccess": "The payment has been deleted successfully. Invoice balances have been recalculated.",
-      "deleteSingleSuccess": "The individual payment has been deleted successfully.",
-      "updateSingleSuccess": "The individual payment has been updated successfully.",
-      "confirmDeleteDescription": "This action cannot be undone. This will permanently delete the payment group and revert the balance of the affected invoices.",
-      "confirmDeleteSingleDescription": "This action cannot be undone. The payment of ${amount} from invoice {invoice} will be deleted and the balance will be recalculated."
+        "deleteSuccess": "The payment has been deleted successfully. Invoice balances have been recalculated.",
+        "deleteSingleSuccess": "The individual payment has been deleted successfully.",
+        "updateSingleSuccess": "The individual payment has been updated successfully.",
+        "confirmDeleteDescription": "This action cannot be undone. This will permanently delete the payment group and revert the balance of the affected invoices.",
+        "confirmDeleteSingleDescription": "This action cannot be undone. The payment of ${amount} from invoice {invoice} will be deleted and the balance will be recalculated."
     },
     "editDialog": {
         "title": "Edit Payment Amount",
