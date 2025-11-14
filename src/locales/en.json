@@ -50,6 +50,8 @@
     "description": "Visualize your monthly sales, purchases, and profits.",
     "monthlyProfit": "Monthly Profit",
     "chartTitle": "Monthly Performance",
+    "colorSalesChartTitle": "Top Selling Flower Colors",
+    "colorSalesChartDescription": "Sales distribution by flower color.",
     "tableTitle": "Monthly Breakdown",
     "month": "Month",
     "sales": "Sales",
@@ -869,5 +871,3 @@
     }
   }
 }
-
-    

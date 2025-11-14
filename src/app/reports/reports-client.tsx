@@ -3,11 +3,11 @@
 import { useMemo, useState } from 'react';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { Invoice, CreditNote, DebitNote, BunchItem } from '@/lib/types';
+import type { Invoice, CreditNote, DebitNote, BunchItem, Producto } from '@/lib/types';
 import { format, parseISO, getYear } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
 
@@ -18,8 +18,14 @@ type MonthlyData = {
   profit: number;
 };
 
+type ColorSalesData = {
+  nombreColor: string;
+  totalSales: number;
+  colorHex: string;
+};
+
 export function ReportsClient() {
-  const { invoices, creditNotes, debitNotes, fincas, customers } = useAppData();
+  const { invoices, creditNotes, debitNotes, fincas, customers, productos } = useAppData();
   const { t, locale } = useTranslation();
   const dateLocale = useMemo(() => (locale === 'es' ? es : enUS), [locale]);
 
@@ -43,24 +49,27 @@ export function ReportsClient() {
     return Array.from(months).sort();
   }, [invoices, selectedYear]);
 
-  const monthlyData = useMemo(() => {
-    let filteredInvoices = invoices;
-
+  const filteredInvoices = useMemo(() => {
+    let filtered = invoices;
     if (selectedFincaId !== 'all') {
-      filteredInvoices = filteredInvoices.filter(inv => inv.farmId === selectedFincaId);
+      filtered = filtered.filter(inv => inv.farmId === selectedFincaId);
     }
     if (selectedCustomerId !== 'all') {
-      filteredInvoices = filteredInvoices.filter(inv => inv.customerId === selectedCustomerId);
+      filtered = filtered.filter(inv => inv.customerId === selectedCustomerId);
     }
     if (selectedYear !== 'all') {
         const year = parseInt(selectedYear);
-        filteredInvoices = filteredInvoices.filter(inv => getYear(parseISO(inv.farmDepartureDate)) === year);
+        filtered = filtered.filter(inv => getYear(parseISO(inv.farmDepartureDate)) === year);
     }
      if (selectedMonth !== 'all' && selectedYear !== 'all') {
         const month = parseInt(selectedMonth) -1;
-        filteredInvoices = filteredInvoices.filter(inv => parseISO(inv.farmDepartureDate).getMonth() === month);
+        filtered = filtered.filter(inv => parseISO(inv.farmDepartureDate).getMonth() === month);
     }
+    return filtered;
+  }, [invoices, selectedFincaId, selectedCustomerId, selectedYear, selectedMonth]);
 
+
+  const monthlyData = useMemo(() => {
     const dataByMonth: Record<string, { sales: number; purchases: number }> = {};
     const filteredInvoiceIds = new Set(filteredInvoices.map(inv => inv.id));
 
@@ -122,7 +131,38 @@ export function ReportsClient() {
 
     return finalData;
 
-  }, [invoices, creditNotes, debitNotes, selectedFincaId, selectedCustomerId, selectedYear, selectedMonth]);
+  }, [filteredInvoices, invoices, creditNotes, debitNotes, selectedYear]);
+
+  const salesByColorData: ColorSalesData[] = useMemo(() => {
+    const salesByColor: Record<string, { totalSales: number; colorHex: string }> = {};
+    const productMap = new Map<string, Producto>(productos.map(p => [p.id, p]));
+
+    filteredInvoices.forEach(invoice => {
+      if (invoice.type === 'purchase') return;
+
+      invoice.items.forEach(item => {
+        item.bunches.forEach(bunch => {
+          const product = productMap.get(bunch.productoId);
+          if (product) {
+            const saleValue = bunch.stemsPerBunch * bunch.bunchesPerBox * bunch.salePrice;
+            if (!salesByColor[product.nombreColor]) {
+              salesByColor[product.nombreColor] = { totalSales: 0, colorHex: product.color };
+            }
+            salesByColor[product.nombreColor].totalSales += saleValue;
+          }
+        });
+      });
+    });
+
+    return Object.entries(salesByColor)
+      .map(([nombreColor, data]) => ({
+        nombreColor,
+        totalSales: data.totalSales,
+        colorHex: data.colorHex,
+      }))
+      .sort((a, b) => b.totalSales - a.totalSales)
+      .slice(0, 15); // Top 15 colors
+  }, [filteredInvoices, productos]);
 
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
@@ -246,6 +286,29 @@ export function ReportsClient() {
         </CardContent>
       </Card>
       
+      <Card>
+        <CardHeader>
+          <CardTitle>{t('reports.colorSalesChartTitle')}</CardTitle>
+          <CardDescription>{t('reports.colorSalesChartDescription')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ResponsiveContainer width="100%" height={400}>
+            <BarChart data={salesByColorData} layout="vertical">
+              <CartesianGrid strokeDasharray="3 3" />
+              <XAxis type="number" tickFormatter={(value) => formatCurrency(value)} />
+              <YAxis type="category" dataKey="nombreColor" width={120} />
+              <Tooltip formatter={(value: number) => formatCurrency(value)} />
+              <Legend />
+              <Bar dataKey="totalSales" name={t('reports.sales')} layout="vertical">
+                {salesByColorData.map((entry, index) => (
+                  <Cell key={`cell-${index}`} fill={entry.colorHex || '#8884d8'} />
+                ))}
+              </Bar>
+            </BarChart>
+          </ResponsiveContainer>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle>{t('reports.tableTitle')}</CardTitle>

@@ -50,6 +50,8 @@
     "description": "Visualiza tus ventas, compras y ganancias mensuales.",
     "monthlyProfit": "Ganancia Mensual",
     "chartTitle": "Rendimiento Mensual",
+    "colorSalesChartTitle": "Colores de Flores Más Vendidos",
+    "colorSalesChartDescription": "Distribución de ventas por color de flor.",
     "tableTitle": "Desglose Mensual",
     "month": "Mes",
     "sales": "Ventas",
