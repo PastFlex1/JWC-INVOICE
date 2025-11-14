@@ -24,11 +24,22 @@ type ColorSalesData = {
   colorHex: string;
 };
 
+type InvoiceDetailReport = {
+  id: string;
+  date: string;
+  invoiceNumber: string;
+  farmName: string;
+  customerName: string;
+  chargeFarm: number;
+  chargeClient: number;
+  profit: number;
+};
+
 const CustomYAxisTick = (props: any) => {
   const { x, y, payload } = props;
   return (
     <g transform={`translate(${x},${y})`}>
-      <Text x={0} y={0} dy={0} textAnchor="end" fill="#666" width={140} style={{ whiteSpace: 'normal' }}>
+      <Text x={0} y={0} dy={0} textAnchor="end" fill="#666" width={150} style={{ whiteSpace: 'normal' }}>
         {payload.value}
       </Text>
     </g>
@@ -78,57 +89,66 @@ export function ReportsClient() {
     }
     return filtered;
   }, [invoices, selectedFincaId, selectedCustomerId, selectedYear, selectedMonth]);
+  
+  const invoiceDetails = useMemo(() => {
+    const fincaMap = new Map(fincas.map(f => [f.id, f.name]));
+    const customerMap = new Map(customers.map(c => [c.id, c.name]));
+    const filteredInvoiceIds = new Set(filteredInvoices.map(inv => inv.id));
+
+    return filteredInvoices.map(invoice => {
+        let saleValue = 0;
+        let purchaseValue = 0;
+
+        invoice.items.forEach(item => {
+            item.bunches.forEach((bunch: BunchItem) => {
+                const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
+                if (invoice.type === 'sale' || invoice.type === 'both') {
+                    saleValue += stems * bunch.salePrice;
+                }
+                if (invoice.type === 'purchase' || invoice.type === 'both') {
+                    purchaseValue += stems * bunch.purchasePrice;
+                }
+            });
+        });
+
+        const relatedCreditNotes = creditNotes.filter(note => note.invoiceId === invoice.id);
+        const relatedDebitNotes = debitNotes.filter(note => note.invoiceId === invoice.id);
+
+        relatedCreditNotes.forEach(note => {
+            if (note.type === 'sale') saleValue -= note.amount;
+            else purchaseValue -= note.amount;
+        });
+
+        relatedDebitNotes.forEach(note => {
+            if (note.type === 'sale') saleValue += note.amount;
+            else purchaseValue += note.amount;
+        });
+        
+        return {
+            id: invoice.id,
+            date: invoice.farmDepartureDate,
+            invoiceNumber: invoice.invoiceNumber,
+            farmName: fincaMap.get(invoice.farmId) || t('common.unknown'),
+            customerName: customerMap.get(invoice.customerId) || t('common.unknown'),
+            chargeClient: saleValue,
+            chargeFarm: purchaseValue,
+            profit: saleValue - purchaseValue,
+        };
+    }).sort((a,b) => parseISO(b.date).getTime() - parseISO(a.date).getTime())
+
+  }, [filteredInvoices, creditNotes, debitNotes, fincas, customers, t]);
 
 
   const monthlyData = useMemo(() => {
     const dataByMonth: Record<string, { sales: number; purchases: number }> = {};
-    const filteredInvoiceIds = new Set(filteredInvoices.map(inv => inv.id));
-
-    filteredInvoices.forEach((invoice) => {
-      const monthKey = selectedYear === 'all' ? format(parseISO(invoice.farmDepartureDate), 'yyyy-MM') : format(parseISO(invoice.farmDepartureDate), 'MM');
-      if (!dataByMonth[monthKey]) {
-        dataByMonth[monthKey] = { sales: 0, purchases: 0 };
-      }
-
-      let saleValue = 0;
-      let purchaseValue = 0;
-
-      invoice.items.forEach(item => {
-        item.bunches.forEach((bunch: BunchItem) => {
-          const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
-          if (invoice.type === 'sale' || invoice.type === 'both') {
-            saleValue += stems * bunch.salePrice;
-          }
-          if (invoice.type === 'purchase' || invoice.type === 'both') {
-            purchaseValue += stems * bunch.purchasePrice;
-          }
-        });
-      });
-
-      dataByMonth[monthKey].sales += saleValue;
-      dataByMonth[monthKey].purchases += purchaseValue;
-    });
-
-    creditNotes.forEach(note => {
-        if (!filteredInvoiceIds.has(note.invoiceId)) return;
-        const invoice = invoices.find(inv => inv.id === note.invoiceId);
-        if(!invoice) return;
-        const monthKey = selectedYear === 'all' ? format(parseISO(invoice.farmDepartureDate), 'yyyy-MM') : format(parseISO(invoice.farmDepartureDate), 'MM');
-        if(dataByMonth[monthKey]){
-            if(note.type === 'sale') dataByMonth[monthKey].sales -= note.amount;
-            else dataByMonth[monthKey].purchases -= note.amount;
+    
+    invoiceDetails.forEach(detail => {
+        const monthKey = selectedYear === 'all' ? format(parseISO(detail.date), 'yyyy-MM') : format(parseISO(detail.date), 'MM');
+        if (!dataByMonth[monthKey]) {
+            dataByMonth[monthKey] = { sales: 0, purchases: 0 };
         }
-    });
-
-    debitNotes.forEach(note => {
-        if (!filteredInvoiceIds.has(note.invoiceId)) return;
-        const invoice = invoices.find(inv => inv.id === note.invoiceId);
-        if(!invoice) return;
-        const monthKey = selectedYear === 'all' ? format(parseISO(invoice.farmDepartureDate), 'yyyy-MM') : format(parseISO(invoice.farmDepartureDate), 'MM');
-        if(dataByMonth[monthKey]){
-            if(note.type === 'sale') dataByMonth[monthKey].sales += note.amount;
-            else dataByMonth[monthKey].purchases += note.amount;
-        }
+        dataByMonth[monthKey].sales += detail.chargeClient;
+        dataByMonth[monthKey].purchases += detail.chargeFarm;
     });
     
     const finalData = Object.entries(dataByMonth)
@@ -142,7 +162,7 @@ export function ReportsClient() {
 
     return finalData;
 
-  }, [filteredInvoices, invoices, creditNotes, debitNotes, selectedYear]);
+  }, [invoiceDetails, selectedYear]);
 
   const salesByColorData: ColorSalesData[] = useMemo(() => {
     const salesByColor: Record<string, { totalSales: number; colorHex: string }> = {};
@@ -182,9 +202,9 @@ export function ReportsClient() {
     }).format(value);
   };
   
-  const totalSales = monthlyData.reduce((acc, data) => acc + data.sales, 0);
-  const totalPurchases = monthlyData.reduce((acc, data) => acc + data.purchases, 0);
-  const totalProfit = monthlyData.reduce((acc, data) => acc + data.profit, 0);
+  const totalSales = invoiceDetails.reduce((acc, data) => acc + data.chargeClient, 0);
+  const totalPurchases = invoiceDetails.reduce((acc, data) => acc + data.chargeFarm, 0);
+  const totalProfit = invoiceDetails.reduce((acc, data) => acc + data.profit, 0);
 
   const getMonthName = (monthNumber: string) => {
       const year = selectedYear !== 'all' ? parseInt(selectedYear) : new Date().getFullYear();
@@ -328,27 +348,33 @@ export function ReportsClient() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>{t('reports.month')}</TableHead>
-                <TableHead className="text-right">{t('reports.sales')}</TableHead>
-                <TableHead className="text-right">{t('reports.purchases')}</TableHead>
-                <TableHead className="text-right">{t('reports.profit')}</TableHead>
+                <TableHead>{t('reports.table.date')}</TableHead>
+                <TableHead>{t('reports.table.invoice')}</TableHead>
+                <TableHead>{t('reports.table.farm')}</TableHead>
+                <TableHead>{t('reports.table.customer')}</TableHead>
+                <TableHead className="text-right">{t('reports.table.chargeFarm')}</TableHead>
+                <TableHead className="text-right">{t('reports.table.chargeClient')}</TableHead>
+                <TableHead className="text-right">{t('reports.table.profit')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-              {monthlyData.map((data) => (
-                <TableRow key={data.month}>
-                  <TableCell className="font-medium">{getXAxisFormatter(data.month)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(data.sales)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(data.purchases)}</TableCell>
+              {invoiceDetails.map((data) => (
+                <TableRow key={data.id}>
+                  <TableCell>{format(parseISO(data.date), 'dd/MM/yyyy')}</TableCell>
+                  <TableCell className="font-medium">{data.invoiceNumber}</TableCell>
+                  <TableCell>{data.farmName}</TableCell>
+                  <TableCell>{data.customerName}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(data.chargeFarm)}</TableCell>
+                  <TableCell className="text-right">{formatCurrency(data.chargeClient)}</TableCell>
                   <TableCell className="text-right font-semibold">{formatCurrency(data.profit)}</TableCell>
                 </TableRow>
               ))}
             </TableBody>
              <TableFooter>
                 <TableRow className="font-bold text-lg">
-                    <TableCell>Total</TableCell>
-                    <TableCell className="text-right">{formatCurrency(totalSales)}</TableCell>
+                    <TableCell colSpan={4}>{t('reports.table.total')}</TableCell>
                     <TableCell className="text-right">{formatCurrency(totalPurchases)}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(totalSales)}</TableCell>
                     <TableCell className="text-right">{formatCurrency(totalProfit)}</TableCell>
                 </TableRow>
             </TableFooter>

@@ -66,7 +66,17 @@
     "filterByYear": "Filtrar por Año",
     "allYears": "Todos los Años",
     "filterByMonth": "Filtrar por Mes",
-    "allMonths": "Todos los Meses"
+    "allMonths": "Todos los Meses",
+    "table": {
+      "date": "Fecha",
+      "invoice": "Factura",
+      "farm": "Finca",
+      "customer": "Cliente",
+      "chargeFarm": "Cargo Finca",
+      "chargeClient": "Cargo Cliente",
+      "profit": "Utilidad",
+      "total": "Total"
+    }
   },
   "invoices": {
     "title": "Facturas",
@@ -728,7 +738,8 @@
     "unknownError": "Error desconocido",
     "downloadSuccess": "El archivo {fileName} se ha descargado.",
     "excelError": "Ocurrió un error inesperado al generar el archivo Excel.",
-    "allDates": "Todas las fechas"
+    "allDates": "Todas las fechas",
+    "unknown": "Desconocido"
   },
   "accountsPayable": {
     "title": "Cuentas por Pagar",
