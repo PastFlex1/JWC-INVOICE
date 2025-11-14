@@ -8,6 +8,7 @@
     "invoices": "Invoices",
     "customers": "Customers",
     "reports": "Reports",
+    "comparativeReport": "Comparative Report",
     "configuration": "Configuration",
     "settings": "Settings",
     "viewPayments": "View Payments",
@@ -34,8 +35,7 @@
     "historicalAccountStatement_client": "Historical Statement (Client)",
     "historicalAccountStatement_farm": "Historical Statement (Farm)",
     "registerPayment": "Register Payment",
-    "registerPurchasePayment": "Register Purchase Payment",
-    "comparativeSalesReport": "Comparative Sales Report"
+    "registerPurchasePayment": "Register Purchase Payment"
   },
   "masterTables": {
     "products": "Products",

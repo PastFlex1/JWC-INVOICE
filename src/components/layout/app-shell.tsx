@@ -93,6 +93,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { href: '/accounts-payable', label: t('sidebar.accountsPayable'), icon: Receipt },
     { href: '/view-payments', label: t('sidebar.viewPayments'), icon: BookCheck },
     { href: '/reports', label: t('sidebar.reports'), icon: LineChart },
+    { href: '/reports/comparative-sales', label: t('sidebar.comparativeReport'), icon: BarChartHorizontal },
   ];
   
   const documentsNavItems = [
@@ -106,7 +107,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { href: '/historical-farm-account-statement', label: t('documents.historicalAccountStatement_farm'), icon: Archive },
     { href: '/payments', label: t('documents.registerPayment'), icon: Banknote },
     { href: '/record-purchase-payment', label: t('documents.registerPurchasePayment'), icon: CreditCard },
-    { href: '/reports/comparative-sales', label: t('documents.comparativeSalesReport'), icon: BarChartHorizontal },
   ];
 
   const settingsNavItems = [
