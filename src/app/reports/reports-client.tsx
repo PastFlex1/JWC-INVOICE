@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useMemo, useState } from 'react';
@@ -7,12 +8,22 @@ import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, Responsive
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import type { Invoice, CreditNote, DebitNote, BunchItem, Producto } from '@/lib/types';
+import type { Invoice, CreditNote, DebitNote, BunchItem, Producto, Financials, Customer, Carguera, Consignatario, Pais } from '@/lib/types';
 import { format, parseISO, getYear } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
 import { Button } from '@/components/ui/button';
-import Link from 'next/link';
 import { Eye } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+} from '@/components/ui/alert-dialog';
+import { InvoiceDetailView } from '@/app/invoices/[id]/invoice-detail-view';
+
 
 type MonthlyData = {
   month: string;
@@ -39,6 +50,15 @@ type InvoiceDetailReport = {
   profit: number;
 };
 
+type PreviewData = {
+  invoice: Invoice;
+  customer: Customer | null;
+  consignatario: Consignatario | null;
+  carguera: Carguera | null;
+  pais: Pais | null;
+  financials: Financials;
+};
+
 const CustomYAxisTick = (props: any) => {
   const { x, y, payload } = props;
   return (
@@ -51,7 +71,7 @@ const CustomYAxisTick = (props: any) => {
 };
 
 export function ReportsClient() {
-  const { invoices, creditNotes, debitNotes, fincas, customers, productos } = useAppData();
+  const { invoices, creditNotes, debitNotes, fincas, customers, productos, cargueras, consignatarios, paises, payments } = useAppData();
   const { t, locale } = useTranslation();
   const dateLocale = useMemo(() => (locale === 'es' ? es : enUS), [locale]);
 
@@ -59,6 +79,7 @@ export function ReportsClient() {
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('all');
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [previewData, setPreviewData] = useState<PreviewData | null>(null);
 
   const availableYears = useMemo(() => {
     const years = new Set(invoices.map(inv => getYear(parseISO(inv.farmDepartureDate))));
@@ -97,8 +118,7 @@ export function ReportsClient() {
   const invoiceDetails: InvoiceDetailReport[] = useMemo(() => {
     const fincaMap = new Map(fincas.map(f => [f.id, f.name]));
     const customerMap = new Map(customers.map(c => [c.id, c.name]));
-    const filteredInvoiceIds = new Set(filteredInvoices.map(inv => inv.id));
-
+    
     return filteredInvoices.map(invoice => {
         let saleValue = 0;
         let purchaseValue = 0;
@@ -202,6 +222,25 @@ export function ReportsClient() {
       .slice(0, 15); // Top 15 colors
   }, [filteredInvoices, productos]);
 
+  const handlePreviewClick = (invoiceId: string) => {
+    const invoice = invoices.find(inv => inv.id === invoiceId);
+    if (!invoice) return;
+
+    const customer = customers.find(c => c.id === invoice.customerId) || null;
+    const consignatario = invoice.consignatarioId ? consignatarios.find(c => c.id === invoice.consignatarioId) : null;
+    const carguera = invoice.carrierId ? cargueras.find(c => c.id === invoice.carrierId) : null;
+    const pais = invoice.countryId ? paises.find(p => p.id === invoice.countryId) : null;
+
+    const financials: Financials = {
+      payments: payments.filter(p => p.invoiceId === invoice.id),
+      creditNotes: creditNotes.filter(cn => cn.invoiceId === invoice.id),
+      debitNotes: debitNotes.filter(dn => dn.invoiceId === invoice.id),
+    };
+
+    setPreviewData({ invoice, customer, consignatario, carguera, pais, financials });
+  };
+
+
   const formatCurrency = (value: number) => {
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
@@ -228,6 +267,7 @@ export function ReportsClient() {
   };
 
   return (
+    <>
     <div className="space-y-6">
       <div>
         <h2 className="text-3xl font-bold tracking-tight font-headline">{t('reports.title')}</h2>
@@ -379,10 +419,8 @@ export function ReportsClient() {
                   <TableCell className="text-right">{formatCurrency(data.chargeClient)}</TableCell>
                   <TableCell className="text-right font-semibold">{formatCurrency(data.profit)}</TableCell>
                   <TableCell className="text-right">
-                    <Button asChild variant="ghost" size="icon" title={t('invoices.view.invoiceTitle')}>
-                      <Link href={`/invoices/${data.id}`}>
-                        <Eye className="h-4 w-4" />
-                      </Link>
+                    <Button variant="ghost" size="icon" title={t('invoices.view.invoiceTitle')} onClick={() => handlePreviewClick(data.id)}>
+                      <Eye className="h-4 w-4" />
                     </Button>
                   </TableCell>
                 </TableRow>
@@ -402,5 +440,32 @@ export function ReportsClient() {
         </CardContent>
       </Card>
     </div>
+
+    <AlertDialog open={!!previewData} onOpenChange={() => setPreviewData(null)}>
+        <AlertDialogContent className="sm:max-w-6xl h-[90vh] flex flex-col">
+            <AlertDialogHeader>
+                <AlertDialogTitle>{t('invoices.view.invoiceTitle')} #{previewData?.invoice.invoiceNumber}</AlertDialogTitle>
+                <AlertDialogDescription>
+                    {t('invoices.historyDescription')}
+                </AlertDialogDescription>
+            </AlertDialogHeader>
+            <div className="flex-grow overflow-y-auto">
+              {previewData && (
+                <InvoiceDetailView
+                  invoice={previewData.invoice}
+                  customer={previewData.customer}
+                  consignatario={previewData.consignatario}
+                  carguera={previewData.carguera}
+                  pais={previewData.pais}
+                  financials={previewData.financials}
+                />
+              )}
+            </div>
+            <AlertDialogFooter>
+                <AlertDialogCancel onClick={() => setPreviewData(null)}>{t('common.cancel')}</AlertDialogCancel>
+            </AlertDialogFooter>
+        </AlertDialogContent>
+    </AlertDialog>
+    </>
   );
 }
