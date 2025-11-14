@@ -6,7 +6,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format, toDate, parseISO, addDays } from 'date-fns';
-import { CalendarIcon, Trash2, PlusCircle, Loader2 } from 'lucide-react';
+import { CalendarIcon, Trash2, PlusCircle, Loader2, ChevronsUpDown } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Button } from '@/components/ui/button';
@@ -101,6 +101,7 @@ export function NewInvoiceForm() {
   const [filteredConsignatarios, setFilteredConsignatarios] = useState<typeof consignatarios>([]);
   const [filteredMarcaciones, setFilteredMarcaciones] = useState<typeof marcaciones>([]);
   const [itemToDelete, setItemToDelete] = useState<{ lineItemIndex: number; bunchIndex: number } | null>(null);
+  const [isReferenceOpen, setIsReferenceOpen] = useState(false);
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
@@ -172,6 +173,7 @@ export function NewInvoiceForm() {
 
   const farmDepartureDate = form.watch('farmDepartureDate');
   const watchedItems = form.watch('items');
+  const referenceValue = form.watch('reference');
 
   useEffect(() => {
     if (farmDepartureDate && form.formState.dirtyFields.farmDepartureDate) {
@@ -394,6 +396,13 @@ export function NewInvoiceForm() {
         form.setValue(`${bunchPath}.stemsPerBunch`, colorData.tallosPorRamo);
     }
   };
+
+  const suggestedMarcaciones = useMemo(() => {
+    if (!referenceValue) return filteredMarcaciones;
+    return filteredMarcaciones.filter(m => 
+      m.numeroMarcacion.toLowerCase().includes(referenceValue.toLowerCase())
+    );
+  }, [referenceValue, filteredMarcaciones]);
 
 
   async function onSubmit(values: InvoiceFormValues) {
@@ -719,20 +728,44 @@ export function NewInvoiceForm() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>{t('invoices.new.reference')}</FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value ?? ''} disabled={!selectedCustomerId || filteredMarcaciones.length === 0}>
-                      <FormControl>
-                        <SelectTrigger>
-                          <SelectValue placeholder={!selectedCustomerId ? t('invoices.new.selectCustomerFirst') : filteredMarcaciones.length === 0 ? t('invoices.new.noMarkings') : t('invoices.new.markingPlaceholder')} />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent>
-                        {filteredMarcaciones.map((m) => (
-                          <SelectItem key={m.id} value={m.numeroMarcacion}>
-                            {m.numeroMarcacion}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <Popover open={isReferenceOpen} onOpenChange={setIsReferenceOpen}>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant="outline"
+                            role="combobox"
+                            className={cn("w-full justify-between", !field.value && "text-muted-foreground")}
+                            disabled={!selectedCustomerId || filteredMarcaciones.length === 0}
+                          >
+                            {field.value || (!selectedCustomerId ? t('invoices.new.selectCustomerFirst') : filteredMarcaciones.length === 0 ? t('invoices.new.noMarkings') : t('invoices.new.markingPlaceholder'))}
+                            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-[--radix-popover-trigger-width] p-0">
+                        <Input
+                          placeholder={t('invoices.new.markingPlaceholder')}
+                          className="h-9"
+                          value={field.value}
+                          onChange={field.onChange}
+                          onFocus={() => setIsReferenceOpen(true)}
+                        />
+                        <div className="max-h-60 overflow-auto">
+                          {suggestedMarcaciones.map((m) => (
+                            <div
+                              key={m.id}
+                              onClick={() => {
+                                form.setValue('reference', m.numeroMarcacion);
+                                setIsReferenceOpen(false);
+                              }}
+                              className="p-2 text-sm hover:bg-accent cursor-pointer"
+                            >
+                              {m.numeroMarcacion}
+                            </div>
+                          ))}
+                        </div>
+                      </PopoverContent>
+                    </Popover>
                     <FormMessage />
                   </FormItem>
                 )}
