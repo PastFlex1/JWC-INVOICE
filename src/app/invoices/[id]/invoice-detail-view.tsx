@@ -29,18 +29,19 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
     let totalBoxTypeValue = 0;
 
     invoice?.items?.forEach(item => {
-      totalBoxes += 1;
-      totalBoxTypeValue += boxTypeValues[item.boxType] || 0;
+      const numBoxes = Number(item.boxNumber) || 1;
+      totalBoxes += numBoxes;
+      totalBoxTypeValue += (boxTypeValues[item.boxType] || 0) * numBoxes;
       if (item.bunches && Array.isArray(item.bunches)) {
         item.bunches.forEach(bunch => {
           const bunchesCount = Number(bunch.bunchesPerBox) || 0;
           const stemsPerBunch = Number(bunch.stemsPerBunch) || 0;
           const price = invoice.type === 'purchase' ? (Number(bunch.purchasePrice) || 0) : (Number(bunch.salePrice) || 0);
 
-          totalBunches += bunchesCount;
+          totalBunches += bunchesCount * numBoxes;
           const stemsInBunch = bunchesCount * stemsPerBunch;
-          totalStems += stemsInBunch;
-          totalFob += stemsInBunch * price;
+          totalStems += stemsInBunch * numBoxes;
+          totalFob += (stemsInBunch * price) * numBoxes;
         });
       }
     });
@@ -54,6 +55,7 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
 
   const renderItemRow = (item: LineItem, index: number) => {
     const itemBoxValue = boxTypeValues[item.boxType] || 0;
+    const numBoxes = item.boxNumber || 1;
 
     return (
        <React.Fragment key={item.id || index}>
@@ -62,20 +64,20 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
             const bunchesPerBox = bunch.bunchesPerBox || 0;
             const pricePerStem = invoice.type === 'purchase' ? bunch.purchasePrice : bunch.salePrice;
 
-            const totalStemsForBunch = stemsPerBunch * bunchesPerBox;
+            const totalStemsForBunch = stemsPerBunch * bunchesPerBox * numBoxes;
             const totalPrice = totalStemsForBunch * pricePerStem;
             
             return (
                  <div key={bunch.id || bunchIndex} className="contents text-[10px] leading-tight">
-                    <div className="border-b border-l border-gray-400 p-1 text-center">{bunchIndex === 0 ? item.boxNumber : ''}</div>
+                    <div className="border-b border-l border-gray-400 p-1 text-center">{bunchIndex === 0 ? numBoxes : ''}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-center">{bunchIndex === 0 ? item.boxType.toUpperCase() : ''}</div>
-                    <div className="border-b border-l border-gray-400 p-1 text-center">{bunchIndex === 0 ? itemBoxValue.toFixed(2) : ''}</div>
+                    <div className="border-b border-l border-gray-400 p-1 text-center">{bunchIndex === 0 ? (itemBoxValue * numBoxes).toFixed(2) : ''}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-left">{invoice.reference}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-left">{bunch.product}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-left">{bunch.variety}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-center">{bunch.length}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-center">{totalStemsForBunch}</div>
-                    <div className="border-b border-l border-gray-400 p-1 text-center">{bunchesPerBox}</div>
+                    <div className="border-b border-l border-gray-400 p-1 text-center">{bunchesPerBox * numBoxes}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-right">{pricePerStem.toFixed(3)}</div>
                     <div className="border-b border-r border-l border-gray-400 p-1 text-right font-semibold">${totalPrice.toFixed(2)}</div>
                 </div>
