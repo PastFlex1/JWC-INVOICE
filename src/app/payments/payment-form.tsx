@@ -508,13 +508,13 @@ export function PaymentForm({
                     {(bankFeePreview ?? 0) > 0 && (
                         <TableRow>
                             <TableCell>{t('payments.dialog.bankFee')}</TableCell>
-                            <TableCell className="text-right">-${(bankFeePreview ?? 0).toFixed(2)}</TableCell>
+                            <TableCell className="text-right">-${(Number(bankFeePreview) || 0).toFixed(2)}</TableCell>
                         </TableRow>
                     )}
                      <TableRow className="font-bold bg-muted/50">
                         <TableCell>{t('payments.dialog.total')}</TableCell>
                         <TableCell className="text-right">
-                           ${((paymentPreview?.reduce((acc, p) => acc + p.amountToApply, 0) || 0) + (bankFeePreview ?? 0)).toFixed(2)}
+                           ${((paymentPreview?.reduce((acc, p) => acc + p.amountToApply, 0) || 0) - (Number(bankFeePreview) || 0)).toFixed(2)}
                         </TableCell>
                     </TableRow>
                 </TableBody>

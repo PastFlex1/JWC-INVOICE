@@ -94,59 +94,64 @@ export async function addBulkPayment(
 ): Promise<void> {
   if (!db) throw new Error("Firebase is not configured. Check your .env file.");
 
-  const batch = writeBatch(db);
+  await runTransaction(db, async (transaction) => {
+    // 1. Handle Bank Fee by creating a Credit Note
+    if (bankFee && bankFee > 0 && invoicesToPay.length > 0) {
+      const firstInvoice = invoicesToPay[0];
+      const creditNoteRef = doc(collection(db, 'creditNotes'));
+      const invoiceDoc = await transaction.get(doc(db, 'invoices', firstInvoice.invoiceId));
+      const invoiceData = invoiceDoc.data();
+      
+      const creditNoteData = {
+        invoiceId: firstInvoice.invoiceId,
+        amount: bankFee,
+        reason: 'Costo Bancario',
+        date: new Date(paymentData.paymentDate),
+        type: paymentData.type,
+        invoiceNumber: invoiceData?.invoiceNumber || '',
+      };
+      transaction.set(creditNoteRef, creditNoteData);
 
-  if (bankFee && bankFee > 0 && invoicesToPay.length > 0) {
-    const firstInvoice = invoicesToPay[0];
-    const creditNoteRef = doc(collection(db, 'creditNotes'));
-    const creditNoteData = {
-      invoiceId: firstInvoice.invoiceId,
-      amount: bankFee,
-      reason: 'Costo Bancario',
-      date: new Date(paymentData.paymentDate),
-      type: paymentData.type,
-      invoiceNumber: (await getDoc(doc(db, 'invoices', firstInvoice.invoiceId))).data()?.invoiceNumber || '',
-    };
-    batch.set(creditNoteRef, creditNoteData);
-  }
-
-  for (const invoice of invoicesToPay) {
-    if (invoice.amountToPay <= 0) continue;
-
-    const newPaymentRef = doc(collection(db, 'payments'));
-    const newPaymentData = {
-      ...paymentData,
-      invoiceId: invoice.invoiceId,
-      amount: invoice.amountToPay,
-      paymentDate: new Date(paymentData.paymentDate),
-    };
-    batch.set(newPaymentRef, newPaymentData);
-
-    let newBalance = invoice.balance - invoice.amountToPay;
-    if (bankFee && bankFee > 0 && invoice.invoiceId === invoicesToPay[0].invoiceId) {
-        newBalance -= bankFee;
+      // Also adjust the balance of the first invoice to account for the new credit note
+      invoicesToPay[0].balance -= bankFee;
     }
 
-    const isPaid = newBalance <= 0.01;
-    const dueDate = new Date(invoice.farmDepartureDate);
-    dueDate.setDate(dueDate.getDate() + 30); // Assuming 30 days payment term
-    const newStatus = isPaid ? 'Paid' : (new Date() > dueDate ? 'Overdue' : 'Pending');
+    // 2. Process payments for each selected invoice
+    for (const invoice of invoicesToPay) {
+      if (invoice.amountToPay <= 0) continue;
 
-    const invoiceRef = doc(db, 'invoices', invoice.invoiceId);
-    const updatePayload: { saleStatus?: string; purchaseStatus?: string } = {};
-    
-    if (paymentData.type === 'sale') {
-        updatePayload.saleStatus = newStatus;
-    } else if (paymentData.type === 'purchase') {
-        updatePayload.purchaseStatus = newStatus;
+      const newPaymentRef = doc(collection(db, 'payments'));
+      const newPaymentData = {
+        ...paymentData,
+        invoiceId: invoice.invoiceId,
+        amount: invoice.amountToPay,
+        paymentDate: new Date(paymentData.paymentDate),
+      };
+      transaction.set(newPaymentRef, newPaymentData);
+
+      // 3. Update invoice status based on new balance
+      const newBalance = invoice.balance - invoice.amountToPay;
+      const isPaid = newBalance <= 0.01; // Using a small threshold for floating point inaccuracies
+      
+      const dueDate = new Date(invoice.farmDepartureDate);
+      dueDate.setDate(dueDate.getDate() + 30); // Assuming 30 days payment term
+      const newStatus = isPaid ? 'Paid' : (new Date() > dueDate ? 'Overdue' : 'Pending');
+
+      const invoiceRef = doc(db, 'invoices', invoice.invoiceId);
+      const updatePayload: { saleStatus?: string; purchaseStatus?: string } = {};
+      
+      if (invoice.type === 'sale' || (invoice.type === 'both' && paymentData.type === 'sale')) {
+          updatePayload.saleStatus = newStatus;
+      }
+      if (invoice.type === 'purchase' || (invoice.type === 'both' && paymentData.type === 'purchase')) {
+          updatePayload.purchaseStatus = newStatus;
+      }
+
+      if (Object.keys(updatePayload).length > 0) {
+        transaction.update(invoiceRef, updatePayload);
+      }
     }
-
-    if (Object.keys(updatePayload).length > 0) {
-      batch.update(invoiceRef, updatePayload);
-    }
-  }
-
-  await batch.commit();
+  });
 }
 
 
