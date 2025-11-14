@@ -60,6 +60,10 @@ export default function PaymentReceiptDownloadPdfButton({ payment }: PaymentRece
         scale: 3,
         useCORS: true,
         logging: false,
+        width: printableElement.scrollWidth,
+        height: printableElement.scrollHeight,
+        windowWidth: document.documentElement.scrollWidth,
+        windowHeight: document.documentElement.scrollHeight,
       });
 
       const imgData = canvas.toDataURL('image/png');
