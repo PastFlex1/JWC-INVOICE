@@ -22,7 +22,9 @@
     "changeLanguage": "Change language"
   },
   "reportsNav": {
-    "title": "Reports",
+    "title": "Reports"
+  },
+  "documents": {
     "creditNotes_client": "Credit Notes (Client)",
     "debitNotes_client": "Debit Notes (Client)",
     "creditNotes_farm": "Credit Notes (Farm)",
@@ -53,7 +55,7 @@
     "chartTitle": "Monthly Performance",
     "colorSalesChartTitle": "Top Selling Flower Colors",
     "colorSalesChartDescription": "Sales distribution by flower color.",
-    "tableTitle": "Monthly Breakdown",
+    "tableTitle": "Detailed Breakdown",
     "month": "Month",
     "sales": "Sales",
     "purchases": "Purchases",
@@ -72,6 +74,7 @@
       "invoice": "Invoice",
       "farm": "Farm",
       "customer": "Customer",
+      "totalStems": "Total Stems",
       "chargeFarm": "Charge Farm",
       "chargeClient": "Charge Client",
       "profit": "Profit",

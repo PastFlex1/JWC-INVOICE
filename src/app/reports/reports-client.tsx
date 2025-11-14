@@ -30,6 +30,7 @@ type InvoiceDetailReport = {
   invoiceNumber: string;
   farmName: string;
   customerName: string;
+  totalStems: number;
   chargeFarm: number;
   chargeClient: number;
   profit: number;
@@ -90,7 +91,7 @@ export function ReportsClient() {
     return filtered;
   }, [invoices, selectedFincaId, selectedCustomerId, selectedYear, selectedMonth]);
   
-  const invoiceDetails = useMemo(() => {
+  const invoiceDetails: InvoiceDetailReport[] = useMemo(() => {
     const fincaMap = new Map(fincas.map(f => [f.id, f.name]));
     const customerMap = new Map(customers.map(c => [c.id, c.name]));
     const filteredInvoiceIds = new Set(filteredInvoices.map(inv => inv.id));
@@ -98,10 +99,12 @@ export function ReportsClient() {
     return filteredInvoices.map(invoice => {
         let saleValue = 0;
         let purchaseValue = 0;
+        let totalStems = 0;
 
         invoice.items.forEach(item => {
             item.bunches.forEach((bunch: BunchItem) => {
                 const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
+                totalStems += stems;
                 if (invoice.type === 'sale' || invoice.type === 'both') {
                     saleValue += stems * bunch.salePrice;
                 }
@@ -130,6 +133,7 @@ export function ReportsClient() {
             invoiceNumber: invoice.invoiceNumber,
             farmName: fincaMap.get(invoice.farmId) || t('common.unknown'),
             customerName: customerMap.get(invoice.customerId) || t('common.unknown'),
+            totalStems: totalStems,
             chargeClient: saleValue,
             chargeFarm: purchaseValue,
             profit: saleValue - purchaseValue,
@@ -205,6 +209,7 @@ export function ReportsClient() {
   const totalSales = invoiceDetails.reduce((acc, data) => acc + data.chargeClient, 0);
   const totalPurchases = invoiceDetails.reduce((acc, data) => acc + data.chargeFarm, 0);
   const totalProfit = invoiceDetails.reduce((acc, data) => acc + data.profit, 0);
+  const totalStems = invoiceDetails.reduce((acc, data) => acc + data.totalStems, 0);
 
   const getMonthName = (monthNumber: string) => {
       const year = selectedYear !== 'all' ? parseInt(selectedYear) : new Date().getFullYear();
@@ -352,6 +357,7 @@ export function ReportsClient() {
                 <TableHead>{t('reports.table.invoice')}</TableHead>
                 <TableHead>{t('reports.table.farm')}</TableHead>
                 <TableHead>{t('reports.table.customer')}</TableHead>
+                <TableHead className="text-right">{t('reports.table.totalStems')}</TableHead>
                 <TableHead className="text-right">{t('reports.table.chargeFarm')}</TableHead>
                 <TableHead className="text-right">{t('reports.table.chargeClient')}</TableHead>
                 <TableHead className="text-right">{t('reports.table.profit')}</TableHead>
@@ -364,6 +370,7 @@ export function ReportsClient() {
                   <TableCell className="font-medium">{data.invoiceNumber}</TableCell>
                   <TableCell>{data.farmName}</TableCell>
                   <TableCell>{data.customerName}</TableCell>
+                  <TableCell className="text-right">{data.totalStems}</TableCell>
                   <TableCell className="text-right">{formatCurrency(data.chargeFarm)}</TableCell>
                   <TableCell className="text-right">{formatCurrency(data.chargeClient)}</TableCell>
                   <TableCell className="text-right font-semibold">{formatCurrency(data.profit)}</TableCell>
@@ -373,6 +380,7 @@ export function ReportsClient() {
              <TableFooter>
                 <TableRow className="font-bold text-lg">
                     <TableCell colSpan={4}>{t('reports.table.total')}</TableCell>
+                    <TableCell className="text-right">{totalStems}</TableCell>
                     <TableCell className="text-right">{formatCurrency(totalPurchases)}</TableCell>
                     <TableCell className="text-right">{formatCurrency(totalSales)}</TableCell>
                     <TableCell className="text-right">{formatCurrency(totalProfit)}</TableCell>

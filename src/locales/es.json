@@ -22,7 +22,9 @@
     "changeLanguage": "Cambiar idioma"
   },
   "reportsNav": {
-    "title": "Reportes",
+    "title": "Reportes"
+  },
+  "documents": {
     "creditNotes_client": "Notas de Crédito (Cliente)",
     "debitNotes_client": "Notas de Débito (Cliente)",
     "creditNotes_farm": "Notas de Crédito (Finca)",
@@ -53,7 +55,7 @@
     "chartTitle": "Rendimiento Mensual",
     "colorSalesChartTitle": "Colores de Flores Más Vendidos",
     "colorSalesChartDescription": "Distribución de ventas por color de flor.",
-    "tableTitle": "Desglose Mensual",
+    "tableTitle": "Desglose Detallado",
     "month": "Mes",
     "sales": "Ventas",
     "purchases": "Compras",
@@ -72,6 +74,7 @@
       "invoice": "Factura",
       "farm": "Finca",
       "customer": "Cliente",
+      "totalStems": "Total Tallos",
       "chargeFarm": "Cargo Finca",
       "chargeClient": "Cargo Cliente",
       "profit": "Utilidad",
