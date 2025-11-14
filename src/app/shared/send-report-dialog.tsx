@@ -24,6 +24,17 @@ import { Loader2, Send } from 'lucide-react';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Textarea } from '@/components/ui/textarea';
 
+const emailListSchema = z.string().refine(
+    (value) => {
+      if (!value) return true; // Optional field
+      const emails = value.split(',').map(email => email.trim()).filter(Boolean);
+      return emails.every(email => z.string().email().safeParse(email).success);
+    },
+    {
+      message: 'Proporcione una lista válida de direcciones de correo electrónico separadas por comas.',
+    }
+);
+
 const formSchema = z.object({
   to: z.string()
     .min(1, 'Se requiere al menos un correo electrónico.')
@@ -37,6 +48,7 @@ const formSchema = z.object({
         message: 'Proporcione una lista válida de direcciones de correo electrónico separadas por comas.',
       }
     ),
+  bcc: emailListSchema.optional(),
   body: z.string().optional(),
 });
 
@@ -64,7 +76,7 @@ export default function SendReportDialog({
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
-    defaultValues: { to: '', body: '' }
+    defaultValues: { to: '', bcc: '', body: '' }
   });
 
   const onSubmit = (values: z.infer<typeof formSchema>) => {
@@ -98,6 +110,7 @@ export default function SendReportDialog({
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 to: values.to,
+                bcc: values.bcc,
                 subject,
                 body,
                 attachments: [{ filename: attachmentFileName, content: pdfBase64 }],
@@ -145,6 +158,19 @@ export default function SendReportDialog({
                     <FormLabel>Para</FormLabel>
                     <FormControl>
                       <Input placeholder="email@ejemplo.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="bcc"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>CCO</FormLabel>
+                    <FormControl>
+                      <Input placeholder="copia@ejemplo.com" {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

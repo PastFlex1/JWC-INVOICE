@@ -25,6 +25,17 @@ import { useTranslation } from '@/context/i18n-context';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Textarea } from '@/components/ui/textarea';
 
+const emailListSchema = z.string().refine(
+    (value) => {
+      if (!value) return true; // Optional field
+      const emails = value.split(',').map(email => email.trim()).filter(Boolean);
+      return emails.every(email => z.string().email().safeParse(email).success);
+    },
+    {
+      message: 'Proporcione una lista válida de direcciones de correo electrónico separadas por comas.',
+    }
+);
+
 const formSchema = z.object({
   to: z.string()
     .min(1, 'Se requiere al menos un correo electrónico.')
@@ -38,6 +49,7 @@ const formSchema = z.object({
         message: 'Proporcione una lista válida de direcciones de correo electrónico separadas por comas.',
       }
     ),
+  bcc: emailListSchema.optional(),
   body: z.string().optional(),
 });
 
@@ -64,6 +76,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
     if (customer && isOpen) {
       form.reset({
         to: customer.email || '',
+        bcc: '',
         body: '',
       });
       setError(null);
@@ -127,6 +140,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
             },
             body: JSON.stringify({
                 to: values.to,
+                bcc: values.bcc,
                 subject,
                 body,
                 attachments: [{
@@ -188,6 +202,19 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
                     <FormLabel>{t('sendInvoiceDialog.to')}</FormLabel>
                     <FormControl>
                       <Input {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="bcc"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('sendInvoiceDialog.bcc')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={t('sendInvoiceDialog.bccPlaceholder')} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

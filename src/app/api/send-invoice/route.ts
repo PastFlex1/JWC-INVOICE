@@ -13,13 +13,15 @@ export async function POST(request: Request) {
     }
 
     const body = await request.json();
-    const { to, subject, body: emailBody, attachments: pdfAttachments } = body;
+    const { to, bcc, subject, body: emailBody, attachments: pdfAttachments } = body;
 
     if (!to || !subject || !emailBody) {
       return NextResponse.json({ message: 'Missing required fields in request.' }, { status: 400 });
     }
 
     const toEmails = to.split(',').map((email: string) => email.trim()).filter(Boolean);
+    const bccEmails = bcc ? bcc.split(',').map((email: string) => email.trim()).filter(Boolean) : [];
+
 
     if (toEmails.length === 0) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
@@ -57,6 +59,7 @@ export async function POST(request: Request) {
     await resend.emails.send({
       from: 'JWC FLOWERS <facturacion@puntodeventastore.store>',
       to: toEmails,
+      bcc: bccEmails.length > 0 ? bccEmails : undefined,
       subject: subject,
       html: emailHtml,
       attachments: attachments,

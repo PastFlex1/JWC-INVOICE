@@ -21,7 +21,8 @@
     "documents": "Documents",
     "changeLanguage": "Change language"
   },
-  "documents": {
+  "reportsNav": {
+    "title": "Reports",
     "creditNotes_client": "Credit Notes (Client)",
     "debitNotes_client": "Debit Notes (Client)",
     "creditNotes_farm": "Credit Notes (Farm)",
@@ -692,6 +693,8 @@
     "title": "Send Invoice via Email",
     "description": "Invoice {invoiceNumber} will be sent to {customerName}. You can add multiple comma-separated emails.",
     "to": "To",
+    "bcc": "BCC",
+    "bccPlaceholder": "bcc@example.com",
     "subject": "Subject",
     "body": "Message Body",
     "bodyPlaceholder": "Write a message to add to the email...",

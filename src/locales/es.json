@@ -21,7 +21,8 @@
     "documents": "Documentos",
     "changeLanguage": "Cambiar idioma"
   },
-  "documents": {
+  "reportsNav": {
+    "title": "Reportes",
     "creditNotes_client": "Notas de Crédito (Cliente)",
     "debitNotes_client": "Notas de Débito (Cliente)",
     "creditNotes_farm": "Notas de Crédito (Finca)",
@@ -692,6 +693,8 @@
     "title": "Enviar Factura por Correo",
     "description": "La factura {invoiceNumber} será enviada a {customerName}. Puede añadir múltiples correos separados por comas.",
     "to": "Para",
+    "bcc": "CCO",
+    "bccPlaceholder": "copia.oculta@ejemplo.com",
     "subject": "Asunto",
     "body": "Cuerpo del Mensaje",
     "bodyPlaceholder": "Escriba un mensaje para añadir al correo...",

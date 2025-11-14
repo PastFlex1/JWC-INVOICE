@@ -25,6 +25,17 @@ import html2canvas from 'html2canvas';
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from '@/context/i18n-context';
 
+const emailListSchema = z.string().refine(
+    (value) => {
+      if (!value) return true; // Optional field
+      const emails = value.split(',').map(email => email.trim()).filter(Boolean);
+      return emails.every(email => z.string().email().safeParse(email).success);
+    },
+    {
+      message: 'Proporcione una lista válida de direcciones de correo electrónico separadas por comas.',
+    }
+);
+
 const HistoricalSendFarmDocumentsDialog = ({ finca, isOpen, onClose }: { finca: Finca | null; isOpen: boolean; onClose: () => void; }) => {
   const { toast } = useToast();
   const { t } = useTranslation();
@@ -44,6 +55,7 @@ const HistoricalSendFarmDocumentsDialog = ({ finca, isOpen, onClose }: { finca: 
           message: t('farmAccountStatement.sendDialog.toInvalid'),
         }
       ),
+    bcc: emailListSchema.optional(),
     body: z.string().optional(),
   }), [t]);
 
@@ -56,6 +68,7 @@ const HistoricalSendFarmDocumentsDialog = ({ finca, isOpen, onClose }: { finca: 
     if (finca && isOpen) {
       form.reset({
         to: finca.email || '', 
+        bcc: '',
         body: '',
       });
       setError(null);
@@ -130,6 +143,7 @@ const HistoricalSendFarmDocumentsDialog = ({ finca, isOpen, onClose }: { finca: 
             },
             body: JSON.stringify({
                 to: values.to,
+                bcc: values.bcc,
                 subject: subject,
                 body: body,
                 attachments,
@@ -189,6 +203,19 @@ const HistoricalSendFarmDocumentsDialog = ({ finca, isOpen, onClose }: { finca: 
                     <FormLabel>{t('sendInvoiceDialog.to')}</FormLabel>
                     <FormControl>
                       <Input placeholder="proveedor@email.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+               <FormField
+                control={form.control}
+                name="bcc"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('sendInvoiceDialog.bcc')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={t('sendInvoiceDialog.bccPlaceholder')} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>

@@ -25,6 +25,17 @@ import html2canvas from 'html2canvas';
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from '@/context/i18n-context';
 
+const emailListSchema = z.string().refine(
+    (value) => {
+      if (!value) return true; // Optional field
+      const emails = value.split(',').map(email => email.trim()).filter(Boolean);
+      return emails.every(email => z.string().email().safeParse(email).success);
+    },
+    {
+      message: 'Proporcione una lista válida de direcciones de correo electrónico separadas por comas.',
+    }
+);
+
 const formSchema = z.object({
   to: z.string()
     .min(1, 'Se requiere al menos un correo electrónico.')
@@ -38,6 +49,7 @@ const formSchema = z.object({
         message: 'Proporcione una lista válida de direcciones de correo electrónico separadas por comas.',
       }
     ),
+  bcc: emailListSchema.optional(),
   body: z.string().optional(),
 });
 
@@ -102,6 +114,7 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
     if (finca && isOpen) {
       form.reset({
         to: finca.email || '', 
+        bcc: '',
         body: '',
       });
       setError(null);
@@ -138,6 +151,7 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
             },
             body: JSON.stringify({
                 to: values.to,
+                bcc: values.bcc,
                 subject: subject,
                 body: body,
                 attachments,
@@ -176,9 +190,9 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)}>
             <DialogHeader>
-              <DialogTitle>{t('farmAccountStatement.sendDocumentsDialog.title')}</DialogTitle>
+              <DialogTitle>{t('farmAccountStatement.sendDialog.title')}</DialogTitle>
               <DialogDescription>
-                {t('farmAccountStatement.sendDocumentsDialog.description', { farmName: finca.name })}
+                {t('farmAccountStatement.sendDialog.description', { farmName: finca.name })}
               </DialogDescription>
             </DialogHeader>
 
@@ -198,6 +212,19 @@ export default function SendFarmDocumentsDialog({ finca, invoices, isOpen, onClo
                     <FormLabel>{t('sendInvoiceDialog.to')}</FormLabel>
                     <FormControl>
                       <Input placeholder="proveedor@email.com" {...field} />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="bcc"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>{t('sendInvoiceDialog.bcc')}</FormLabel>
+                    <FormControl>
+                      <Input {...field} placeholder={t('sendInvoiceDialog.bccPlaceholder')} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
