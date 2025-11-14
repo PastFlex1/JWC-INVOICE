@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -90,4 +91,3 @@ export function EditPaymentDialog({ isOpen, onClose, paymentDetail, onSave }: Ed
     </Dialog>
   );
 }
-```
