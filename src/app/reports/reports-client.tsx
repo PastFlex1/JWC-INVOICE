@@ -3,7 +3,7 @@
 import { useMemo, useState } from 'react';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cell } from 'recharts';
+import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cell, Text } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -22,6 +22,17 @@ type ColorSalesData = {
   nombreColor: string;
   totalSales: number;
   colorHex: string;
+};
+
+const CustomYAxisTick = (props: any) => {
+  const { x, y, payload } = props;
+  return (
+    <g transform={`translate(${x},${y})`}>
+      <Text x={0} y={0} dy={0} textAnchor="end" fill="#666" width={140} style={{ whiteSpace: 'normal' }}>
+        {payload.value}
+      </Text>
+    </g>
+  );
 };
 
 export function ReportsClient() {
@@ -293,10 +304,10 @@ export function ReportsClient() {
         </CardHeader>
         <CardContent>
           <ResponsiveContainer width="100%" height={400}>
-            <BarChart data={salesByColorData} layout="vertical">
+            <BarChart data={salesByColorData} layout="vertical" margin={{ left: 30 }}>
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis type="number" tickFormatter={(value) => formatCurrency(value)} />
-              <YAxis type="category" dataKey="nombreColor" width={120} />
+              <YAxis type="category" dataKey="nombreColor" width={150} tick={<CustomYAxisTick />} />
               <Tooltip formatter={(value: number) => formatCurrency(value)} />
               <Legend />
               <Bar dataKey="totalSales" name={t('reports.sales')} layout="vertical">
