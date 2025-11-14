@@ -176,8 +176,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         <SidebarFooter className="p-4 mt-auto transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">
            <div className="flex items-center gap-3 w-full px-2 h-12">
               <div className="flex flex-col items-start">
-                 <span className="font-medium">{t('sidebar.devMode')}</span>
-                 <span className="text-xs text-muted-foreground">{t('sidebar.dbAccess')}</span>
+                 <span className="font-medium">V1.0.1</span>
               </div>
             </div>
         </SidebarFooter>
