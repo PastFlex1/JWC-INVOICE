@@ -872,6 +872,7 @@
       "paymentMethodPlaceholder": "Seleccione un método",
       "reference": "Referencia / Banco",
       "referencePlaceholder": "Ej: Banco Pichincha",
+      "bankFee": "Costo Bancario",
       "notes": "Notas Adicionales",
       "notesPlaceholder": "Ej: Pago masivo de facturas de Septiembre",
       "previewButton": "Previsualizar Pago",
@@ -896,6 +897,7 @@
       "description": "El monto total se aplicará a las facturas seleccionadas de la siguiente manera. ¿Desea continuar?",
       "invoiceNo": "N° Factura",
       "amountToApply": "Monto a Aplicar",
+      "bankFee": "Costo Bancario",
       "total": "Total",
       "confirmButton": "Confirmar y Guardar"
     }

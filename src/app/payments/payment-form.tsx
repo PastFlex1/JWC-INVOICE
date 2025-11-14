@@ -53,6 +53,7 @@ const formSchema = z.object({
   paymentDate: z.date({ required_error: "La fecha es requerida." }),
   paymentMethod: z.enum(['Efectivo', 'Transferencia', 'Cheque', 'Tarjeta de Crédito', 'Tarjeta de Débito', 'Transferencia Internacional']),
   reference: z.string().optional(),
+  bankFee: z.coerce.number().min(0).optional(),
   notes: z.string().optional(),
 }).refine(data => data.paymentInvoices.some(inv => inv.isSelected), {
     message: "Debe seleccionar al menos una factura.",
@@ -71,7 +72,11 @@ type PaymentFormData = z.infer<typeof formSchema>;
 type FormSubmitData = Omit<Payment, 'id' | 'invoiceId' | 'amount'>;
 
 type PaymentFormProps = {
-  onSubmit: (paymentDetails: FormSubmitData, selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', farmDepartureDate: string, amountToPay: number }[]) => Promise<boolean>;
+  onSubmit: (
+    paymentDetails: FormSubmitData,
+    selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', farmDepartureDate: string, amountToPay: number }[],
+    bankFee?: number
+  ) => Promise<boolean>;
   isSubmitting: boolean;
   customers: Customer[];
   fincas: Finca[];
@@ -97,6 +102,7 @@ export function PaymentForm({
 }: PaymentFormProps) {
   const { t } = useTranslation();
   const [paymentPreview, setPaymentPreview] = useState<{ invoiceNumber: string; amountToApply: number }[] | null>(null);
+  const [bankFeePreview, setBankFeePreview] = useState<number | undefined>(undefined);
 
   const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
   const consignatarioMap = useMemo(() => new Map(consignatarios.map(c => [c.id, c.nombreConsignatario])), [consignatarios]);
@@ -110,6 +116,7 @@ export function PaymentForm({
       paymentDate: new Date(),
       paymentMethod: 'Transferencia',
       reference: '',
+      bankFee: 0,
       notes: '',
     },
   });
@@ -190,6 +197,7 @@ export function PaymentForm({
     form.trigger().then(isValid => {
         if (!isValid) {
             setPaymentPreview(null);
+            setBankFeePreview(undefined);
             return;
         }
 
@@ -198,11 +206,12 @@ export function PaymentForm({
             .map(inv => ({ invoiceNumber: inv.invoiceNumber, amountToApply: inv.amountToPay! }));
         
         setPaymentPreview(preview);
+        setBankFeePreview(form.getValues('bankFee'));
     });
   };
 
   async function handleSubmit(values: PaymentFormData) {
-    const { entityId, ...paymentDetails } = values;
+    const { entityId, bankFee, ...paymentDetails } = values;
     
     const invoicesToPay = values.paymentInvoices
       .filter(inv => inv.isSelected && (inv.amountToPay || 0) > 0)
@@ -226,7 +235,7 @@ export function PaymentForm({
       notes: paymentDetails.notes,
     };
 
-    const success = await onSubmit(finalPaymentDetails, invoicesToPay);
+    const success = await onSubmit(finalPaymentDetails, invoicesToPay, bankFee);
 
     if (success) {
         form.reset({
@@ -234,9 +243,11 @@ export function PaymentForm({
             paymentInvoices: [],
             paymentDate: new Date(),
             reference: '',
+            bankFee: 0,
             notes: '',
         });
         setPaymentPreview(null);
+        setBankFeePreview(undefined);
     }
   }
 
@@ -373,7 +384,7 @@ export function PaymentForm({
 
           {watchedPaymentInvoices.some(inv => inv.isSelected) && (
              <div className="space-y-4 border p-4 rounded-md">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     <FormField control={form.control} name="paymentDate" render={({ field }) => (
                         <FormItem className="flex flex-col">
                         <FormLabel>{t('payments.form.paymentDate')}</FormLabel>
@@ -417,6 +428,19 @@ export function PaymentForm({
                         <FormMessage />
                         </FormItem>
                     )}
+                    />
+                     <FormField
+                        control={form.control}
+                        name="bankFee"
+                        render={({ field }) => (
+                            <FormItem>
+                            <FormLabel>{t('payments.form.bankFee')}</FormLabel>
+                            <FormControl>
+                                <Input type="number" step="0.01" placeholder="0.00" {...field} value={field.value || ''} />
+                            </FormControl>
+                            <FormMessage />
+                            </FormItem>
+                        )}
                     />
                 </div>
                 
@@ -481,10 +505,16 @@ export function PaymentForm({
                             <TableCell className="text-right">${p.amountToApply.toFixed(2)}</TableCell>
                         </TableRow>
                     ))}
+                    {(bankFeePreview ?? 0) > 0 && (
+                        <TableRow>
+                            <TableCell>{t('payments.dialog.bankFee')}</TableCell>
+                            <TableCell className="text-right">-${(bankFeePreview ?? 0).toFixed(2)}</TableCell>
+                        </TableRow>
+                    )}
                      <TableRow className="font-bold bg-muted/50">
                         <TableCell>{t('payments.dialog.total')}</TableCell>
                         <TableCell className="text-right">
-                           ${(paymentPreview?.reduce((acc, p) => acc + p.amountToApply, 0) || 0).toFixed(2)}
+                           ${((paymentPreview?.reduce((acc, p) => acc + p.amountToApply, 0) || 0) + (bankFeePreview ?? 0)).toFixed(2)}
                         </TableCell>
                     </TableRow>
                 </TableBody>

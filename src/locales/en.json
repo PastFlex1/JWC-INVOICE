@@ -872,6 +872,7 @@
       "paymentMethodPlaceholder": "Select a method",
       "reference": "Reference / Bank",
       "referencePlaceholder": "e.g., Bank of America",
+      "bankFee": "Bank Fee",
       "notes": "Additional Notes",
       "notesPlaceholder": "e.g., Bulk payment for September invoices",
       "previewButton": "Preview Payment",
@@ -896,6 +897,7 @@
       "description": "The total amount will be applied to the selected invoices as follows. Do you want to continue?",
       "invoiceNo": "Invoice #",
       "amountToApply": "Amount to Apply",
+      "bankFee": "Bank Fee",
       "total": "Total",
       "confirmButton": "Confirm and Save"
     }

@@ -90,10 +90,25 @@ async function recalculateInvoiceStatus(transaction: any, invoiceId: string, pay
 export async function addBulkPayment(
   paymentData: Omit<Payment, 'id' | 'invoiceId' | 'amount'>, 
   invoicesToPay: { invoiceId: string; balance: number; amountToPay: number; type: 'sale' | 'purchase' | 'both', farmDepartureDate: string }[],
+  bankFee?: number,
 ): Promise<void> {
   if (!db) throw new Error("Firebase is not configured. Check your .env file.");
 
   const batch = writeBatch(db);
+
+  if (bankFee && bankFee > 0 && invoicesToPay.length > 0) {
+    const firstInvoice = invoicesToPay[0];
+    const creditNoteRef = doc(collection(db, 'creditNotes'));
+    const creditNoteData = {
+      invoiceId: firstInvoice.invoiceId,
+      amount: bankFee,
+      reason: 'Costo Bancario',
+      date: new Date(paymentData.paymentDate),
+      type: paymentData.type,
+      invoiceNumber: (await getDoc(doc(db, 'invoices', firstInvoice.invoiceId))).data()?.invoiceNumber || '',
+    };
+    batch.set(creditNoteRef, creditNoteData);
+  }
 
   for (const invoice of invoicesToPay) {
     if (invoice.amountToPay <= 0) continue;
@@ -107,7 +122,11 @@ export async function addBulkPayment(
     };
     batch.set(newPaymentRef, newPaymentData);
 
-    const newBalance = invoice.balance - invoice.amountToPay;
+    let newBalance = invoice.balance - invoice.amountToPay;
+    if (bankFee && bankFee > 0 && invoice.invoiceId === invoicesToPay[0].invoiceId) {
+        newBalance -= bankFee;
+    }
+
     const isPaid = newBalance <= 0.01;
     const dueDate = new Date(invoice.farmDepartureDate);
     dueDate.setDate(dueDate.getDate() + 30); // Assuming 30 days payment term
