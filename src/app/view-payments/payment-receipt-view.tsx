@@ -111,4 +111,3 @@ export function PaymentReceiptView({ payment, t: tProp, onEditPayment, onDeleteP
     </Card>
   );
 }
-```
