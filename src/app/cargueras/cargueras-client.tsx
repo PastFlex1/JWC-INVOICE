@@ -149,7 +149,7 @@ export function CarguerasClient() {
                 <TableRow>
                   <TableHead>{t('cargueras.list.name')}</TableHead>
                   <TableHead>{t('cargueras.list.country')}</TableHead>
-                  <TableHead className="text-right">{t('common.actions')}</TableHead>
+                  <TableHead className="text-right">{t('common.actions.title')}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
