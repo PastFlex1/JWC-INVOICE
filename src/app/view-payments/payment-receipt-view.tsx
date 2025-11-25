@@ -110,13 +110,15 @@ export function PaymentReceiptView({ payment, t: tProp, onEditPayment, onDeleteP
             <TableFooter>
                 {(payment.bankFee || 0) > 0 && (
                     <TableRow>
-                        <TableCell colSpan={isActionable ? 4 : 3} className="text-right">{t('payments.dialog.bankFee')}</TableCell>
+                        <TableCell colSpan={isActionable ? 3 : 2} className="text-right font-medium">{t('payments.dialog.bankFee')}</TableCell>
                         <TableCell className="text-right">-${(payment.bankFee || 0).toFixed(2)}</TableCell>
+                         {isActionable && <TableCell />}
                     </TableRow>
                 )}
                 <TableRow className="font-bold text-lg bg-muted/50">
-                    <TableCell colSpan={isActionable ? 4 : 3} className="text-right">{t('viewPayments.receipt.totalPaid')}</TableCell>
+                    <TableCell colSpan={isActionable ? 3 : 2} className="text-right">{t('viewPayments.receipt.totalPaid')}</TableCell>
                     <TableCell className="text-right">${totalPaid.toFixed(2)}</TableCell>
+                    {isActionable && <TableCell />}
                 </TableRow>
             </TableFooter>
           </Table>
