@@ -136,18 +136,20 @@ export function InvoicesClient() {
     return customerMap[customerId] || null;
   };
 
-  const getInvoiceBalance = (invoice: Invoice) => {
+  const getInvoiceTotal = (invoice: Invoice) => {
     const subtotal = invoice.items.reduce((acc, item) => {
-        if (!item.bunches) return acc;
-        return acc + item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
-            const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
-            return bunchAcc + (stems * bunch.salePrice);
-        }, 0);
+      if (!item.bunches) return acc;
+      return acc + item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
+        const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
+        return bunchAcc + (stems * bunch.salePrice);
+      }, 0);
     }, 0);
 
-    const { credits, debits, payments: totalPayments } = notesAndPaymentsByInvoiceId[invoice.id] || { credits: 0, debits: 0, payments: 0 };
+    const customer = getCustomer(invoice.customerId);
+    const isNational = customer?.type === 'National';
+    const iva = isNational ? subtotal * 0.15 : 0;
     
-    return subtotal + debits - credits - totalPayments;
+    return subtotal + iva;
   };
 
   const handleDeleteClick = (invoice: Invoice) => {
@@ -254,7 +256,7 @@ export function InvoicesClient() {
                 </TableHeader>
                 <TableBody>
                   {paginatedInvoices.map((invoice) => {
-                    const balance = getInvoiceBalance(invoice);
+                    const total = getInvoiceTotal(invoice);
                     return (
                       <TableRow key={invoice.id}>
                         <TableCell className="font-medium">
@@ -264,7 +266,7 @@ export function InvoicesClient() {
                         </TableCell>
                         <TableCell>{getCustomer(invoice.customerId)?.name || t('invoices.unknownCustomer')}</TableCell>
                         <TableCell>{format(parseISO(invoice.farmDepartureDate), 'PPP')}</TableCell>
-                        <TableCell>${balance.toFixed(2)}</TableCell>
+                        <TableCell>${total.toFixed(2)}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
                             <Link href={`/invoices/${invoice.id}`} passHref>

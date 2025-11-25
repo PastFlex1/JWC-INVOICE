@@ -135,20 +135,15 @@ export function AccountsPayableClient() {
     return fincaMap[farmId] || null;
   };
 
-  const getInvoiceBalance = (invoice: Invoice) => {
+  const getInvoiceTotal = (invoice: Invoice) => {
     const subtotal = invoice.items.reduce((acc, item) => {
         if (!item.bunches) return acc;
         return acc + item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
             const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
-            // For accounts payable, always use the purchase price
             return bunchAcc + (stems * bunch.purchasePrice);
         }, 0);
     }, 0);
-
-    const { credits, debits, payments: totalPayments } = notesAndPaymentsByInvoiceId[invoice.id] || { credits: 0, debits: 0, payments: 0 };
-    
-    // For payables, credits decrease what you owe, debits increase it.
-    return subtotal + debits - credits - totalPayments;
+    return subtotal;
   };
 
   const handleDeleteClick = (invoice: Invoice) => {
@@ -254,7 +249,7 @@ export function AccountsPayableClient() {
                 </TableHeader>
                 <TableBody>
                   {paginatedInvoices.map((invoice) => {
-                    const balance = getInvoiceBalance(invoice);
+                    const total = getInvoiceTotal(invoice);
                     return (
                       <TableRow key={invoice.id}>
                         <TableCell className="font-medium">
@@ -264,7 +259,7 @@ export function AccountsPayableClient() {
                         </TableCell>
                         <TableCell>{getFinca(invoice.farmId)?.name || t('invoices.unknownCustomer')}</TableCell>
                         <TableCell>{format(parseISO(invoice.farmDepartureDate), 'PPP')}</TableCell>
-                        <TableCell>${balance.toFixed(2)}</TableCell>
+                        <TableCell>${total.toFixed(2)}</TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
                             <Link href={`/invoices/${invoice.id}`} passHref>
