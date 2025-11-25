@@ -95,12 +95,25 @@ export async function addBulkPayment(
   if (!db) throw new Error("Firebase is not configured. Check your .env file.");
 
   await runTransaction(db, async (transaction) => {
+    const invoiceDocs = new Map<string, DocumentData | undefined>();
+    const invoicesToUpdate = [];
+
+    // --- PHASE 1: READS ---
+    // Pre-fetch all necessary invoice documents.
+    for (const invoice of invoicesToPay) {
+        if (!invoiceDocs.has(invoice.invoiceId)) {
+            const invoiceRef = doc(db, 'invoices', invoice.invoiceId);
+            const invoiceDoc = await transaction.get(invoiceRef);
+            invoiceDocs.set(invoice.invoiceId, invoiceDoc.data());
+        }
+    }
+
+    // --- PHASE 2: WRITES ---
     // 1. Handle Bank Fee by creating a Credit Note
     if (bankFee && bankFee > 0 && invoicesToPay.length > 0) {
       const firstInvoice = invoicesToPay[0];
       const creditNoteRef = doc(collection(db, 'creditNotes'));
-      const invoiceDoc = await transaction.get(doc(db, 'invoices', firstInvoice.invoiceId));
-      const invoiceData = invoiceDoc.data();
+      const invoiceData = invoiceDocs.get(firstInvoice.invoiceId);
       
       const creditNoteData = {
         invoiceId: firstInvoice.invoiceId,
@@ -111,9 +124,9 @@ export async function addBulkPayment(
         invoiceNumber: invoiceData?.invoiceNumber || '',
       };
       transaction.set(creditNoteRef, creditNoteData);
-
-      // Also adjust the balance of the first invoice to account for the new credit note
-      invoicesToPay[0].balance -= bankFee;
+      
+      // Adjust balance for the upcoming payment logic
+      firstInvoice.balance -= bankFee;
     }
 
     // 2. Process payments for each selected invoice
@@ -129,15 +142,14 @@ export async function addBulkPayment(
       };
       transaction.set(newPaymentRef, newPaymentData);
 
-      // 3. Update invoice status based on new balance
+      // 3. Prepare invoice status update
       const newBalance = invoice.balance - invoice.amountToPay;
-      const isPaid = newBalance <= 0.01; // Using a small threshold for floating point inaccuracies
+      const isPaid = newBalance <= 0.01;
       
       const dueDate = new Date(invoice.farmDepartureDate);
-      dueDate.setDate(dueDate.getDate() + 30); // Assuming 30 days payment term
+      dueDate.setDate(dueDate.getDate() + 30);
       const newStatus = isPaid ? 'Paid' : (new Date() > dueDate ? 'Overdue' : 'Pending');
 
-      const invoiceRef = doc(db, 'invoices', invoice.invoiceId);
       const updatePayload: { saleStatus?: string; purchaseStatus?: string } = {};
       
       if (invoice.type === 'sale' || (invoice.type === 'both' && paymentData.type === 'sale')) {
@@ -148,8 +160,14 @@ export async function addBulkPayment(
       }
 
       if (Object.keys(updatePayload).length > 0) {
-        transaction.update(invoiceRef, updatePayload);
+        invoicesToUpdate.push({ id: invoice.invoiceId, payload: updatePayload });
       }
+    }
+
+    // 4. Apply all invoice status updates
+    for (const { id, payload } of invoicesToUpdate) {
+        const invoiceRef = doc(db, 'invoices', id);
+        transaction.update(invoiceRef, payload);
     }
   });
 }
