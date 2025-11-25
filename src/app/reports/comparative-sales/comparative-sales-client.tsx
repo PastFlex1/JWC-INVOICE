@@ -3,9 +3,11 @@
 import { useMemo, useState } from 'react';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 import type { Invoice, BunchItem } from '@/lib/types';
 import { format, parseISO, getYear, getMonth } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
@@ -30,15 +32,21 @@ export function ComparativeSalesClient() {
   const [selectedFincaId, setSelectedFincaId] = useState<string>('all');
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
-  const [selectedYear, setSelectedYear] = useState<string>('all');
+  const [selectedYears, setSelectedYears] = useState<string[]>([]);
   
   const fincaMap = useMemo(() => new Map(fincas.map(f => [f.id, f.name])), [fincas]);
   const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
 
   const allAvailableYears = useMemo(() => {
     const years = new Set(invoices.map(inv => getYear(parseISO(inv.farmDepartureDate))));
-    return Array.from(years).sort((a,b) => b - a);
+    return Array.from(years).sort((a,b) => b - a).map(String);
   }, [invoices]);
+
+  useEffect(() => {
+    if (allAvailableYears.length > 0) {
+      setSelectedYears(allAvailableYears);
+    }
+  }, [allAvailableYears]);
 
   const filteredInvoices = useMemo(() => {
     let filtered = invoices;
@@ -51,11 +59,12 @@ export function ComparativeSalesClient() {
     if (selectedMonth !== 'all') {
       filtered = filtered.filter(inv => getMonth(parseISO(inv.farmDepartureDate)) === parseInt(selectedMonth));
     }
-    if (selectedYear !== 'all') {
-      filtered = filtered.filter(inv => getYear(parseISO(inv.farmDepartureDate)) === parseInt(selectedYear));
+    if (selectedYears.length > 0) {
+      const numericYears = selectedYears.map(Number);
+      filtered = filtered.filter(inv => numericYears.includes(getYear(parseISO(inv.farmDepartureDate))));
     }
     return filtered;
-  }, [invoices, selectedFincaId, selectedCustomerId, selectedMonth, selectedYear]);
+  }, [invoices, selectedFincaId, selectedCustomerId, selectedMonth, selectedYears]);
 
 
   const comparativeData = useMemo(() => {
@@ -105,12 +114,8 @@ export function ComparativeSalesClient() {
   }, [filteredInvoices, fincaMap, customerMap, t, dateLocale]);
   
   const displayedYears = useMemo(() => {
-    if (selectedYear !== 'all') {
-      return [parseInt(selectedYear)];
-    }
-    const years = new Set(filteredInvoices.map(inv => getYear(parseISO(inv.farmDepartureDate))));
-    return Array.from(years).sort();
-  }, [filteredInvoices, selectedYear]);
+    return selectedYears.sort((a, b) => Number(a) - Number(b));
+  }, [selectedYears]);
 
   const formatCurrency = (value?: number) => {
     if (value === undefined) return '$0.00';
@@ -158,15 +163,31 @@ export function ComparativeSalesClient() {
                     {customers.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                 </SelectContent>
             </Select>
-             <Select value={selectedYear} onValueChange={setSelectedYear}>
-                <SelectTrigger className="w-full md:w-auto md:min-w-[150px]">
-                    <SelectValue placeholder={t('reports.filterByYear')} />
-                </SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">{t('reports.allYears')}</SelectItem>
-                    {allAvailableYears.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
-                </SelectContent>
-            </Select>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full md:w-auto md:min-w-[200px]">
+                    {selectedYears.length === 0 ? t('reports.selectYears') : selectedYears.length === allAvailableYears.length ? t('reports.allYears') : selectedYears.join(', ')}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent>
+                <DropdownMenuLabel>{t('reports.filterByYear')}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {allAvailableYears.map(year => (
+                  <DropdownMenuCheckboxItem
+                    key={year}
+                    checked={selectedYears.includes(year)}
+                    onCheckedChange={(checked) => {
+                      setSelectedYears(prev => 
+                        checked ? [...prev, year] : prev.filter(y => y !== year)
+                      );
+                    }}
+                  >
+                    {year}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+
             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[150px]">
                     <SelectValue placeholder={t('reports.filterByMonth')} />
@@ -197,31 +218,41 @@ export function ComparativeSalesClient() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {comparativeData.map((data, index) => (
-                <TableRow key={index}>
-                  <TableCell>{data.monthName}</TableCell>
-                  <TableCell>{data.fincaName}</TableCell>
-                  <TableCell>{data.customerName}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(data.chargeFarm)}</TableCell>
-                  {displayedYears.map(year => (
-                    <TableCell key={year} className="text-right">{formatCurrency(data.chargeClient[year])}</TableCell>
-                  ))}
-                </TableRow>
-              ))}
-            </TableBody>
-            <TableFooter>
-                <TableRow>
-                    <TableCell colSpan={3}>{t('reports.table.total')}</TableCell>
-                    <TableCell className="text-right font-bold">
-                        {formatCurrency(comparativeData.reduce((acc, curr) => acc + curr.chargeFarm, 0))}
-                    </TableCell>
+              {comparativeData.length > 0 ? (
+                 comparativeData.map((data, index) => (
+                  <TableRow key={index}>
+                    <TableCell>{data.monthName}</TableCell>
+                    <TableCell>{data.fincaName}</TableCell>
+                    <TableCell>{data.customerName}</TableCell>
+                    <TableCell className="text-right">{formatCurrency(data.chargeFarm)}</TableCell>
                     {displayedYears.map(year => (
-                        <TableCell key={year} className="text-right font-bold">
-                            {formatCurrency(comparativeData.reduce((acc, curr) => acc + (curr.chargeClient[year] || 0), 0))}
-                        </TableCell>
+                      <TableCell key={year} className="text-right">{formatCurrency(data.chargeClient[year])}</TableCell>
                     ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={4 + displayedYears.length} className="text-center">
+                    {t('reports.noData')}
+                  </TableCell>
                 </TableRow>
-            </TableFooter>
+              )}
+            </TableBody>
+            {comparativeData.length > 0 && (
+              <TableFooter>
+                  <TableRow>
+                      <TableCell colSpan={3}>{t('reports.table.total')}</TableCell>
+                      <TableCell className="text-right font-bold">
+                          {formatCurrency(comparativeData.reduce((acc, curr) => acc + curr.chargeFarm, 0))}
+                      </TableCell>
+                      {displayedYears.map(year => (
+                          <TableCell key={year} className="text-right font-bold">
+                              {formatCurrency(comparativeData.reduce((acc, curr) => acc + (curr.chargeClient[year] || 0), 0))}
+                          </TableCell>
+                      ))}
+                  </TableRow>
+              </TableFooter>
+            )}
           </Table>
         </CardContent>
       </Card>

@@ -68,8 +68,10 @@
     "allCustomers": "Todos los Clientes",
     "filterByYear": "Filtrar por Año",
     "allYears": "Todos los Años",
+    "selectYears": "Seleccionar años...",
     "filterByMonth": "Filtrar por Mes",
     "allMonths": "Todos los Meses",
+    "noData": "No hay datos disponibles para los filtros seleccionados.",
     "table": {
       "date": "Fecha",
       "invoice": "Factura",

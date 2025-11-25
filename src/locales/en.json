@@ -68,8 +68,10 @@
     "allCustomers": "All Customers",
     "filterByYear": "Filter by Year",
     "allYears": "All Years",
+    "selectYears": "Select years...",
     "filterByMonth": "Filter by Month",
     "allMonths": "All Months",
+    "noData": "No data available for the selected filters.",
     "table": {
       "date": "Date",
       "invoice": "Invoice",
