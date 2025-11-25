@@ -7,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
-import type { Payment, Invoice, Customer, Finca } from '@/lib/types';
+import type { Payment, Invoice, Customer, Finca, CreditNote } from '@/lib/types';
 import { format, parseISO, isWithinInterval, startOfDay, endOfDay } from 'date-fns';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
@@ -64,10 +64,11 @@ export type AggregatedPayment = {
     reference?: string;
     notes?: string;
     details: PaymentDetail[];
+    bankFee: number;
 };
 
 export function ViewPaymentsClient() {
-  const { payments, invoices, customers, fincas, consignatarios, refreshData } = useAppData();
+  const { payments, invoices, customers, fincas, consignatarios, creditNotes, refreshData } = useAppData();
   const [searchTerm, setSearchTerm] = useState('');
   const [dateRange, setDateRange] = useState<DateRange | undefined>(undefined);
   const debouncedSearchTerm = useDebounce(searchTerm, 300);
@@ -99,7 +100,7 @@ export function ViewPaymentsClient() {
           if (p.type === 'purchase') {
               entityId = invoice.farmId;
               entity = fincaMap.get(entityId);
-          } else { // 'sale' or 'both' for a customer payment
+          } else {
               entityId = invoice.customerId;
               entity = customerMap.get(entityId);
           }
@@ -120,6 +121,7 @@ export function ViewPaymentsClient() {
                   reference: p.reference,
                   notes: p.notes,
                   details: [],
+                  bankFee: 0,
               };
           }
 
@@ -136,9 +138,37 @@ export function ViewPaymentsClient() {
             consigneeName: consigneeName
           });
       });
+      
+      creditNotes.forEach(cn => {
+        if (cn.reason === 'Costo Bancario') {
+          const invoice = invoiceMap.get(cn.invoiceId);
+          if (!invoice) return;
+          
+          let entityId: string | null = null;
+          if (cn.type === 'purchase') {
+              entityId = invoice.farmId;
+          } else {
+              entityId = invoice.customerId;
+          }
+
+          if (!entityId) return;
+
+          const paymentDateStr = format(parseISO(cn.date), 'yyyy-MM-dd');
+          
+          // Try to find a matching payment group
+          const matchingGroupKey = Object.keys(groupedPayments).find(key => 
+             key.startsWith(`${paymentDateStr}-${entityId}`)
+          );
+
+          if (matchingGroupKey && groupedPayments[matchingGroupKey]) {
+            groupedPayments[matchingGroupKey].bankFee += cn.amount;
+          }
+        }
+      });
+
 
       return Object.values(groupedPayments).sort((a,b) => parseISO(b.paymentDate).getTime() - parseISO(a.paymentDate).getTime());
-  }, [payments, invoices, customerMap, fincaMap, invoiceMap, consignatarioMap, t]);
+  }, [payments, invoices, customerMap, fincaMap, invoiceMap, consignatarioMap, t, creditNotes]);
 
   const filteredPayments = useMemo(() => {
     let filtered = aggregatedPayments;
@@ -369,7 +399,7 @@ export function ViewPaymentsClient() {
             <AlertDialogHeader>
                 <AlertDialogTitle>{t('common.confirmDeleteTitle')}</AlertDialogTitle>
                 <AlertDialogDescription>
-                    {t('viewPayments.toast.confirmDeleteSingleDescription', { amount: singlePaymentToDelete?.amount.toFixed(2), invoice: singlePaymentToDelete?.invoiceNumber })}
+                    {t('viewPayments.toast.confirmDeleteSingleDescription', { amount: singlePaymentToDelete?.amount.toFixed(2) || '0.00', invoice: singlePaymentToDelete?.invoiceNumber || '' })}
                 </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>

@@ -3,7 +3,7 @@
 
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
 import { format, parseISO } from 'date-fns';
 import type { AggregatedPayment, PaymentDetail } from './view-payments-client';
 import { useTranslation } from '@/context/i18n-context';
@@ -21,6 +21,8 @@ export function PaymentReceiptView({ payment, t: tProp, onEditPayment, onDeleteP
   const { t: tHook } = useTranslation();
   const t = tProp || tHook;
   const isActionable = !!(onEditPayment && onDeletePayment);
+
+  const totalPaid = payment.amount - (payment.bankFee || 0);
 
   return (
     <Card className="p-6 bg-white text-black shadow-lg border print:shadow-none print:border-0" id={`payment-receipt-${payment.id}`}>
@@ -105,6 +107,18 @@ export function PaymentReceiptView({ payment, t: tProp, onEditPayment, onDeleteP
                 </TableRow>
               ))}
             </TableBody>
+            <TableFooter>
+                {(payment.bankFee || 0) > 0 && (
+                    <TableRow>
+                        <TableCell colSpan={isActionable ? 4 : 3} className="text-right">{t('payments.dialog.bankFee')}</TableCell>
+                        <TableCell className="text-right">-${(payment.bankFee || 0).toFixed(2)}</TableCell>
+                    </TableRow>
+                )}
+                <TableRow className="font-bold text-lg bg-muted/50">
+                    <TableCell colSpan={isActionable ? 4 : 3} className="text-right">{t('viewPayments.receipt.totalPaid')}</TableCell>
+                    <TableCell className="text-right">${totalPaid.toFixed(2)}</TableCell>
+                </TableRow>
+            </TableFooter>
           </Table>
         </section>
 

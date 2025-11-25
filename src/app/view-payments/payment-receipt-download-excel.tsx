@@ -41,13 +41,16 @@ export default function PaymentReceiptDownloadExcelButton({ payment }: PaymentRe
         ws_data.push([
           detail.invoiceNumber,
           detail.customerName,
-          detail.consigneeName,
+          detail.consigneeName || '',
           detail.amount,
         ]);
       });
       
       ws_data.push([]);
-      ws_data.push(["", "", t('viewPayments.receipt.totalPaid'), payment.amount]);
+      if (payment.bankFee > 0) {
+        ws_data.push(["", "", t('viewPayments.dialog.bankFee'), -payment.bankFee]);
+      }
+      ws_data.push(["", "", t('viewPayments.receipt.totalPaid'), payment.amount - payment.bankFee]);
 
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
 
