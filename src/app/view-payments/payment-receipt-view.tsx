@@ -23,6 +23,7 @@ export function PaymentReceiptView({ payment, t: tProp, onEditPayment, onDeleteP
   const isActionable = !!(onEditPayment && onDeletePayment);
 
   const totalPaid = payment.amount - (payment.bankFee || 0);
+  const totalApplied = payment.details.reduce((sum, detail) => sum + detail.amount, 0);
 
   return (
     <Card className="p-6 bg-white text-black shadow-lg border print:shadow-none print:border-0" id={`payment-receipt-${payment.id}`}>
@@ -108,6 +109,11 @@ export function PaymentReceiptView({ payment, t: tProp, onEditPayment, onDeleteP
               ))}
             </TableBody>
             <TableFooter>
+                <TableRow>
+                    <TableCell colSpan={isActionable ? 3 : 2} className="text-right font-medium">{t('viewPayments.receipt.totalPaid')}</TableCell>
+                    <TableCell className="text-right">${totalApplied.toFixed(2)}</TableCell>
+                    {isActionable && <TableCell />}
+                </TableRow>
                 {(payment.bankFee || 0) > 0 && (
                     <TableRow>
                         <TableCell colSpan={isActionable ? 3 : 2} className="text-right font-medium">{t('payments.dialog.bankFee')}</TableCell>
@@ -116,7 +122,7 @@ export function PaymentReceiptView({ payment, t: tProp, onEditPayment, onDeleteP
                     </TableRow>
                 )}
                 <TableRow className="font-bold text-lg bg-muted/50">
-                    <TableCell colSpan={isActionable ? 3 : 2} className="text-right">{t('viewPayments.receipt.totalPaid')}</TableCell>
+                    <TableCell colSpan={isActionable ? 3 : 2} className="text-right">{t('payments.dialog.total')}</TableCell>
                     <TableCell className="text-right">${totalPaid.toFixed(2)}</TableCell>
                     {isActionable && <TableCell />}
                 </TableRow>
