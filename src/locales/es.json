@@ -796,6 +796,7 @@
       "date": "Fecha",
       "entity": "Cliente/Proveedor",
       "totalAmount": "Monto Total",
+      "bankFee": "Costo Bancario",
       "invoicesPaid": "Facturas Pagadas",
       "method": "Método",
       "bank": "Banco",

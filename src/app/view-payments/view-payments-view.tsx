@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -50,6 +51,7 @@ export function ViewPaymentsView({ payments, onViewPayment, onSendPayment, onDel
               <TableHead>{t('viewPayments.table.date')}</TableHead>
               <TableHead>{t('viewPayments.table.entity')}</TableHead>
               <TableHead>{t('viewPayments.table.totalAmount')}</TableHead>
+              <TableHead>{t('viewPayments.table.bankFee')}</TableHead>
               <TableHead>{t('viewPayments.table.invoicesPaid')}</TableHead>
               <TableHead>{t('viewPayments.table.method')}</TableHead>
               <TableHead>{t('viewPayments.table.bank')}</TableHead>
@@ -62,6 +64,7 @@ export function ViewPaymentsView({ payments, onViewPayment, onSendPayment, onDel
                 <TableCell>{format(parseISO(payment.paymentDate), 'PPP')}</TableCell>
                 <TableCell className="font-medium">{payment.entityName}</TableCell>
                 <TableCell className="font-bold">${payment.amount.toFixed(2)}</TableCell>
+                <TableCell className="text-destructive">${(payment.bankFee || 0).toFixed(2)}</TableCell>
                 <TableCell>
                   <Badge variant="secondary">
                     {t('viewPayments.table.paidToInvoices', { count: payment.details.length })}
@@ -128,3 +131,4 @@ export function ViewPaymentsView({ payments, onViewPayment, onSendPayment, onDel
     </>
   );
 }
+

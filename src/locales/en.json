@@ -796,6 +796,7 @@
       "date": "Date",
       "entity": "Customer/Supplier",
       "totalAmount": "Total Amount",
+      "bankFee": "Bank Fee",
       "invoicesPaid": "Invoices Paid",
       "method": "Method",
       "bank": "Bank",
