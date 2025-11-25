@@ -16,7 +16,14 @@ const formSchema = z.object({
   name: z.string().min(3, { message: "Name must be at least 3 characters." }),
   address: z.string().min(5, { message: "Address is too short." }),
   phone: z.string().min(7, { message: "Phone number is not valid." }),
-  email: z.string().email({ message: "Invalid email format." }).optional().or(z.literal('')),
+  email: z.string().refine(value => {
+    if (!value) return true; // Optional field
+    const emails = value.split(',').map(email => email.trim()).filter(Boolean);
+    if (emails.length === 0) return true; // Allow empty string
+    return emails.every(email => z.string().email().safeParse(email).success);
+  }, {
+    message: "Please provide a valid list of comma-separated email addresses."
+  }).optional(),
   taxId: z.string().min(10, { message: "Tax ID / RUC is not valid." }),
   productType: z.string().min(3, { message: "Product type is too short." }),
 });
@@ -110,7 +117,7 @@ export function FincaForm({ onSubmit, onClose, initialData, isSubmitting }: Finc
                 <FormItem>
                   <FormLabel>Email</FormLabel>
                   <FormControl>
-                    <Input placeholder="contact@farm.com" {...field} />
+                    <Input placeholder="contact@farm.com, sales@farm.com" {...field} />
                   </FormControl>
                   <FormMessage />
                 </FormItem>
