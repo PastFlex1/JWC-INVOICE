@@ -30,9 +30,15 @@ export function ComparativeSalesClient() {
   const [selectedFincaId, setSelectedFincaId] = useState<string>('all');
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
+  const [selectedYear, setSelectedYear] = useState<string>('all');
   
   const fincaMap = useMemo(() => new Map(fincas.map(f => [f.id, f.name])), [fincas]);
   const customerMap = useMemo(() => new Map(customers.map(c => [c.id, c.name])), [customers]);
+
+  const allAvailableYears = useMemo(() => {
+    const years = new Set(invoices.map(inv => getYear(parseISO(inv.farmDepartureDate))));
+    return Array.from(years).sort((a,b) => b - a);
+  }, [invoices]);
 
   const filteredInvoices = useMemo(() => {
     let filtered = invoices;
@@ -45,8 +51,11 @@ export function ComparativeSalesClient() {
     if (selectedMonth !== 'all') {
       filtered = filtered.filter(inv => getMonth(parseISO(inv.farmDepartureDate)) === parseInt(selectedMonth));
     }
+    if (selectedYear !== 'all') {
+      filtered = filtered.filter(inv => getYear(parseISO(inv.farmDepartureDate)) === parseInt(selectedYear));
+    }
     return filtered;
-  }, [invoices, selectedFincaId, selectedCustomerId, selectedMonth]);
+  }, [invoices, selectedFincaId, selectedCustomerId, selectedMonth, selectedYear]);
 
 
   const comparativeData = useMemo(() => {
@@ -95,10 +104,13 @@ export function ComparativeSalesClient() {
     });
   }, [filteredInvoices, fincaMap, customerMap, t, dateLocale]);
   
-  const availableYears = useMemo(() => {
+  const displayedYears = useMemo(() => {
+    if (selectedYear !== 'all') {
+      return [parseInt(selectedYear)];
+    }
     const years = new Set(filteredInvoices.map(inv => getYear(parseISO(inv.farmDepartureDate))));
     return Array.from(years).sort();
-  }, [filteredInvoices]);
+  }, [filteredInvoices, selectedYear]);
 
   const formatCurrency = (value?: number) => {
     if (value === undefined) return '$0.00';
@@ -146,6 +158,15 @@ export function ComparativeSalesClient() {
                     {customers.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                 </SelectContent>
             </Select>
+             <Select value={selectedYear} onValueChange={setSelectedYear}>
+                <SelectTrigger className="w-full md:w-auto md:min-w-[150px]">
+                    <SelectValue placeholder={t('reports.filterByYear')} />
+                </SelectTrigger>
+                <SelectContent>
+                    <SelectItem value="all">{t('reports.allYears')}</SelectItem>
+                    {allAvailableYears.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
+                </SelectContent>
+            </Select>
             <Select value={selectedMonth} onValueChange={setSelectedMonth}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[150px]">
                     <SelectValue placeholder={t('reports.filterByMonth')} />
@@ -170,7 +191,7 @@ export function ComparativeSalesClient() {
                 <TableHead>{t('comparativeReport.table.farm')}</TableHead>
                 <TableHead>{t('comparativeReport.table.customer')}</TableHead>
                 <TableHead className="text-right">{t('comparativeReport.table.chargeFarm')}</TableHead>
-                {availableYears.map(year => (
+                {displayedYears.map(year => (
                   <TableHead key={year} className="text-right">{t('comparativeReport.table.chargeClient')} {year}</TableHead>
                 ))}
               </TableRow>
@@ -182,7 +203,7 @@ export function ComparativeSalesClient() {
                   <TableCell>{data.fincaName}</TableCell>
                   <TableCell>{data.customerName}</TableCell>
                   <TableCell className="text-right">{formatCurrency(data.chargeFarm)}</TableCell>
-                  {availableYears.map(year => (
+                  {displayedYears.map(year => (
                     <TableCell key={year} className="text-right">{formatCurrency(data.chargeClient[year])}</TableCell>
                   ))}
                 </TableRow>
@@ -194,7 +215,7 @@ export function ComparativeSalesClient() {
                     <TableCell className="text-right font-bold">
                         {formatCurrency(comparativeData.reduce((acc, curr) => acc + curr.chargeFarm, 0))}
                     </TableCell>
-                    {availableYears.map(year => (
+                    {displayedYears.map(year => (
                         <TableCell key={year} className="text-right font-bold">
                             {formatCurrency(comparativeData.reduce((acc, curr) => acc + (curr.chargeClient[year] || 0), 0))}
                         </TableCell>
