@@ -32,9 +32,7 @@ export default function RootLayout({
         <AuthProvider>
           <I18nProvider>
             <AppDataProvider>
-              <AppInitializer>
-                {children}
-              </AppInitializer>
+              <AppInitializer>{children}</AppInitializer>
             </AppDataProvider>
             <Toaster />
           </I18nProvider>
