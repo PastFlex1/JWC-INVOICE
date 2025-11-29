@@ -58,19 +58,13 @@ export function AccountStatementClient() {
     const customer = customers.find(c => c.id === selectedCustomerId);
     if (!customer) return null;
 
-    let customerInvoices = invoices.filter(inv => inv.customerId === selectedCustomerId && (inv.type === 'sale' || inv.type === 'both') && inv.saleStatus !== 'Paid');
+    let customerInvoices = invoices.filter(inv => inv.customerId === selectedCustomerId && (inv.type === 'sale' || inv.type === 'both'));
     
     if (selectedMonth !== 'all') {
       customerInvoices = customerInvoices.filter(inv => format(parseISO(inv.farmDepartureDate), 'yyyy-MM') === selectedMonth);
     }
     
-    if (customerInvoices.length === 0) return null;
-    
-    const sortedInvoices = customerInvoices.sort((a, b) => new Date(b.farmDepartureDate).getTime() - new Date(a.farmDepartureDate).getTime());
-    const latestInvoiceDate = sortedInvoices[0].farmDepartureDate;
-
-
-    const processedInvoices = customerInvoices.map(invoice => {
+    let processedInvoices = customerInvoices.map(invoice => {
        const invoiceSubtotal = invoice.items.reduce((acc, item) => {
         if (!item.bunches) return acc;
         const numberOfBoxes = item.numberOfBoxes || 1;
@@ -103,8 +97,13 @@ export function AccountStatementClient() {
         balance,
         consigneeName,
       };
-    });
+    }).filter(inv => inv.balance > 0.01); // Only show invoices with a balance
     
+    if (processedInvoices.length === 0) return null;
+
+    const sortedInvoices = processedInvoices.sort((a, b) => new Date(b.farmDepartureDate).getTime() - new Date(a.farmDepartureDate).getTime());
+    const latestInvoiceDate = sortedInvoices[0].farmDepartureDate;
+
     const totalOutstanding = processedInvoices.reduce((acc, inv) => acc + inv.balance, 0);
     const totalCredits = processedInvoices.reduce((acc, inv) => acc + inv.credits, 0);
     const totalDebits = processedInvoices.reduce((acc, inv) => acc + inv.debits, 0);

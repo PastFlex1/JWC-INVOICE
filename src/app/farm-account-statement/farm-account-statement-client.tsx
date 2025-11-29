@@ -87,7 +87,7 @@ export function FarmAccountStatementClient() {
     const finca = fincas.find(f => f.id === selectedFincaId);
     if (!finca) return null;
 
-    let fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both') && inv.purchaseStatus !== 'Paid');
+    let fincaInvoices = invoices.filter(inv => inv.farmId === selectedFincaId && (inv.type === 'purchase' || inv.type === 'both'));
     
     if (selectedCustomerId) {
       fincaInvoices = fincaInvoices.filter(inv => inv.customerId === selectedCustomerId);
@@ -100,12 +100,7 @@ export function FarmAccountStatementClient() {
       fincaInvoices = fincaInvoices.filter(inv => format(parseISO(inv.farmDepartureDate), 'yyyy-MM') === selectedMonth);
     }
     
-    if (fincaInvoices.length === 0) return null;
-    
-    const sortedInvoices = fincaInvoices.sort((a, b) => new Date(b.farmDepartureDate).getTime() - new Date(a.farmDepartureDate).getTime());
-    const latestInvoiceDate = sortedInvoices[0].farmDepartureDate;
-
-    const processedInvoices = fincaInvoices.map(invoice => {
+    let processedInvoices = fincaInvoices.map(invoice => {
        const invoiceSubtotal = invoice.items.reduce((acc, item) => {
         if (!item.bunches) return acc;
         const numberOfBoxes = item.numberOfBoxes || 1;
@@ -139,8 +134,13 @@ export function FarmAccountStatementClient() {
         balance,
         consigneeName,
       };
-    });
+    }).filter(inv => inv.balance > 0.01);
     
+    if (processedInvoices.length === 0) return null;
+
+    const sortedInvoices = processedInvoices.sort((a, b) => new Date(b.farmDepartureDate).getTime() - new Date(a.farmDepartureDate).getTime());
+    const latestInvoiceDate = sortedInvoices[0].farmDepartureDate;
+
     const totalOutstanding = processedInvoices.reduce((acc, inv) => acc + inv.balance, 0);
     const totalCredits = processedInvoices.reduce((acc, inv) => acc + inv.credits, 0);
     const totalDebits = processedInvoices.reduce((acc, inv) => acc + inv.debits, 0);
