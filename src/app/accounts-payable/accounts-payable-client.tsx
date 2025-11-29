@@ -138,10 +138,12 @@ export function AccountsPayableClient() {
   const getInvoiceTotal = (invoice: Invoice) => {
     const subtotal = invoice.items.reduce((acc, item) => {
         if (!item.bunches) return acc;
-        return acc + item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
+        const numberOfBoxes = item.numberOfBoxes || 1;
+        const itemSubtotal = item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
             const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
             return bunchAcc + (stems * bunch.purchasePrice);
         }, 0);
+        return acc + (itemSubtotal * numberOfBoxes);
     }, 0);
     return subtotal;
   };
