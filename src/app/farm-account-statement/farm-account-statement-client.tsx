@@ -248,14 +248,14 @@ export function FarmAccountStatementClient() {
           </CardContent>
         </Card>
         
-        {statementData && statementData.invoices.length > 0 && (
-          <FarmAccountStatementView data={statementData} />
+        {selectedFincaId && !statementData && (
+          <div className="text-center py-12 text-muted-foreground">
+              <p>{t('farmAccountStatement.noInvoices')}</p>
+          </div>
         )}
 
-        {selectedFincaId && (!statementData || statementData.invoices.length === 0) && (
-            <div className="text-center py-12 text-muted-foreground">
-                <p>{t('farmAccountStatement.noInvoices')}</p>
-            </div>
+        {statementData && statementData.invoices.length > 0 && (
+          <FarmAccountStatementView data={statementData} />
         )}
 
         {!selectedFincaId && (

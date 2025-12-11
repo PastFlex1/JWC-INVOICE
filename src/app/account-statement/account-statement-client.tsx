@@ -97,7 +97,7 @@ export function AccountStatementClient() {
         balance,
         consigneeName,
       };
-    }).filter(inv => inv.balance > 0.01); // Only show invoices with a balance
+    }).filter(inv => inv.balance > 0.01);
     
     if (processedInvoices.length === 0) return null;
 
@@ -179,14 +179,14 @@ export function AccountStatementClient() {
           </CardContent>
         </Card>
         
-        {statementData && statementData.invoices.length > 0 && (
-          <AccountStatementView data={statementData} dateLocale={dateLocale} />
-        )}
-
-        {selectedCustomerId && (!statementData || statementData.invoices.length === 0) && (
+        {selectedCustomerId && !statementData && (
           <div className="text-center py-12 text-muted-foreground">
             <p>{t('accountStatement.noInvoices')}</p>
           </div>
+        )}
+
+        {statementData && statementData.invoices.length > 0 && (
+          <AccountStatementView data={statementData} dateLocale={dateLocale} />
         )}
 
         {!selectedCustomerId && (
