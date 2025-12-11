@@ -57,7 +57,7 @@ export async function POST(request: Request) {
     });
 
     await resend.emails.send({
-      from: 'JWC FLOWERS <facturacion@puntodeventastore.store>',
+      from: 'JCW FLOWERS <facturacion@puntodeventastore.store>',
       to: toEmails,
       bcc: bccEmails.length > 0 ? bccEmails : undefined,
       subject: subject,
