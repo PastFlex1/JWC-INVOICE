@@ -101,9 +101,6 @@ export function AccountStatementClient() {
     
     if (processedInvoices.length === 0) return null;
 
-    const sortedInvoices = processedInvoices.sort((a, b) => new Date(b.farmDepartureDate).getTime() - new Date(a.farmDepartureDate).getTime());
-    const latestInvoiceDate = sortedInvoices[0].farmDepartureDate;
-
     const totalOutstanding = processedInvoices.reduce((acc, inv) => acc + inv.balance, 0);
     const totalCredits = processedInvoices.reduce((acc, inv) => acc + inv.credits, 0);
     const totalDebits = processedInvoices.reduce((acc, inv) => acc + inv.debits, 0);
@@ -121,7 +118,7 @@ export function AccountStatementClient() {
       totalDebits,
       totalPayments,
       urgentPayment,
-      statementDate: latestInvoiceDate
+      statementDate: new Date().toISOString()
     };
   }, [selectedCustomerId, selectedMonth, customers, invoices, creditNotes, debitNotes, payments, consignatarioMap]);
 

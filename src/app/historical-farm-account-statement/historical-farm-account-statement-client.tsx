@@ -56,9 +56,6 @@ export function HistoricalFarmAccountStatementClient() {
 
     if (fincaInvoices.length === 0) return null;
 
-    const sortedInvoices = fincaInvoices.sort((a, b) => new Date(b.farmDepartureDate).getTime() - new Date(a.farmDepartureDate).getTime());
-    const latestInvoiceDate = sortedInvoices[0].farmDepartureDate;
-
     const processedInvoices = fincaInvoices.map(invoice => {
        const invoiceSubtotal = invoice.items.reduce((acc, item) => {
         if (!item.bunches) return acc;
@@ -108,7 +105,7 @@ export function HistoricalFarmAccountStatementClient() {
       totalDebits,
       totalPayments,
       urgentPayment,
-      statementDate: latestInvoiceDate,
+      statementDate: new Date().toISOString(),
     };
   }, [selectedFincaId, dateRange, fincas, invoices, creditNotes, debitNotes, payments]);
 

@@ -64,9 +64,6 @@ export function HistoricalAccountStatementClient() {
 
     if (customerInvoices.length === 0) return null;
 
-    const sortedInvoices = customerInvoices.sort((a, b) => new Date(b.farmDepartureDate).getTime() - new Date(a.farmDepartureDate).getTime());
-    const latestInvoiceDate = sortedInvoices[0].farmDepartureDate;
-
     const processedInvoices = customerInvoices.map(invoice => {
        const invoiceSubtotal = invoice.items.reduce((acc, item) => {
         if (!item.bunches) return acc;
@@ -119,7 +116,7 @@ export function HistoricalAccountStatementClient() {
       totalDebits,
       totalPayments,
       urgentPayment,
-      statementDate: latestInvoiceDate,
+      statementDate: new Date().toISOString(),
     };
   }, [selectedCustomerId, dateRange, customers, invoices, creditNotes, debitNotes, payments, consignatarioMap]);
 
