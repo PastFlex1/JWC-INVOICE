@@ -38,10 +38,6 @@ export async function POST(request: Request) {
           <br>
           <p>Please don't answer to this email, because is automatically, if you need assistance, please contact to <a href="mailto:jcwf@outlook.es">jcwf@outlook.es</a></p>
           <br>
-          <p>Best Regards</p>
-          <p>Team: JCW FLOWERS</p>
-          <p>Teams: Alexa JCW FLOWERS</p>
-          <p>Email: jcwf@outlook.es</p>
           <img src="cid:jcw-logo-id" alt="JCW Flowers Logo" width="200" />
         </body>
       </html>
