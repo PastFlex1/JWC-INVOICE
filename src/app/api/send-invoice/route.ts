@@ -30,6 +30,7 @@ export async function POST(request: Request) {
     // Read logo file and convert to Base64 string
     const logoPath = path.join(process.cwd(), 'public', 'logo.png');
     const logoBase64 = fs.readFileSync(logoPath).toString('base64');
+    const logoDataUri = `data:image/png;base64,${logoBase64}`;
     
     const emailHtml = `
       <html>
@@ -38,19 +39,12 @@ export async function POST(request: Request) {
           <br>
           <p>Please don't answer to this email, because is automatically, if you need assistance, please contact to <a href="mailto:jcwf@outlook.es">jcwf@outlook.es</a></p>
           <br>
-          <img src="cid:jcw-logo-id" alt="JCW Flowers Logo" width="200" />
+          <img src="${logoDataUri}" alt="JCW Flowers Logo" width="200" />
         </body>
       </html>
     `;
 
     const attachments = pdfAttachments || [];
-    
-    // Add the logo as an embedded attachment with a Content-ID
-    attachments.push({
-      filename: 'logo.png',
-      content: logoBase64,
-      contentId: 'jcw-logo-id',
-    });
 
     await resend.emails.send({
       from: 'JCW FLOWERS <facturacion@puntodeventastore.store>',
