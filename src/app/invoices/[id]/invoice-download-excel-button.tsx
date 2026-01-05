@@ -99,7 +99,7 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
             const totalPrice = totalStemsForBunch * pricePerStem;
             
             ws_data.push([
-              bunchIndex === 0 ? item.boxNumber : '',
+              bunchIndex === 0 ? item.numberOfBoxes : '',
               bunchIndex === 0 ? item.boxType.toUpperCase() : '',
               bunchIndex === 0 ? itemBoxValue.toFixed(2) : '',
               invoice.reference || '',

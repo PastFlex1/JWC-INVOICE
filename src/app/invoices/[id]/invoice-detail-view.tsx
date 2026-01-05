@@ -29,7 +29,7 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
     let totalBoxTypeValue = 0;
 
     invoice?.items?.forEach(item => {
-      const numBoxes = Number(item.boxNumber) || 1;
+      const numBoxes = Number(item.numberOfBoxes) || 1;
       totalBoxes += numBoxes;
       totalBoxTypeValue += (boxTypeValues[item.boxType] || 0) * numBoxes;
       if (item.bunches && Array.isArray(item.bunches)) {
@@ -55,7 +55,7 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
 
   const renderItemRow = (item: LineItem, index: number) => {
     const itemBoxValue = boxTypeValues[item.boxType] || 0;
-    const numBoxes = item.boxNumber || 1;
+    const numBoxes = item.numberOfBoxes || 1;
 
     return (
        <React.Fragment key={item.id || index}>

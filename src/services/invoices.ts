@@ -3,6 +3,7 @@
 
 
 
+
 import { db } from '@/lib/firebase';
 import type { Invoice, LineItem, Customer, Consignatario, Carguera, Pais } from '@/lib/types';
 import {
@@ -51,6 +52,12 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData> | DocumentS
       purchaseStatus = data.status;
     }
   }
+  
+  const items = (Array.isArray(data.items) ? data.items : []).map((item: any) => ({
+    ...item,
+    numberOfBoxes: item.numberOfBoxes ?? item.boxNumber ?? 1,
+  }));
+
 
   return {
     id: snapshot.id,
@@ -66,7 +73,7 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData> | DocumentS
     reference: data.reference,
     masterAWB: data.masterAWB,
     houseAWB: data.houseAWB,
-    items: Array.isArray(data.items) ? data.items : [],
+    items: items,
     saleStatus: saleStatus || (data.type === 'purchase' ? 'N/A' : 'Pending'),
     purchaseStatus: purchaseStatus || (data.type === 'sale' ? 'N/A' : 'Pending'),
     consignatarioId: data.consignatarioId,

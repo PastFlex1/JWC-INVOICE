@@ -126,7 +126,6 @@ export function NewInvoiceForm() {
           reference: invoiceToLoad.reference || '',
           items: invoiceToLoad.items.map(item => ({
             ...item,
-            numberOfBoxes: (item as any).boxNumber || 1, // Migration from boxNumber
             id: uuidv4(),
             bunches: item.bunches.map(bunch => ({
               ...bunch,
@@ -137,7 +136,6 @@ export function NewInvoiceForm() {
         };
         delete dataForForm.saleStatus;
         delete dataForForm.purchaseStatus;
-        delete dataForForm.boxNumber; // clean up old field
         form.reset(dataForForm);
       } else {
         console.warn(`Invoice with id ${idToLoad} not found.`);
@@ -418,7 +416,6 @@ export function NewInvoiceForm() {
       flightDate: values.flightDate.toISOString(),
       items: values.items.map(item => ({
         ...item,
-        boxNumber: item.numberOfBoxes, // Keep for legacy compatibility if needed
       })) as LineItem[],
     };
 

@@ -32,7 +32,7 @@ export interface BunchItem {
 
 export interface LineItem {
   id: string;
-  boxNumber: number;
+  numberOfBoxes: number;
   boxType: 'qb' | 'eb' | 'hb' | 'jhb';
   numberOfBunches: number;
   bunches: BunchItem[];
