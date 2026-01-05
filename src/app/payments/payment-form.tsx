@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -147,11 +148,15 @@ export function PaymentForm({
         const calculatedInvoices = entityInvoices.map(invoice => {
             const subtotal = invoice.items.reduce((acc, item) => {
               if (!item.bunches) return acc;
+              const numberOfBoxes = item.numberOfBoxes || 1;
               const priceField = paymentType === 'purchase' ? 'purchasePrice' : 'salePrice';
-              return acc + item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
-                const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
+              
+              const itemSubtotal = item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
+                const stems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0);
                 return bunchAcc + (stems * (bunch[priceField] || 0));
               }, 0);
+              
+              return acc + (itemSubtotal * numberOfBoxes);
             }, 0);
 
             const creditsForType = creditNotes.filter(cn => cn.invoiceId === invoice.id && cn.type === paymentType).reduce((sum, note) => sum + note.amount, 0);
@@ -511,7 +516,7 @@ export function PaymentForm({
                             <TableCell className="text-right">-${(Number(bankFeePreview) || 0).toFixed(2)}</TableCell>
                         </TableRow>
                     )}
-                     <TableRow className="font-bold bg-muted/50">
+                     <TableRow className="font-bold text-lg bg-muted/50">
                         <TableCell>{t('payments.dialog.total')}</TableCell>
                         <TableCell className="text-right">
                            ${((paymentPreview?.reduce((acc, p) => acc + p.amountToApply, 0) || 0) - (Number(bankFeePreview) || 0)).toFixed(2)}
@@ -532,3 +537,4 @@ export function PaymentForm({
     </>
   );
 }
+
