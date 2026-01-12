@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useMemo, useCallback } from 'react';
@@ -36,6 +37,7 @@ import { useTranslation } from '@/context/i18n-context';
 import { addInvoice, updateInvoice } from '@/services/invoices';
 import type { Invoice, BunchItem, LineItem } from '@/lib/types';
 import { useAppData } from '@/context/app-data-context';
+import { getInvoiceStatus } from '@/lib/due-date';
 
 const SESSION_STORAGE_KEY = 'newInvoiceFormData';
 
@@ -104,6 +106,7 @@ export function NewInvoiceForm() {
   const [itemToDelete, setItemToDelete] = useState<{ lineItemIndex: number; bunchIndex: number } | null>(null);
   const [isReferenceOpen, setIsReferenceOpen] = useState(false);
   const [creditError, setCreditError] = useState<string | null>(null);
+  const [creditWarning, setCreditWarning] = useState<string | null>(null);
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
@@ -283,6 +286,8 @@ export function NewInvoiceForm() {
   const selectedCustomerId = form.watch('customerId');
   useEffect(() => {
     setCreditError(null);
+    setCreditWarning(null);
+
     if (!selectedCustomerId) {
       setFilteredConsignatarios([]);
       setFilteredMarcaciones([]);
@@ -409,31 +414,67 @@ export function NewInvoiceForm() {
   async function onSubmit(values: InvoiceFormValues) {
     setIsSubmitting(true);
     setCreditError(null);
+    setCreditWarning(null);
 
     // Credit Check
     const customer = customers.find(c => c.id === values.customerId);
-    if (customer && (values.type === 'sale' || values.type === 'both')) {
-      const customerInvoices = invoices.filter(inv => inv.customerId === customer.id && inv.id !== editId);
-      
-      const outstandingBalance = customerInvoices.reduce((acc, inv) => {
-        const credits = creditNotes.filter(cn => cn.invoiceId === inv.id && cn.type === 'sale').reduce((sum, note) => sum + note.amount, 0);
-        const debits = debitNotes.filter(dn => dn.invoiceId === inv.id && dn.type === 'sale').reduce((sum, note) => sum + note.amount, 0);
-        const paid = payments.filter(p => p.invoiceId === inv.id && p.type === 'sale').reduce((sum, payment) => sum + payment.amount, 0);
-        
-        const invoiceTotal = inv.items.reduce((total, item) => {
-          return total + item.bunches.reduce((sub, bunch) => sub + (bunch.stemsPerBunch * bunch.bunchesPerBox * bunch.salePrice), 0);
-        }, 0);
-        
-        const balance = invoiceTotal + debits - credits - paid;
-        return acc + (balance > 0 ? balance : 0);
-      }, 0);
+    let creditCheckPassed = true;
+    let warningMessage = '';
 
-      const newInvoiceTotal = totals.totalValue;
-      if (customer.cupo > 0 && (outstandingBalance + newInvoiceTotal > customer.cupo)) {
-        setCreditError(`Crédito insuficiente. Límite: $${customer.cupo.toFixed(2)}, Saldo pendiente: $${outstandingBalance.toFixed(2)}, Factura actual: $${newInvoiceTotal.toFixed(2)}.`);
+    if (customer && (values.type === 'sale' || values.type === 'both')) {
+      const controlType = customer.tipoControl;
+
+      if (controlType !== 'Ninguna') {
+        const customerInvoices = invoices.filter(inv => inv.customerId === customer.id && inv.id !== editId);
+        
+        let outstandingBalance = 0;
+        let hasOverdue = false;
+        
+        customerInvoices.forEach(inv => {
+            const credits = creditNotes.filter(cn => cn.invoiceId === inv.id && cn.type === 'sale').reduce((sum, note) => sum + note.amount, 0);
+            const debits = debitNotes.filter(dn => dn.invoiceId === inv.id && dn.type === 'sale').reduce((sum, note) => sum + note.amount, 0);
+            const paid = payments.filter(p => p.invoiceId === inv.id && p.type === 'sale').reduce((sum, payment) => sum + payment.amount, 0);
+
+            const invoiceTotal = inv.items.reduce((total, item) => {
+                return total + item.bunches.reduce((sub, bunch) => sub + (bunch.stemsPerBunch * bunch.bunchesPerBox * bunch.salePrice), 0);
+            }, 0);
+            
+            const balance = invoiceTotal + debits - credits - paid;
+            if (balance > 0.01) {
+              outstandingBalance += balance;
+              if (getInvoiceStatus(parseISO(inv.farmDepartureDate), balance, customer) === 'Overdue') {
+                hasOverdue = true;
+              }
+            }
+        });
+
+        const newInvoiceTotal = totals.totalValue;
+        const exceedsCreditLimit = customer.cupo > 0 && (outstandingBalance + newInvoiceTotal > customer.cupo);
+
+        if (controlType === 'Advertencia') {
+            if (exceedsCreditLimit) warningMessage += `El cliente está superando su límite de crédito de $${customer.cupo.toFixed(2)}. `;
+            if (hasOverdue) warningMessage += `El cliente tiene facturas vencidas.`;
+            if (warningMessage) setCreditWarning(warningMessage);
+        } else {
+            let blockReason = '';
+            if ((controlType === 'BloquearMonto' || controlType === 'BloquearMontoVencidas') && exceedsCreditLimit) {
+                blockReason += `Crédito insuficiente. Límite: $${customer.cupo.toFixed(2)}, Saldo pendiente: $${outstandingBalance.toFixed(2)}, Factura actual: $${newInvoiceTotal.toFixed(2)}. `;
+            }
+            if ((controlType === 'BloquearVencidas' || controlType === 'BloquearMontoVencidas') && hasOverdue) {
+                blockReason += `El cliente tiene facturas vencidas y no se le puede facturar.`;
+            }
+
+            if (blockReason) {
+                setCreditError(blockReason);
+                creditCheckPassed = false;
+            }
+        }
+      }
+    }
+
+    if (!creditCheckPassed) {
         setIsSubmitting(false);
         return;
-      }
     }
   
     const { id, ...dataToSubmit } = values;
@@ -504,11 +545,19 @@ export function NewInvoiceForm() {
         <p className="text-muted-foreground">{editId ? t('invoices.new.editDescription') : t('invoices.new.description')}</p>
       </div>
 
-       {creditError && (
+      {creditError && (
         <Alert variant="destructive">
           <AlertCircle className="h-4 w-4" />
           <AlertTitle>Error de Límite de Crédito</AlertTitle>
           <AlertDescription>{creditError}</AlertDescription>
+        </Alert>
+      )}
+
+      {creditWarning && (
+        <Alert variant="default" className="bg-yellow-100 border-yellow-300 text-yellow-800">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Advertencia de Crédito</AlertTitle>
+          <AlertDescription>{creditWarning}</AlertDescription>
         </Alert>
       )}
 

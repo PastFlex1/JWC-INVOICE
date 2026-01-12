@@ -14,6 +14,7 @@ export interface Customer {
   vendedor: string;
   plazo: 0 | 8 | 15 | 30 | 45;
   cupo: number;
+  tipoControl: 'Ninguna' | 'Advertencia' | 'BloquearMonto' | 'BloquearVencidas' | 'BloquearMontoVencidas';
   daeId?: string;
 }
 

@@ -1,3 +1,4 @@
+
 import { db } from '@/lib/firebase';
 import type { Customer } from '@/lib/types';
 import {
@@ -30,6 +31,7 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData> | DocumentS
     vendedor: data.vendedor,
     plazo: data.plazo,
     cupo: data.cupo,
+    tipoControl: data.tipoControl || 'Advertencia',
     daeId: data.daeId,
   };
 };

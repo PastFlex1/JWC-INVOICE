@@ -1,4 +1,5 @@
 
+
 'use client';
 
 import { useEffect, useMemo } from 'react';
@@ -36,6 +37,7 @@ const formSchema = z.object({
   vendedor: z.string().min(1, { message: "Seller is required." }),
   plazo: z.coerce.number().refine(val => [0, 8, 15, 30, 45].includes(val), { message: "Invalid term." }),
   cupo: z.coerce.number().positive({ message: "Credit limit must be a positive number." }),
+  tipoControl: z.enum(['Ninguna', 'Advertencia', 'BloquearMonto', 'BloquearVencidas', 'BloquearMontoVencidas']),
 }).refine(data => {
     if (data.type === 'National') {
         if (data.cedula.length === 10) {
@@ -85,6 +87,7 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
       plazo: Number(initialData.plazo) as any,
       cupo: Number(initialData.cupo),
       daeId: initialData.daeId || "__none__",
+      tipoControl: initialData.tipoControl || 'Advertencia',
     } : {
       type: 'National',
       name: '',
@@ -99,6 +102,7 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
       vendedor: '',
       plazo: 15,
       cupo: 0,
+      tipoControl: 'Advertencia',
     },
   });
 
@@ -150,6 +154,7 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
       plazo: Number(initialData.plazo) as any,
       cupo: Number(initialData.cupo),
       daeId: initialData.daeId || "__none__",
+      tipoControl: initialData.tipoControl || 'Advertencia'
     } : {
       type: 'National',
       name: '',
@@ -164,6 +169,7 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
       vendedor: '',
       plazo: 15,
       cupo: 0,
+      tipoControl: 'Advertencia',
     });
   }, [initialData, form]);
 
@@ -189,7 +195,7 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(handleSubmit)} className="space-y-4">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <FormField
             control={form.control}
             name="type"
@@ -404,7 +410,7 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
               </FormItem>
             )}
           />
-          <FormField
+           <FormField
             control={form.control}
             name="daeId"
             render={({ field }) => (
@@ -423,6 +429,30 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
                         {d.pais} ({d.numeroDae})
                       </SelectItem>
                     ))}
+                  </SelectContent>
+                </Select>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+           <FormField
+            control={form.control}
+            name="tipoControl"
+            render={({ field }) => (
+              <FormItem>
+                <FormLabel>Tipo de Control</FormLabel>
+                <Select onValueChange={field.onChange} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione un tipo de control" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    <SelectItem value="Ninguna">Ninguna acción</SelectItem>
+                    <SelectItem value="Advertencia">Advertencia</SelectItem>
+                    <SelectItem value="BloquearMonto">Bloquear por Monto superado</SelectItem>
+                    <SelectItem value="BloquearVencidas">Bloquear por Cuotas Vencidas</SelectItem>
+                    <SelectItem value="BloquearMontoVencidas">Bloquear por Cuotas o Monto</SelectItem>
                   </SelectContent>
                 </Select>
                 <FormMessage />
