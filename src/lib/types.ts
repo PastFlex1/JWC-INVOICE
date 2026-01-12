@@ -12,7 +12,7 @@ export interface Customer {
   phone: string;
   agencia: string;
   vendedor: string;
-  plazo: number;
+  plazo: 0 | 8 | 15 | 30 | 45;
   cupo: number;
   daeId?: string;
 }

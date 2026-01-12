@@ -33,7 +33,7 @@ const formSchema = z.object({
   phone: z.string().min(7, { message: "Invalid phone number." }),
   agencia: z.string().min(1, { message: "Agency is required." }),
   vendedor: z.string().min(1, { message: "Seller is required." }),
-  plazo: z.coerce.number().refine(val => [8, 15, 30, 45].includes(val), { message: "Invalid term." }),
+  plazo: z.coerce.number().refine(val => [0, 8, 15, 30, 45].includes(val), { message: "Invalid term." }),
   cupo: z.coerce.number().positive({ message: "Credit limit must be a positive number." }),
 }).refine(data => {
     if (data.type === 'National') {
@@ -79,7 +79,7 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
     mode: 'onChange',
     defaultValues: initialData ? {
       ...initialData,
-      plazo: Number(initialData.plazo),
+      plazo: Number(initialData.plazo) as any,
       cupo: Number(initialData.cupo),
       daeId: initialData.daeId || "__none__",
     } : {
@@ -144,7 +144,7 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
   useEffect(() => {
     form.reset(initialData ? {
       ...initialData,
-      plazo: Number(initialData.plazo),
+      plazo: Number(initialData.plazo) as any,
       cupo: Number(initialData.cupo),
       daeId: initialData.daeId || "__none__",
     } : {
@@ -369,6 +369,7 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
                       </SelectTrigger>
                     </FormControl>
                     <SelectContent>
+                      <SelectItem value="0">Prepago (0 días)</SelectItem>
                       {[8, 15, 30, 45].map(d => (
                         <SelectItem key={d} value={String(d)}>
                           {d} days
