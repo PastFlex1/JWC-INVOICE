@@ -6,7 +6,7 @@ import { useForm, useFieldArray } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
 import { format, toDate, parseISO, addDays } from 'date-fns';
-import { CalendarIcon, Trash2, PlusCircle, Loader2, ChevronsUpDown } from 'lucide-react';
+import { CalendarIcon, Trash2, PlusCircle, Loader2, ChevronsUpDown, AlertCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { Alert, AlertTitle, AlertDescription } from '@/components/ui/alert';
 import { cn } from '@/lib/utils';
 import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/context/i18n-context';
@@ -90,7 +91,7 @@ export function NewInvoiceForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { toast } = useToast();
-  const { customers, fincas, vendedores, cargueras, paises, consignatarios, productos, marcaciones, invoices, refreshData, isLoading: isAppDataLoading } = useAppData();
+  const { customers, fincas, vendedores, cargueras, paises, consignatarios, productos, marcaciones, invoices, creditNotes, debitNotes, payments, refreshData, isLoading: isAppDataLoading } = useAppData();
   const { t } = useTranslation();
 
   const editId = searchParams.get('edit');
@@ -102,6 +103,7 @@ export function NewInvoiceForm() {
   const [filteredMarcaciones, setFilteredMarcaciones] = useState<typeof marcaciones>([]);
   const [itemToDelete, setItemToDelete] = useState<{ lineItemIndex: number; bunchIndex: number } | null>(null);
   const [isReferenceOpen, setIsReferenceOpen] = useState(false);
+  const [creditError, setCreditError] = useState<string | null>(null);
 
   const form = useForm<InvoiceFormValues>({
     resolver: zodResolver(invoiceSchema),
@@ -280,6 +282,7 @@ export function NewInvoiceForm() {
 
   const selectedCustomerId = form.watch('customerId');
   useEffect(() => {
+    setCreditError(null);
     if (!selectedCustomerId) {
       setFilteredConsignatarios([]);
       setFilteredMarcaciones([]);
@@ -405,6 +408,33 @@ export function NewInvoiceForm() {
 
   async function onSubmit(values: InvoiceFormValues) {
     setIsSubmitting(true);
+    setCreditError(null);
+
+    // Credit Check
+    const customer = customers.find(c => c.id === values.customerId);
+    if (customer && (values.type === 'sale' || values.type === 'both')) {
+      const customerInvoices = invoices.filter(inv => inv.customerId === customer.id && inv.id !== editId);
+      
+      const outstandingBalance = customerInvoices.reduce((acc, inv) => {
+        const credits = creditNotes.filter(cn => cn.invoiceId === inv.id && cn.type === 'sale').reduce((sum, note) => sum + note.amount, 0);
+        const debits = debitNotes.filter(dn => dn.invoiceId === inv.id && dn.type === 'sale').reduce((sum, note) => sum + note.amount, 0);
+        const paid = payments.filter(p => p.invoiceId === inv.id && p.type === 'sale').reduce((sum, payment) => sum + payment.amount, 0);
+        
+        const invoiceTotal = inv.items.reduce((total, item) => {
+          return total + item.bunches.reduce((sub, bunch) => sub + (bunch.stemsPerBunch * bunch.bunchesPerBox * bunch.salePrice), 0);
+        }, 0);
+        
+        const balance = invoiceTotal + debits - credits - paid;
+        return acc + (balance > 0 ? balance : 0);
+      }, 0);
+
+      const newInvoiceTotal = totals.totalValue;
+      if (customer.cupo > 0 && (outstandingBalance + newInvoiceTotal > customer.cupo)) {
+        setCreditError(`Crédito insuficiente. Límite: $${customer.cupo.toFixed(2)}, Saldo pendiente: $${outstandingBalance.toFixed(2)}, Factura actual: $${newInvoiceTotal.toFixed(2)}.`);
+        setIsSubmitting(false);
+        return;
+      }
+    }
   
     const { id, ...dataToSubmit } = values;
 
@@ -473,6 +503,15 @@ export function NewInvoiceForm() {
         <h2 className="text-3xl font-bold tracking-tight font-headline">{editId ? t('invoices.new.editTitle') : t('invoices.new.title')}</h2>
         <p className="text-muted-foreground">{editId ? t('invoices.new.editDescription') : t('invoices.new.description')}</p>
       </div>
+
+       {creditError && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertTitle>Error de Límite de Crédito</AlertTitle>
+          <AlertDescription>{creditError}</AlertDescription>
+        </Alert>
+      )}
+
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
           <Card>

@@ -13,6 +13,7 @@ import { Textarea } from '@/components/ui/textarea';
 import type { Customer, Pais, Carguera, Vendedor, Dae, Provincia } from '@/lib/types';
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useToast } from '@/hooks/use-toast';
 
 const formSchema = z.object({
   type: z.enum(['National', 'International'], { required_error: "Type is required." }),
@@ -74,6 +75,8 @@ type CustomerFormProps = {
 };
 
 export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras, vendedores, daes, provincias, isSubmitting }: CustomerFormProps) {
+  const { toast } = useToast();
+  
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -174,6 +177,13 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
         dataToSubmit.id = initialData.id;
     }
     onSubmit(dataToSubmit);
+
+    if (initialData && initialData.cupo !== values.cupo) {
+        toast({
+            title: "Crédito Actualizado",
+            description: `El cupo de crédito para ${values.name} ha sido actualizado.`,
+        });
+    }
   }
 
   return (
