@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -246,6 +247,7 @@ export function AccountsPayableClient() {
                     <TableHead>{t('accountsPayable.table.supplier')}</TableHead>
                     <TableHead>{t('accountsPayable.table.departureDate')}</TableHead>
                     <TableHead>{t('accountsPayable.table.outstandingAmount')}</TableHead>
+                    <TableHead>{t('invoices.status')}</TableHead>
                     <TableHead className="text-right">{t('common.actions.title')}</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -262,6 +264,15 @@ export function AccountsPayableClient() {
                         <TableCell>{getFinca(invoice.farmId)?.name || t('invoices.unknownCustomer')}</TableCell>
                         <TableCell>{format(parseISO(invoice.farmDepartureDate), 'PPP')}</TableCell>
                         <TableCell>${total.toFixed(2)}</TableCell>
+                         <TableCell>
+                          <Badge variant={
+                              invoice.purchaseStatus === 'Paid' ? 'secondary' :
+                              invoice.purchaseStatus === 'Overdue' ? 'destructive' :
+                              'outline'
+                          }>
+                              {invoice.purchaseStatus}
+                          </Badge>
+                        </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
                             <Link href={`/invoices/${invoice.id}`} passHref>

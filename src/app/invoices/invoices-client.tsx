@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useEffect, useMemo } from 'react';
@@ -253,6 +254,7 @@ export function InvoicesClient() {
                     <TableHead>{t('invoices.customer')}</TableHead>
                     <TableHead>{t('invoices.flightDate')}</TableHead>
                     <TableHead>{t('invoices.amount')}</TableHead>
+                    <TableHead>{t('invoices.status')}</TableHead>
                     <TableHead className="text-right">{t('invoices.actions.title')}</TableHead>
                   </TableRow>
                 </TableHeader>
@@ -269,6 +271,15 @@ export function InvoicesClient() {
                         <TableCell>{getCustomer(invoice.customerId)?.name || t('invoices.unknownCustomer')}</TableCell>
                         <TableCell>{format(parseISO(invoice.farmDepartureDate), 'PPP')}</TableCell>
                         <TableCell>${total.toFixed(2)}</TableCell>
+                        <TableCell>
+                          <Badge variant={
+                              invoice.saleStatus === 'Paid' ? 'secondary' :
+                              invoice.saleStatus === 'Overdue' ? 'destructive' :
+                              'outline'
+                          }>
+                              {invoice.saleStatus}
+                          </Badge>
+                        </TableCell>
                         <TableCell className="text-right">
                           <div className="flex items-center justify-end gap-1">
                             <Link href={`/invoices/${invoice.id}`} passHref>
