@@ -94,7 +94,7 @@ export function HistoricalFarmAccountStatementClient() {
     const totalPayments = processedInvoices.reduce((acc, inv) => acc + inv.payments, 0);
 
     const urgentPayment = processedInvoices
-        .filter(inv => inv.status === 'Overdue')
+        .filter(inv => inv.purchaseStatus === 'Overdue')
         .reduce((acc, inv) => acc + inv.balance, 0);
 
     return {

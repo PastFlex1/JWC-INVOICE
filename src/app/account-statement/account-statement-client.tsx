@@ -14,9 +14,19 @@ import { useTranslation } from '@/context/i18n-context';
 import { format, parseISO } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
 
+type InvoiceStatus = "Paid" | "Pending" | "Overdue" | "N/A";
+
+const getStatus = (inv: Invoice): InvoiceStatus => {
+  if (inv.type === "purchase") return inv.purchaseStatus ?? "N/A";
+  if (inv.type === "sale") return inv.saleStatus ?? "N/A";
+  // both
+  return inv.purchaseStatus ?? inv.saleStatus ?? "N/A";
+};
+
+
 export type StatementData = {
   customer: Customer;
-  invoices: (Invoice & { total: number; balance: number; credits: number; debits: number; payments: number; consigneeName?: string; })[];
+  invoices: (Invoice & { total: number; balance: number; credits: number; debits: number; payments: number; consigneeName?: string; status: InvoiceStatus; })[];
   totalOutstanding: number;
   totalCredits: number;
   totalDebits: number;
@@ -96,6 +106,7 @@ export function AccountStatementClient() {
         payments: totalPayments,
         balance,
         consigneeName,
+        status: getStatus(invoice),
       };
     }).filter(inv => inv.balance > 0.01);
     
@@ -107,7 +118,7 @@ export function AccountStatementClient() {
     const totalPayments = processedInvoices.reduce((acc, inv) => acc + inv.payments, 0);
 
     const urgentPayment = processedInvoices
-        .filter(inv => inv.saleStatus === 'Overdue')
+        .filter(inv => inv.status === 'Overdue')
         .reduce((acc, inv) => acc + inv.balance, 0);
 
     return {
