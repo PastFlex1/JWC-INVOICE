@@ -94,6 +94,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { href: '/view-payments', label: t('sidebar.viewPayments'), icon: BookCheck },
     { href: '/reports', label: t('sidebar.reports'), icon: LineChart },
     { href: '/reports/comparative-sales', label: t('sidebar.comparativeReport'), icon: BarChartHorizontal },
+    { href: '/reports/customer-report', label: t('sidebar.customerReport'), icon: Users },
   ];
   
   const documentsNavItems = [

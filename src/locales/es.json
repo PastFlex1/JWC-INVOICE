@@ -9,6 +9,7 @@
     "customers": "Clientes",
     "reports": "Reportes",
     "comparativeReport": "Reporte Comparativo",
+    "customerReport": "Reporte por Cliente",
     "configuration": "Configuración",
     "settings": "Ajustes",
     "viewPayments": "Ver Pagos",
@@ -94,6 +95,19 @@
       "customer": "Cliente",
       "chargeFarm": "Valor Compra",
       "chargeClient": "Valor Venta"
+    }
+  },
+  "customerReport": {
+    "title": "Reporte de Ventas por Cliente",
+    "description": "Analice el rendimiento de ventas para cada cliente.",
+    "chartTitle": "Top Clientes por Ventas",
+    "tableTitle": "Desglose Detallado por Cliente",
+    "table": {
+      "customer": "Cliente",
+      "totalStems": "Total Tallos",
+      "purchaseValue": "Valor Compra",
+      "saleValue": "Valor Venta",
+      "profit": "Utilidad"
     }
   },
   "invoices": {
