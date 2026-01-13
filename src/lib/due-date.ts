@@ -1,10 +1,9 @@
 'use client';
 
 import type { Customer } from './types';
-import { add, setDate, endOfMonth, startOfDay, isPast } from 'date-fns';
+import { add, setDate, startOfDay } from 'date-fns';
 
 export function calculateDueDate(invoiceDate: Date, customer: Customer | null): Date {
-  // National customers and prepay international customers have immediate due dates.
   if (!customer || customer.type === 'National') {
     return invoiceDate;
   }
@@ -13,33 +12,30 @@ export function calculateDueDate(invoiceDate: Date, customer: Customer | null): 
   const plazoDays = customer.plazo || 0;
 
   switch (plazoDays) {
-    case 0: // Prepago
+    case 0:
       return cleanInvoiceDate;
     
-    case 8: // 8 días
+    case 8:
       return add(cleanInvoiceDate, { days: 8 });
 
-    case 15: // 15 días (quincenal)
+    case 15:
       const dayOfMonth = cleanInvoiceDate.getDate();
       if (dayOfMonth <= 15) {
-        // Facturas del 1-15, vencen el 30 del mismo mes.
         return setDate(cleanInvoiceDate, 30);
       } else {
-        // Facturas del 16 en adelante, vencen el 15 del siguiente mes.
         const nextMonth = add(cleanInvoiceDate, { months: 1 });
         return setDate(nextMonth, 15);
       }
       
-    case 30: // 30 días
+    case 30:
         const nextMonthFor30 = add(cleanInvoiceDate, { months: 1 });
         return setDate(nextMonthFor30, 30);
     
-    case 45: // 45 días
+    case 45:
         const thirdMonth = add(cleanInvoiceDate, { months: 2 });
         return setDate(thirdMonth, 15);
 
     default:
-      // Fallback a la lógica simple si es un plazo no especificado (aunque no debería pasar con el form)
       return add(cleanInvoiceDate, { days: plazoDays });
   }
 }

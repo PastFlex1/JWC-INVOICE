@@ -35,7 +35,7 @@ const formSchema = z.object({
   phone: z.string().min(7, { message: "Invalid phone number." }),
   agencia: z.string().min(1, { message: "Agency is required." }),
   vendedor: z.string().min(1, { message: "Seller is required." }),
-  plazo: z.coerce.number().refine(val => [0, 8, 15, 30, 45].includes(val), { message: "Invalid term." }),
+  plazo: z.coerce.number().int().min(0, "Term must be a positive number."),
   cupo: z.coerce.number().positive({ message: "Credit limit must be a positive number." }),
   tipoControl: z.enum(['Ninguna', 'Advertencia', 'BloquearMonto', 'BloquearVencidas', 'BloquearMontoVencidas']),
 }).refine(data => {
@@ -378,21 +378,9 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
             render={({ field }) => (
               <FormItem>
                 <FormLabel>Term (days)</FormLabel>
-                <Select onValueChange={(value) => field.onChange(Number(value))} defaultValue={String(field.value)}>
-                    <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a term" />
-                      </SelectTrigger>
-                    </FormControl>
-                    <SelectContent>
-                      <SelectItem value="0">Prepago (0 días)</SelectItem>
-                      {[8, 15, 30, 45].map(d => (
-                        <SelectItem key={d} value={String(d)}>
-                          {d} days
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <FormControl>
+                   <Input type="number" placeholder="15" {...field} />
+                </FormControl>
                 <FormMessage />
               </FormItem>
             )}

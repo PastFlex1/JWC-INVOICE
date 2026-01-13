@@ -12,7 +12,7 @@ export interface Customer {
   phone: string;
   agencia: string;
   vendedor: string;
-  plazo: 0 | 8 | 15 | 30 | 45;
+  plazo: number;
   cupo: number;
   tipoControl: 'Ninguna' | 'Advertencia' | 'BloquearMonto' | 'BloquearVencidas' | 'BloquearMontoVencidas';
   daeId?: string;
