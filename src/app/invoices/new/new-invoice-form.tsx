@@ -10,7 +10,7 @@ import { format, toDate, parseISO, addDays } from 'date-fns';
 import { CalendarIcon, Trash2, PlusCircle, Loader2, ChevronsUpDown, AlertCircle } from 'lucide-react';
 import { v4 as uuidv4 } from 'uuid';
 
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -1103,7 +1103,7 @@ export function NewInvoiceForm() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={() => setItemToDelete(null)}>{t('common.cancel')}</AlertDialogCancel>
-            <AlertDialogAction onClick={confirmRemoveBunch} variant="destructive">
+            <AlertDialogAction onClick={confirmRemoveBunch} className={buttonVariants({ variant: "destructive" })}>
               {t('common.delete')}
             </AlertDialogAction>
           </AlertDialogFooter>

@@ -3,7 +3,7 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import { Search, Calendar as CalendarIcon, X as XIcon, Trash2 } from 'lucide-react';
-import { Button } from '@/components/ui/button';
+import { Button, buttonVariants } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -387,7 +387,7 @@ export function ViewPaymentsClient() {
             </AlertDialogHeader>
             <AlertDialogFooter>
                 <AlertDialogCancel onClick={() => setPaymentToDelete(null)}>{t('common.cancel')}</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeletePayment} variant="destructive" disabled={isDeleting}>
+                <AlertDialogAction onClick={handleDeletePayment} className={buttonVariants({ variant: "destructive" })} disabled={isDeleting}>
                     {isDeleting ? t('common.deleting') : t('common.delete')}
                 </AlertDialogAction>
             </AlertDialogFooter>
@@ -404,7 +404,7 @@ export function ViewPaymentsClient() {
             </AlertDialogHeader>
             <AlertDialogFooter>
                 <AlertDialogCancel onClick={() => setSinglePaymentToDelete(null)}>{t('common.cancel')}</AlertDialogCancel>
-                <AlertDialogAction onClick={handleDeleteSinglePayment} variant="destructive" disabled={isDeleting}>
+                <AlertDialogAction onClick={handleDeleteSinglePayment} className={buttonVariants({ variant: "destructive" })} disabled={isDeleting}>
                     {isDeleting ? t('common.deleting') : t('common.delete')}
                 </AlertDialogAction>
             </AlertDialogFooter>
