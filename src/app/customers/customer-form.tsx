@@ -84,8 +84,6 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
     mode: 'onChange',
     defaultValues: initialData ? {
       ...initialData,
-      plazo: Number(initialData.plazo) as any,
-      cupo: Number(initialData.cupo),
       daeId: initialData.daeId || "__none__",
       tipoControl: initialData.tipoControl || 'Advertencia',
     } : {
@@ -151,8 +149,6 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
   useEffect(() => {
     form.reset(initialData ? {
       ...initialData,
-      plazo: Number(initialData.plazo) as any,
-      cupo: Number(initialData.cupo),
       daeId: initialData.daeId || "__none__",
       tipoControl: initialData.tipoControl || 'Advertencia'
     } : {
@@ -372,7 +368,7 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
               </FormItem>
             )}
           />
-          <FormField
+           <FormField
             control={form.control}
             name="plazo"
             render={({ field }) => (
@@ -413,7 +409,7 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
                   <SelectContent>
                     <SelectItem value="__none__">None</SelectItem>
                     {daes.map(d => (
-                      <SelectItem key={d.id} value={d.id} disabled={selectedPais && d.pais !== selectedPais}>
+                      <SelectItem key={d.id} value={d.id} disabled={!!selectedPais && d.pais !== selectedPais}>
                         {d.pais} ({d.numeroDae})
                       </SelectItem>
                     ))}
