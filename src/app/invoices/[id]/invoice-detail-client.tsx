@@ -73,7 +73,7 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
     <InvoiceDetailView 
       invoice={invoiceData.invoice}
       customer={invoiceData.customer}
-      consignatario={invoiceData.consignatario}
+      consignatario={invoiceData.consignatario ?? null}
       carguera={invoiceData.carguera}
       pais={invoiceData.pais}
       financials={invoiceData.financials}
