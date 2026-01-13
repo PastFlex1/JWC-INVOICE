@@ -22,7 +22,7 @@ export default function HistoricalAccountStatementExcelButton({ data }: Historic
   const handleDownloadExcel = () => {
     setIsGenerating(true);
     try {
-      const ws_data = [
+      const ws_data: (string | number)[][] = [
         [t('historicalAccountStatement.excel.title'), data.customer.name.toUpperCase()],
         [],
         [t('accountStatement.excel.customer'), data.customer.name],
@@ -44,7 +44,7 @@ export default function HistoricalAccountStatementExcelButton({ data }: Historic
         ws_data.push([
           format(parseISO(invoice.farmDepartureDate), 'dd/MM/yyyy'),
           invoice.invoiceNumber,
-          invoice.consigneeName,
+          invoice.consigneeName || '',
           invoice.total,
           invoice.credits - invoice.debits,
           invoice.payments,
@@ -54,7 +54,7 @@ export default function HistoricalAccountStatementExcelButton({ data }: Historic
 
       ws_data.push([]);
       ws_data.push([
-        "", "", t('accountStatement.view.totalPending'),
+        "", "", "", t('accountStatement.view.totalPending'),
         data.invoices.reduce((acc, inv) => acc + inv.total, 0),
         data.totalCredits - data.totalDebits,
         data.totalPayments,

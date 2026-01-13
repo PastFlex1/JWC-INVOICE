@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useMemo } from 'react';
@@ -35,18 +36,19 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
 
 
     invoice?.items?.forEach(item => {
-      totalBoxes += 1;
-      totalBoxTypeValue += boxTypeValues[item.boxType] || 0;
+      const numBoxes = Number(item.numberOfBoxes) || 1;
+      totalBoxes += numBoxes;
+      totalBoxTypeValue += (boxTypeValues[item.boxType] || 0) * numBoxes;
       if (item.bunches && Array.isArray(item.bunches)) {
         item.bunches.forEach(bunch => {
           const bunchesCount = Number(bunch.bunchesPerBox) || 0;
           const stemsPerBunch = Number(bunch.stemsPerBunch) || 0;
           const price = invoice.type === 'purchase' ? (Number(bunch.purchasePrice) || 0) : (Number(bunch.salePrice) || 0);
 
-          totalBunches += bunchesCount;
+          totalBunches += bunchesCount * numBoxes;
           const stemsInBunch = bunchesCount * stemsPerBunch;
-          totalStems += stemsInBunch;
-          totalFob += stemsInBunch * price;
+          totalStems += stemsInBunch * numBoxes;
+          totalFob += (stemsInBunch * price) * numBoxes;
         });
       }
     });
@@ -90,24 +92,25 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
 
       invoice.items.forEach((item, itemIndex) => {
         const itemBoxValue = boxTypeValues[item.boxType] || 0;
+        const numBoxes = item.numberOfBoxes || 1;
         (item.bunches || []).forEach((bunch, bunchIndex) => {
             const stemsPerBunch = bunch.stemsPerBunch || 0;
             const bunchesPerBox = bunch.bunchesPerBox || 0;
             const pricePerStem = invoice.type === 'purchase' ? bunch.purchasePrice : bunch.salePrice;
 
-            const totalStemsForBunch = stemsPerBunch * bunchesPerBox;
+            const totalStemsForBunch = stemsPerBunch * bunchesPerBox * numBoxes;
             const totalPrice = totalStemsForBunch * pricePerStem;
             
             ws_data.push([
-              bunchIndex === 0 ? item.numberOfBoxes : '',
+              bunchIndex === 0 ? numBoxes : '',
               bunchIndex === 0 ? item.boxType.toUpperCase() : '',
-              bunchIndex === 0 ? itemBoxValue.toFixed(2) : '',
+              bunchIndex === 0 ? (itemBoxValue * numBoxes).toFixed(2) : '',
               invoice.reference || '',
               bunch.product,
               bunch.variety,
               bunch.length,
               totalStemsForBunch,
-              bunchesPerBox,
+              bunchesPerBox * numBoxes,
               pricePerStem.toFixed(3),
               totalPrice.toFixed(2)
             ]);

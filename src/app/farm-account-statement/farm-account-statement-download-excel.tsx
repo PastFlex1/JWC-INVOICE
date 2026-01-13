@@ -22,7 +22,7 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
   const handleDownloadExcel = () => {
     setIsGenerating(true);
     try {
-      const ws_data = [
+      const ws_data: (string | number)[][] = [
         [t('farmAccountStatement.view.title', { farmName: data.finca.name.toUpperCase() })],
         [],
         [t('farmAccountStatement.view.supplier'), data.finca.name],
@@ -85,7 +85,7 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
 
       ws_data.push([]);
       ws_data.push([
-        "", "", "", t('farmAccountStatement.view.totalPending'),
+        "", "", "", "", t('farmAccountStatement.view.totalPending'),
         data.invoices.reduce((acc, inv) => acc + inv.total, 0),
         data.totalCredits - data.totalDebits,
         data.totalPayments,

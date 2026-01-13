@@ -22,7 +22,7 @@ export default function AccountStatementExcelButton({ data }: AccountStatementEx
   const handleDownloadExcel = () => {
     setIsGenerating(true);
     try {
-      const ws_data = [
+      const ws_data: (string | number)[][] = [
         [t('accountStatement.excel.title'), data.customer.name.toUpperCase()],
         [],
         [t('accountStatement.excel.customer'), data.customer.name],

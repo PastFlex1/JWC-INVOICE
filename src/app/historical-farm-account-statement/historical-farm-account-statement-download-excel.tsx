@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState } from 'react';
@@ -21,7 +22,7 @@ export default function HistoricalFarmAccountStatementExcelButton({ data }: Hist
   const handleDownloadExcel = () => {
     setIsGenerating(true);
     try {
-      const ws_data = [
+      const ws_data: (string | number)[][] = [
         [t('historicalFarmAccountStatement.excel.title'), data.finca.name.toUpperCase()],
         [],
         [t('farmAccountStatement.view.supplier'), data.finca.name],
@@ -53,7 +54,7 @@ export default function HistoricalFarmAccountStatementExcelButton({ data }: Hist
 
       ws_data.push([]);
       ws_data.push([
-        "", "", t('farmAccountStatement.view.totalPending'),
+        "", "", "", t('farmAccountStatement.view.totalPending'),
         data.invoices.reduce((acc, inv) => acc + inv.total, 0),
         data.totalCredits - data.totalDebits,
         data.totalPayments,
