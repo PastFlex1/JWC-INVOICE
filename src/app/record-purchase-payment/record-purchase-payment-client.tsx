@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useAppData } from '@/context/app-data-context';
@@ -17,7 +18,7 @@ export function RecordPurchasePaymentClient() {
 
   const handleAddBulkPayment = async (
     paymentDetails: Omit<Payment, 'id' | 'invoiceId' | 'amount'>,
-    selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', flightDate: string, amountToPay: number }[]
+    selectedInvoices: { invoiceId: string; balance: number; type: 'sale' | 'purchase' | 'both', farmDepartureDate: string, amountToPay: number }[]
   ) => {
     setIsSubmitting(true);
     try {
