@@ -1,4 +1,5 @@
 
+
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { format, parseISO } from 'date-fns';
@@ -18,22 +19,24 @@ export function InvoicePdfView({ invoice, customer, consignatario, carguera, pai
   const isNational = customer?.type === 'National';
 
   const calculateTotals = () => {
-    let totalBoxes = invoice?.items?.length || 0;
+    let totalBoxes = 0;
     let totalBunches = 0;
     let totalStems = 0;
     let totalFob = 0;
 
     invoice?.items?.forEach(item => {
+      const numBoxes = item.numberOfBoxes || 1;
+      totalBoxes += numBoxes;
       if (item.bunches && Array.isArray(item.bunches)) {
         item.bunches.forEach(bunch => {
           const bunchesCount = Number(bunch.bunchesPerBox) || 0;
           const stemsPerBunch = Number(bunch.stemsPerBunch) || 0;
           const salePrice = Number(bunch.salePrice) || 0;
 
-          totalBunches += bunchesCount;
+          totalBunches += bunchesCount * numBoxes;
           const stemsInBunch = bunchesCount * stemsPerBunch;
-          totalStems += stemsInBunch;
-          totalFob += stemsInBunch * salePrice;
+          totalStems += stemsInBunch * numBoxes;
+          totalFob += (stemsInBunch * salePrice) * numBoxes;
         });
       }
     });
@@ -50,21 +53,22 @@ export function InvoicePdfView({ invoice, customer, consignatario, carguera, pai
   const totals = calculateTotals();
 
   const renderItemRow = (item: LineItem, index: number) => {
+    const numBoxes = item.numberOfBoxes || 1;
     return (
        <React.Fragment key={item.id || index}>
         {(item.bunches || []).map((bunch, bunchIndex) => {
-            const totalStemsForBunch = bunch.stemsPerBunch * bunch.bunchesPerBox;
+            const totalStemsForBunch = bunch.stemsPerBunch * bunch.bunchesPerBox * numBoxes;
             const totalPrice = totalStemsForBunch * bunch.salePrice;
             return (
                  <div key={bunch.id || bunchIndex} className="contents text-[10px] leading-tight">
-                    <div className="border-b border-l border-gray-400 p-1 text-center">{bunchIndex === 0 ? item.boxNumber : ''}</div>
+                    <div className="border-b border-l border-gray-400 p-1 text-center">{bunchIndex === 0 ? item.numberOfBoxes : ''}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-center">{bunchIndex === 0 ? item.boxType.toUpperCase() : ''}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-left">{invoice.reference}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-left">{bunch.product}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-left">{bunch.variety}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-center">{bunch.length}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-center">{totalStemsForBunch}</div>
-                    <div className="border-b border-l border-gray-400 p-1 text-center">{bunch.bunchesPerBox}</div>
+                    <div className="border-b border-l border-gray-400 p-1 text-center">{bunch.bunchesPerBox * numBoxes}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-right">{bunch.salePrice.toFixed(3)}</div>
                     <div className="border-b border-r border-l border-gray-400 p-1 text-right font-semibold">${totalPrice.toFixed(2)}</div>
                 </div>
