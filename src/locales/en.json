@@ -67,6 +67,8 @@
     "allFarms": "All Farms",
     "filterByCustomer": "Filter by Customer",
     "allCustomers": "All Customers",
+    "selectCustomers": "Select Customers...",
+    "customersSelected": "{count} customers selected",
     "filterByYear": "Filter by Year",
     "allYears": "All Years",
     "selectYears": "Select years...",

@@ -1,13 +1,15 @@
 
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cell, Text } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 import type { Invoice, BunchItem } from '@/lib/types';
 import { format, parseISO, getYear } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
@@ -38,7 +40,7 @@ export function CustomerReportClient() {
   const dateLocale = useMemo(() => (locale === 'es' ? es : enUS), [locale]);
 
   const [selectedFincaId, setSelectedFincaId] = useState<string>('all');
-  const [selectedCustomerId, setSelectedCustomerId] = useState<string>('all');
+  const [selectedCustomerIds, setSelectedCustomerIds] = useState<string[]>([]);
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
 
@@ -57,13 +59,20 @@ export function CustomerReportClient() {
     return Array.from(months).sort();
   }, [invoices, selectedYear]);
 
+  useEffect(() => {
+    if (customers.length > 0) {
+        setSelectedCustomerIds(customers.map(c => c.id));
+    }
+  }, [customers]);
+
   const filteredInvoices = useMemo(() => {
     let filtered = invoices.filter(inv => inv.type === 'sale' || inv.type === 'both');
     if (selectedFincaId !== 'all') {
       filtered = filtered.filter(inv => inv.farmId === selectedFincaId);
     }
-    if (selectedCustomerId !== 'all') {
-      filtered = filtered.filter(inv => inv.customerId === selectedCustomerId);
+    if (selectedCustomerIds.length > 0) {
+      const customerIdSet = new Set(selectedCustomerIds);
+      filtered = filtered.filter(inv => customerIdSet.has(inv.customerId));
     }
     if (selectedYear !== 'all') {
       const year = parseInt(selectedYear);
@@ -74,7 +83,7 @@ export function CustomerReportClient() {
       filtered = filtered.filter(inv => parseISO(inv.farmDepartureDate).getMonth() === month);
     }
     return filtered;
-  }, [invoices, selectedFincaId, selectedCustomerId, selectedYear, selectedMonth]);
+  }, [invoices, selectedFincaId, selectedCustomerIds, selectedYear, selectedMonth]);
 
   const customerReportData: CustomerReportData[] = useMemo(() => {
     const dataByCustomer: Record<string, CustomerReportData> = {};
@@ -141,13 +150,30 @@ export function CustomerReportClient() {
                     {fincas.map(f => <SelectItem key={f.id} value={f.id}>{f.name}</SelectItem>)}
                 </SelectContent>
             </Select>
-            <Select value={selectedCustomerId} onValueChange={setSelectedCustomerId}>
-                <SelectTrigger className="w-full md:w-auto md:min-w-[200px]"><SelectValue placeholder={t('reports.filterByCustomer')} /></SelectTrigger>
-                <SelectContent>
-                    <SelectItem value="all">{t('reports.allCustomers')}</SelectItem>
-                    {customers.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
-                </SelectContent>
-            </Select>
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button variant="outline" className="w-full md:w-auto md:min-w-[200px]">
+                   {selectedCustomerIds.length === 0 ? t('reports.selectCustomers') : selectedCustomerIds.length === customers.length ? t('reports.allCustomers') : t('reports.customersSelected', { count: selectedCustomerIds.length })}
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent className="w-56">
+                <DropdownMenuLabel>{t('reports.filterByCustomer')}</DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                {customers.map(c => (
+                  <DropdownMenuCheckboxItem
+                    key={c.id}
+                    checked={selectedCustomerIds.includes(c.id)}
+                    onCheckedChange={(checked) => {
+                      setSelectedCustomerIds(prev => 
+                        checked ? [...prev, c.id] : prev.filter(id => id !== c.id)
+                      );
+                    }}
+                  >
+                    {c.name}
+                  </DropdownMenuCheckboxItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
             <Select value={selectedYear} onValueChange={(value) => {setSelectedYear(value); setSelectedMonth('all');}}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[150px]"><SelectValue placeholder={t('reports.filterByYear')} /></SelectTrigger>
                 <SelectContent>

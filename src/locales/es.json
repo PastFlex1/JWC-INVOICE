@@ -67,6 +67,8 @@
     "allFarms": "Todas las Fincas",
     "filterByCustomer": "Filtrar por Cliente",
     "allCustomers": "Todos los Clientes",
+    "selectCustomers": "Seleccionar Clientes...",
+    "customersSelected": "{count} clientes seleccionados",
     "filterByYear": "Filtrar por Año",
     "allYears": "Todos los Años",
     "selectYears": "Seleccionar años...",
