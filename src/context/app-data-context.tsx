@@ -21,6 +21,8 @@ import { getPayments } from '@/services/payments';
 import { getVariedades } from '@/services/variedades';
 import { cargueras as defaultCargueras, provincias as defaultProvincias } from '@/lib/mock-data';
 import { useToast } from '@/hooks/use-toast';
+import { getInvoiceStatus } from '@/lib/due-date';
+import { parseISO } from 'date-fns';
 
 type AppData = {
   paises: Pais[];
@@ -125,6 +127,42 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
           combinedProvincias.push(dp);
         }
       });
+      
+      const customerMap = new Map(customersData.map(c => [c.id, c]));
+
+      const processedInvoices = invoicesData.map(invoice => {
+        const customer = customerMap.get(invoice.customerId);
+
+        const calculateBalance = (type: 'sale' | 'purchase') => {
+          if (invoice.type !== type && invoice.type !== 'both') return 0;
+          
+          const priceField = type === 'sale' ? 'salePrice' : 'purchasePrice';
+          const subtotal = invoice.items.reduce((acc, item) => {
+            return acc + (item.bunches || []).reduce((bunchAcc, bunch) => {
+              const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
+              return bunchAcc + (stems * (bunch[priceField] || 0));
+            }, 0) * (item.numberOfBoxes || 1);
+          }, 0);
+
+          const credits = creditNotesData.filter(cn => cn.invoiceId === invoice.id && cn.type === type).reduce((sum, note) => sum + note.amount, 0);
+          const debits = debitNotesData.filter(dn => dn.invoiceId === invoice.id && dn.type === type).reduce((sum, note) => sum + note.amount, 0);
+          const paid = paymentsData.filter(p => p.invoiceId === invoice.id && p.type === type).reduce((sum, payment) => sum + payment.amount, 0);
+          
+          return (subtotal + debits) - (credits + paid);
+        };
+
+        const saleBalance = calculateBalance('sale');
+        const purchaseBalance = calculateBalance('purchase');
+
+        const saleStatus = invoice.type === 'purchase' ? 'N/A' : getInvoiceStatus(parseISO(invoice.farmDepartureDate), saleBalance, customer || null);
+        const purchaseStatus = invoice.type === 'sale' ? 'N/A' : getInvoiceStatus(parseISO(invoice.farmDepartureDate), purchaseBalance, customer || null);
+
+        return {
+          ...invoice,
+          saleStatus,
+          purchaseStatus,
+        };
+      });
 
       setData({
         paises: paisesData,
@@ -136,7 +174,7 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         daes: daesData,
         marcaciones: marcacionesData,
         provincias: combinedProvincias,
-        invoices: invoicesData,
+        invoices: processedInvoices,
         productos: productosData,
         variedades: variedadesData,
         creditNotes: creditNotesData,

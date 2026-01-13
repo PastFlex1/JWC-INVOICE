@@ -1,4 +1,5 @@
 
+
 import { db } from '@/lib/firebase';
 import type { Payment, Invoice, CreditNote, DebitNote, BunchItem } from '@/lib/types';
 import {
@@ -19,6 +20,8 @@ import {
   deleteDoc,
   Transaction,
 } from 'firebase/firestore';
+import { getInvoiceStatus } from '@/lib/due-date';
+import { parseISO } from 'date-fns';
 
 const paymentFromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData>): Payment => {
   const data = snapshot.data();
@@ -67,56 +70,15 @@ async function recalculateInvoiceStatus(transaction: Transaction, invoiceId: str
     }
 
     const invoiceData = invoiceDoc.data() as Invoice;
-
-    const priceField = paymentType === 'purchase' ? 'purchasePrice' : 'salePrice';
-    const subtotal = invoiceData.items.reduce((acc, item) => {
-        if (!item.bunches) return acc;
-        return acc + item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
-            const stems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0);
-            return bunchAcc + (stems * (bunch[priceField] || 0));
-        }, 0);
-    }, 0);
-
-    const creditNotesQuery = query(collection(db, 'creditNotes'), where('invoiceId', '==', invoiceId), where('type', '==', paymentType));
-    const debitNotesQuery = query(collection(db, 'debitNotes'), where('invoiceId', '==', invoiceId), where('type', '==', paymentType));
-    const paymentsQuery = query(collection(db, 'payments'), where('invoiceId', '==', invoiceId), where('type', '==', paymentType));
     
-    const [creditNotesSnapshot, debitNotesSnapshot, paymentsSnapshot] = await Promise.all([
-        getDocs(creditNotesQuery),
-        getDocs(debitNotesQuery),
-        getDocs(paymentsQuery),
-    ]);
-
-    const totalCredits = creditNotesSnapshot.docs.reduce((sum, doc) => sum + doc.data().amount, 0);
-    const totalDebits = debitNotesSnapshot.docs.reduce((sum, doc) => sum + doc.data().amount, 0);
-    let totalPayments = paymentsSnapshot.docs.reduce((sum, doc) => sum + doc.data().amount, 0);
-    
-    // We must manually adjust for the payments being deleted in this same transaction
-    // as they won't be reflected in the snapshot query. This part of the logic
-    // is tricky. A simpler way is to re-calculate the balance client-side and just set status to pending.
-
-    const totalCharge = subtotal + totalDebits;
-    const balance = totalCharge - totalCredits - totalPayments;
-    
-    let newStatus: 'Paid' | 'Pending' | 'Overdue' = 'Pending';
-    if (balance <= 0.01) {
-        newStatus = 'Paid';
-    } else {
-        const dueDate = new Date(invoiceData.farmDepartureDate);
-        dueDate.setDate(dueDate.getDate() + 30);
-        if (new Date() > dueDate) {
-            newStatus = 'Overdue';
-        } else {
-            newStatus = 'Pending';
-        }
-    }
-
+    // This is a simplified recalculation. A full recalculation is now handled in the AppData context.
+    // Here, we just mark it as pending to trigger a UI update.
     const updatePayload: { saleStatus?: string; purchaseStatus?: string } = {};
 
     if (paymentType === 'sale') {
-      updatePayload.saleStatus = newStatus;
+      updatePayload.saleStatus = 'Pending';
     } else { // purchase
-      updatePayload.purchaseStatus = newStatus;
+      updatePayload.purchaseStatus = 'Pending';
     }
     
     transaction.update(invoiceRef, updatePayload);
@@ -131,7 +93,6 @@ export async function addBulkPayment(
 
   await runTransaction(db, async (transaction) => {
     const invoiceDocs = new Map<string, DocumentData | undefined>();
-    const invoicesToUpdate = [];
 
     // --- PHASE 1: READS ---
     for (const invoice of invoicesToPay) {
@@ -157,8 +118,6 @@ export async function addBulkPayment(
         invoiceNumber: invoiceData?.invoiceNumber || '',
       };
       transaction.set(creditNoteRef, creditNoteData);
-      
-      firstInvoice.balance -= bankFee;
     }
 
     for (const invoice of invoicesToPay) {
@@ -173,30 +132,7 @@ export async function addBulkPayment(
       };
       transaction.set(newPaymentRef, newPaymentData);
 
-      const newBalance = invoice.balance - invoice.amountToPay;
-      const isPaid = newBalance <= 0.01;
-      
-      const dueDate = new Date(invoice.farmDepartureDate);
-      dueDate.setDate(dueDate.getDate() + 30);
-      const newStatus = isPaid ? 'Paid' : (new Date() > dueDate ? 'Overdue' : 'Pending');
-
-      const updatePayload: { saleStatus?: string; purchaseStatus?: string } = {};
-      
-      if (invoice.type === 'sale' || (invoice.type === 'both' && paymentData.type === 'sale')) {
-          updatePayload.saleStatus = newStatus;
-      }
-      if (invoice.type === 'purchase' || (invoice.type === 'both' && paymentData.type === 'purchase')) {
-          updatePayload.purchaseStatus = newStatus;
-      }
-
-      if (Object.keys(updatePayload).length > 0) {
-        invoicesToUpdate.push({ id: invoice.invoiceId, payload: updatePayload });
-      }
-    }
-
-    for (const { id, payload } of invoicesToUpdate) {
-        const invoiceRef = doc(db, 'invoices', id);
-        transaction.update(invoiceRef, payload);
+      // No need to update status here, as it will be recalculated on next data fetch.
     }
   });
 }
@@ -206,79 +142,26 @@ export async function deleteAggregatedPayment(paymentIds: string[]): Promise<voi
     if (!db) throw new Error("Firebase is not configured.");
 
     await runTransaction(db, async (transaction) => {
-        const affectedInvoiceIds = new Set<string>();
-        const paymentsToDelete: { ref: DocumentSnapshot<DocumentData>, data: Payment }[] = [];
-
-        // Phase 1: Reads
+        // Phase 1: Reads (optional, as we don't need the data to just delete)
+        // Phase 2: Writes
         for (const paymentId of paymentIds) {
             const paymentRef = doc(db, 'payments', paymentId);
-            const paymentDoc = await transaction.get(paymentRef);
-            if (paymentDoc.exists()) {
-                const paymentData = paymentFromFirestore(paymentDoc as QueryDocumentSnapshot<DocumentData>);
-                affectedInvoiceIds.add(paymentData.invoiceId);
-                paymentsToDelete.push({ ref: paymentDoc, data: paymentData });
-            }
+            transaction.delete(paymentRef);
         }
-        
-        // Phase 2: Writes
-        for (const { ref } of paymentsToDelete) {
-            transaction.delete(ref.ref);
-        }
-
-        // We cannot reliably recalculate status here without re-querying all related documents
-        // which is not allowed after writes. So we will simply mark the invoices as 'Pending'.
-        // A better approach for full accuracy would be a client-side recalculation trigger after deletion.
-        for (const invoiceId of affectedInvoiceIds) {
-            const paymentType = paymentsToDelete.find(p => p.data.invoiceId === invoiceId)?.data.type;
-             const invoiceRef = doc(db, 'invoices', invoiceId);
-             if (paymentType === 'sale') {
-                transaction.update(invoiceRef, { saleStatus: 'Pending' });
-            } else if (paymentType === 'purchase') {
-                transaction.update(invoiceRef, { purchaseStatus: 'Pending' });
-            }
-        }
+        // Invoice statuses will be recalculated on the next data fetch by the client.
     });
 }
 
 export async function deleteSinglePayment(paymentId: string): Promise<void> {
     if (!db) throw new Error("Firebase is not configured.");
-
-    await runTransaction(db, async (transaction) => {
-        const paymentRef = doc(db, 'payments', paymentId);
-        const paymentDoc = await transaction.get(paymentRef);
-
-        if (paymentDoc.exists()) {
-            const paymentData = paymentFromFirestore(paymentDoc as QueryDocumentSnapshot<DocumentData>);
-            
-            transaction.delete(paymentRef);
-            
-            const invoiceRef = doc(db, 'invoices', paymentData.invoiceId);
-            if (paymentData.type === 'sale') {
-                transaction.update(invoiceRef, { saleStatus: 'Pending' });
-            } else if (paymentData.type === 'purchase') {
-                transaction.update(invoiceRef, { purchaseStatus: 'Pending' });
-            }
-        }
-    });
+    const paymentRef = doc(db, 'payments', paymentId);
+    await deleteDoc(paymentRef);
+    // Status will be recalculated on next data fetch.
 }
 
 export async function updateSinglePayment(paymentId: string, newAmount: number): Promise<void> {
     if (!db) throw new Error("Firebase is not configured.");
-
-    await runTransaction(db, async (transaction) => {
-        const paymentRef = doc(db, 'payments', paymentId);
-        const paymentDoc = await transaction.get(paymentRef);
-
-        if (paymentDoc.exists()) {
-            const paymentData = paymentFromFirestore(paymentDoc as QueryDocumentSnapshot<DocumentData>);
-            transaction.update(paymentRef, { amount: newAmount });
-            
-            const invoiceRef = doc(db, 'invoices', paymentData.invoiceId);
-            if (paymentData.type === 'sale') {
-                transaction.update(invoiceRef, { saleStatus: 'Pending' });
-            } else if (paymentData.type === 'purchase') {
-                transaction.update(invoiceRef, { purchaseStatus: 'Pending' });
-            }
-        }
-    });
+    const paymentRef = doc(db, 'payments', paymentId);
+    await updateDoc(paymentRef, { amount: newAmount });
+    // Status will be recalculated on next data fetch.
 }
