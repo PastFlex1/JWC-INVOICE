@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useEffect, useMemo, useState } from 'react';
@@ -74,8 +75,8 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
       invoice={invoiceData.invoice}
       customer={invoiceData.customer}
       consignatario={invoiceData.consignatario ?? null}
-      carguera={invoiceData.carguera}
-      pais={invoiceData.pais}
+      carguera={invoiceData.carguera ?? null}
+      pais={invoiceData.pais ?? null}
       financials={invoiceData.financials}
     />
   );
