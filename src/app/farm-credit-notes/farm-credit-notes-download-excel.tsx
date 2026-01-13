@@ -23,7 +23,7 @@ export default function FarmCreditNotesDownloadExcelButton({ notes }: FarmCredit
   const handleDownloadExcel = () => {
     setIsGenerating(true);
     try {
-      const ws_data = [
+      const ws_data: (string | number)[][] = [
         [t('creditNotes.farm.reportTitle')],
         [],
         [

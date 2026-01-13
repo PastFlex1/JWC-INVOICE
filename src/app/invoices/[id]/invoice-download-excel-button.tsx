@@ -112,20 +112,20 @@ export default function InvoiceDownloadExcelButton({ invoice, customer, consigna
               totalStemsForBunch,
               bunchesPerBox * numBoxes,
               pricePerStem.toFixed(3),
-              totalPrice.toFixed(2)
+              totalPrice
             ]);
         });
       });
       
       ws_data.push([]);
       ws_data.push(
-        [totals.totalBoxes, "", totals.totalBoxTypeValue.toFixed(2), t('invoices.view.table.totals'), "", "", "", totals.totalStems, totals.totalBunches, "", `$${totals.totalFob.toFixed(2)}`]
+        [totals.totalBoxes, "", totals.totalBoxTypeValue.toFixed(2), t('invoices.view.table.totals'), "", "", "", totals.totalStems, totals.totalBunches, "", totals.totalFob]
       );
 
       ws_data.push([]);
-      ws_data.push(["", "", "", "", "", "", "", "", "", t('invoices.view.subtotal'), `$${totals.totalFob.toFixed(2)}`]);
-      ws_data.push(["", "", "", "", "", "", "", "", "", t('invoices.view.iva'), `$${totals.iva.toFixed(2)}`]);
-      ws_data.push(["", "", "", "", "", "", "", "", "", t('invoices.view.total'), `$${totals.totalConIva.toFixed(2)}`]);
+      ws_data.push(["", "", "", "", "", "", "", "", "", t('invoices.view.subtotal'), totals.totalFob]);
+      ws_data.push(["", "", "", "", "", "", "", "", "", t('invoices.view.iva'), totals.iva]);
+      ws_data.push(["", "", "", "", "", "", "", "", "", t('invoices.view.total'), totals.totalConIva]);
 
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
 

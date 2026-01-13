@@ -23,7 +23,7 @@ export default function DebitNotesDownloadExcelButton({ notes }: DebitNotesDownl
   const handleDownloadExcel = () => {
     setIsGenerating(true);
     try {
-      const ws_data = [
+      const ws_data: (string | number)[][] = [
         [t('debitNotes.reportTitle')],
         [],
         [
