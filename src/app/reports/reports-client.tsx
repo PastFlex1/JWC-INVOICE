@@ -1,17 +1,18 @@
 
 'use client';
 
-import { useMemo, useState } from 'react';
+import { useMemo, useState, useEffect } from 'react';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer, Cell, Text } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
 import type { Invoice, CreditNote, DebitNote, BunchItem, Producto, Financials, Customer, Carguera, Consignatario, Pais } from '@/lib/types';
 import { format, parseISO, getYear } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
-import { Button } from '@/components/ui/button';
 import { Eye } from 'lucide-react';
 import {
   AlertDialog,
@@ -226,10 +227,10 @@ export function ReportsClient() {
     const invoice = invoices.find(inv => inv.id === invoiceId);
     if (!invoice) return;
 
-    const customer = customers.find(c => c.id === invoice.customerId) || null;
-    const consignatario = invoice.consignatarioId ? consignatarios.find(c => c.id === invoice.consignatarioId) : null;
-    const carguera = invoice.carrierId ? cargueras.find(c => c.id === invoice.carrierId) : null;
-    const pais = invoice.countryId ? paises.find(p => p.id === invoice.countryId) : null;
+    const customer = customers.find(c => c.id === invoice.customerId) ?? null;
+    const consignatario = (invoice.consignatarioId ? consignatarios.find(c => c.id === invoice.consignatarioId) : null) ?? null;
+    const carguera = (invoice.carrierId ? cargueras.find(c => c.id === invoice.carrierId) : null) ?? null;
+    const pais = (invoice.countryId ? paises.find(p => p.id === invoice.countryId) : null) ?? null;
 
     const financials: Financials = {
       payments: payments.filter(p => p.invoiceId === invoice.id),
