@@ -55,7 +55,7 @@ export async function addDebitNote(debitNoteData: Omit<DebitNote, 'id'>): Promis
 
    await runTransaction(db, async (transaction) => {
     // 1. Create the new debit note
-    const newDebitNoteRef = doc(collection(db!, 'debitNotes'));
+    const newDebitNoteRef = doc(collection(db, 'debitNotes'));
     const dataWithDate = {
       ...debitNoteData,
       date: new Date(debitNoteData.date),
@@ -64,7 +64,7 @@ export async function addDebitNote(debitNoteData: Omit<DebitNote, 'id'>): Promis
     debitNoteId = newDebitNoteRef.id;
 
     // 2. Update the related invoice's status if it's 'Paid'
-    const invoiceRef = doc(db!, 'invoices', debitNoteData.invoiceId);
+    const invoiceRef = doc(db, 'invoices', debitNoteData.invoiceId);
     const invoiceDoc = await transaction.get(invoiceRef);
 
     if (invoiceDoc.exists()) {

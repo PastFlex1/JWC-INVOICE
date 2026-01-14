@@ -1,11 +1,9 @@
-
 // Import the functions you need from the SDKs you need
 import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
 import { getFirestore, type Firestore } from 'firebase/firestore';
 import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
-// For security, these values are stored in environment variables
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -18,18 +16,18 @@ const firebaseConfig = {
 // Check if all firebase config keys are provided
 const isFirebaseConfigured = Object.values(firebaseConfig).every(value => !!value && !value.includes('YOUR_'));
 
-let app: FirebaseApp | undefined;
-let db: Firestore | undefined;
-let storage: FirebaseStorage | undefined;
+const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 
-// Initialize Firebase only if the config is complete
+let db: Firestore;
+let storage: FirebaseStorage;
+
 if (isFirebaseConfigured) {
-    app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
     db = getFirestore(app);
     storage = getStorage(app);
 } else {
-    console.warn("Firebase configuration is incomplete. App will run in offline mode. Please ensure all NEXT_PUBLIC_FIREBASE_* variables are set correctly in your .env file.");
+    console.warn("Firebase configuration is incomplete. App may not function correctly. Please ensure all NEXT_PUBLIC_FIREBASE_* variables are set correctly in your .env file.");
+    // In a non-configured environment, we cannot initialize Firestore/Storage.
+    // We'll leave them undefined, and service files must handle this case.
 }
-
 
 export { app, db, storage };

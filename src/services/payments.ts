@@ -97,7 +97,7 @@ export async function addBulkPayment(
     // --- PHASE 1: READS ---
     for (const invoice of invoicesToPay) {
         if (!invoiceDocs.has(invoice.invoiceId)) {
-            const invoiceRef = doc(db!, 'invoices', invoice.invoiceId);
+            const invoiceRef = doc(db, 'invoices', invoice.invoiceId);
             const invoiceDoc = await transaction.get(invoiceRef);
             invoiceDocs.set(invoice.invoiceId, invoiceDoc.data());
         }
@@ -106,7 +106,7 @@ export async function addBulkPayment(
     // --- PHASE 2: WRITES ---
     if (bankFee && bankFee > 0 && invoicesToPay.length > 0) {
       const firstInvoice = invoicesToPay[0];
-      const creditNoteRef = doc(collection(db!, 'creditNotes'));
+      const creditNoteRef = doc(collection(db, 'creditNotes'));
       const invoiceData = invoiceDocs.get(firstInvoice.invoiceId);
       
       const creditNoteData = {
@@ -123,7 +123,7 @@ export async function addBulkPayment(
     for (const invoice of invoicesToPay) {
       if (invoice.amountToPay <= 0) continue;
 
-      const newPaymentRef = doc(collection(db!, 'payments'));
+      const newPaymentRef = doc(collection(db, 'payments'));
       const newPaymentData = {
         ...paymentData,
         invoiceId: invoice.invoiceId,
@@ -145,7 +145,7 @@ export async function deleteAggregatedPayment(paymentIds: string[]): Promise<voi
         // Phase 1: Reads (optional, as we don't need the data to just delete)
         // Phase 2: Writes
         for (const paymentId of paymentIds) {
-            const paymentRef = doc(db!, 'payments', paymentId);
+            const paymentRef = doc(db, 'payments', paymentId);
             transaction.delete(paymentRef);
         }
         // Invoice statuses will be recalculated on the next data fetch by the client.
