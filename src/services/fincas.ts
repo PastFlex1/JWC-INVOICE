@@ -1,4 +1,3 @@
-
 import { db } from '@/lib/firebase';
 import type { Finca } from '@/lib/types';
 import {

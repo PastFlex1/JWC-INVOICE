@@ -1,4 +1,3 @@
-
 import { db } from '@/lib/firebase';
 import type { Customer } from '@/lib/types';
 import {

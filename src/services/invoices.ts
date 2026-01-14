@@ -1,10 +1,3 @@
-
-
-
-
-
-
-
 import { db } from '@/lib/firebase';
 import type { Invoice, LineItem, Customer, Consignatario, Carguera, Pais } from '@/lib/types';
 import {

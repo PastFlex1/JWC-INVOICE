@@ -1,5 +1,3 @@
-
-
 import { db } from '@/lib/firebase';
 import type { Variedad } from '@/lib/types';
 import {

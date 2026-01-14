@@ -1,4 +1,3 @@
-
 import { db } from '@/lib/firebase';
 import type { DebitNote, Invoice } from '@/lib/types';
 import {
