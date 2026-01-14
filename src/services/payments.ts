@@ -42,14 +42,12 @@ const paymentFromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData>): Pa
 };
 
 export async function getPayments(): Promise<Payment[]> {
-  if (!db) return [];
   const paymentsCollection = collection(db, 'payments');
   const snapshot = await getDocs(paymentsCollection);
   return snapshot.docs.map(paymentFromFirestore);
 }
 
 export async function getPaymentsForInvoice(invoiceId: string): Promise<Payment[]> {
-  if (!db) return [];
   const paymentsCollection = collection(db, 'payments');
   const q = query(paymentsCollection, where("invoiceId", "==", invoiceId));
   const snapshot = await getDocs(q);
@@ -57,8 +55,6 @@ export async function getPaymentsForInvoice(invoiceId: string): Promise<Payment[
 }
 
 async function recalculateInvoiceStatus(transaction: Transaction, invoiceId: string, paymentType: 'sale' | 'purchase') {
-    if (!db) throw new Error("Database not initialized");
-
     const invoiceRef = doc(db, 'invoices', invoiceId);
     const invoiceDoc = await transaction.get(invoiceRef);
 
@@ -87,10 +83,6 @@ export async function addBulkPayment(
   invoicesToPay: { invoiceId: string; balance: number; amountToPay: number; type: 'sale' | 'purchase' | 'both', farmDepartureDate: string }[],
   bankFee?: number,
 ): Promise<void> {
-  if (!db) {
-    throw new Error("Firebase is not configured. Check your .env file.");
-  }
-
   await runTransaction(db, async (transaction) => {
     const invoiceDocs = new Map<string, DocumentData | undefined>();
 
@@ -139,8 +131,6 @@ export async function addBulkPayment(
 
 
 export async function deleteAggregatedPayment(paymentIds: string[]): Promise<void> {
-    if (!db) throw new Error("Firebase is not configured.");
-    
     await runTransaction(db, async (transaction) => {
         // Phase 1: Reads (optional, as we don't need the data to just delete)
         // Phase 2: Writes
@@ -153,14 +143,12 @@ export async function deleteAggregatedPayment(paymentIds: string[]): Promise<voi
 }
 
 export async function deleteSinglePayment(paymentId: string): Promise<void> {
-    if (!db) throw new Error("Firebase is not configured.");
     const paymentRef = doc(db, 'payments', paymentId);
     await deleteDoc(paymentRef);
     // Status will be recalculated on next data fetch.
 }
 
 export async function updateSinglePayment(paymentId: string, newAmount: number): Promise<void> {
-    if (!db) throw new Error("Firebase is not configured.");
     const paymentRef = doc(db, 'payments', paymentId);
     await updateDoc(paymentRef, { amount: newAmount });
     // Status will be recalculated on next data fetch.

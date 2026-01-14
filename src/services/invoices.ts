@@ -58,14 +58,12 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData> | DocumentS
 };
 
 export async function getInvoices(): Promise<Invoice[]> {
-  if (!db) return [];
   const invoicesCollection = collection(db, 'invoices');
   const snapshot = await getDocs(invoicesCollection);
   return snapshot.docs.map(fromFirestore);
 }
 
 export async function getInvoiceById(id: string): Promise<Invoice | null> {
-  if (!db) return null;
   const invoiceDoc = doc(db, 'invoices', id);
   const snapshot = await getDoc(invoiceDoc);
   if (snapshot.exists()) {
@@ -98,7 +96,6 @@ export async function getInvoiceWithDetails(id: string): Promise<InvoiceWithDeta
 
 
 export async function addInvoice(invoiceData: Omit<Invoice, 'id' | 'saleStatus' | 'purchaseStatus'>): Promise<string> {
-   if (!db) throw new Error("Firebase is not configured. Check your .env file.");
    const invoicesCollection = collection(db, 'invoices');
    
    // Status is now calculated dynamically, so we don't need to set it here.
@@ -117,7 +114,6 @@ export async function addInvoice(invoiceData: Omit<Invoice, 'id' | 'saleStatus' 
 }
 
 export async function updateInvoice(id: string, invoiceData: Partial<Omit<Invoice, 'id'>>): Promise<void> {
-  if (!db) throw new Error("Firebase is not configured. Check your .env file.");
   const invoiceDoc = doc(db, 'invoices', id);
   const dataToUpdate: any = { ...invoiceData };
   
@@ -137,7 +133,6 @@ export async function updateInvoice(id: string, invoiceData: Partial<Omit<Invoic
 }
 
 export async function deleteInvoice(id: string): Promise<void> {
-  if (!db) throw new Error("Firebase is not configured. Check your .env file.");
   const invoiceDoc = doc(db, 'invoices', id);
   await deleteDoc(invoiceDoc);
 }

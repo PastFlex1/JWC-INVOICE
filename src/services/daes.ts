@@ -21,27 +21,23 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData>): Dae => {
 };
 
 export async function getDaes(): Promise<Dae[]> {
-  if (!db) return [];
   const daesCollection = collection(db, 'daes');
   const snapshot = await getDocs(daesCollection);
   return snapshot.docs.map(fromFirestore);
 }
 
 export async function addDae(daeData: Omit<Dae, 'id'>): Promise<string> {
-  if (!db) throw new Error("Firebase is not configured. Check your .env file.");
   const daesCollection = collection(db, 'daes');
   const docRef = await addDoc(daesCollection, daeData);
   return docRef.id;
 }
 
 export async function updateDae(id: string, daeData: Partial<Omit<Dae, 'id'>>): Promise<void> {
-  if (!db) throw new Error("Firebase is not configured. Check your .env file.");
   const daeDoc = doc(db, 'daes', id);
   await updateDoc(daeDoc, daeData);
 }
 
 export async function deleteDae(id: string): Promise<void> {
-  if (!db) throw new Error("Firebase is not configured. Check your .env file.");
   const daeDoc = doc(db, 'daes', id);
   await deleteDoc(daeDoc);
 }

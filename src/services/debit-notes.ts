@@ -34,14 +34,12 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData>): DebitNote
 };
 
 export async function getDebitNotes(): Promise<DebitNote[]> {
-  if (!db) return [];
   const debitNotesCollection = collection(db, 'debitNotes');
   const snapshot = await getDocs(debitNotesCollection);
   return snapshot.docs.map(fromFirestore);
 }
 
 export async function getDebitNotesForInvoice(invoiceId: string): Promise<DebitNote[]> {
-  if (!db) return [];
   const debitNotesCollection = collection(db, 'debitNotes');
   const q = query(debitNotesCollection, where("invoiceId", "==", invoiceId));
   const snapshot = await getDocs(q);
@@ -49,8 +47,6 @@ export async function getDebitNotesForInvoice(invoiceId: string): Promise<DebitN
 }
 
 export async function addDebitNote(debitNoteData: Omit<DebitNote, 'id'>): Promise<string> {
-   if (!db) throw new Error("Firebase is not configured. Check your .env file.");
-
    let debitNoteId = '';
 
    await runTransaction(db, async (transaction) => {
@@ -91,7 +87,6 @@ export async function addDebitNote(debitNoteData: Omit<DebitNote, 'id'>): Promis
 }
 
 export async function deleteDebitNote(id: string): Promise<void> {
-  if (!db) throw new Error("Firebase is not configured. Check your .env file.");
   const debitNoteDoc = doc(db, 'debitNotes', id);
   await deleteDoc(debitNoteDoc);
 }

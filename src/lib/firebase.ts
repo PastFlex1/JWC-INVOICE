@@ -16,18 +16,14 @@ const firebaseConfig = {
 // Check if all firebase config keys are provided
 const isFirebaseConfigured = Object.values(firebaseConfig).every(value => !!value && !value.includes('YOUR_'));
 
-const app: FirebaseApp = !getApps().length ? initializeApp(firebaseConfig) : getApp();
-
-let db: Firestore;
-let storage: FirebaseStorage;
-
-if (isFirebaseConfigured) {
-    db = getFirestore(app);
-    storage = getStorage(app);
-} else {
+if (!isFirebaseConfigured) {
     console.warn("Firebase configuration is incomplete. App may not function correctly. Please ensure all NEXT_PUBLIC_FIREBASE_* variables are set correctly in your .env file.");
-    // In a non-configured environment, we cannot initialize Firestore/Storage.
-    // We'll leave them undefined, and service files must handle this case.
 }
 
-export { app, db, storage };
+// Initialize Firebase
+const app: FirebaseApp = getApps().length ? getApp() : initializeApp(firebaseConfig);
+
+// Export Firestore and Storage instances directly
+// These will throw an error at runtime if config is missing, which is the expected behavior.
+export const db: Firestore = getFirestore(app);
+export const storage: FirebaseStorage = getStorage(app);

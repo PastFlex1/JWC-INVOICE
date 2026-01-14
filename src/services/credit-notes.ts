@@ -34,14 +34,12 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData>): CreditNot
 };
 
 export async function getCreditNotes(): Promise<CreditNote[]> {
-  if (!db) return [];
   const creditNotesCollection = collection(db, 'creditNotes');
   const snapshot = await getDocs(creditNotesCollection);
   return snapshot.docs.map(fromFirestore);
 }
 
 export async function getCreditNotesForInvoice(invoiceId: string): Promise<CreditNote[]> {
-  if (!db) return [];
   const creditNotesCollection = collection(db, 'creditNotes');
   const q = query(creditNotesCollection, where("invoiceId", "==", invoiceId));
   const snapshot = await getDocs(q);
@@ -49,7 +47,6 @@ export async function getCreditNotesForInvoice(invoiceId: string): Promise<Credi
 }
 
 export async function addCreditNote(creditNoteData: Omit<CreditNote, 'id'>): Promise<string> {
-   if (!db) throw new Error("Firebase is not configured. Check your .env file.");
    const creditNotesCollection = collection(db, 'creditNotes');
    const dataWithDate = {
     ...creditNoteData,
@@ -60,7 +57,6 @@ export async function addCreditNote(creditNoteData: Omit<CreditNote, 'id'>): Pro
 }
 
 export async function deleteCreditNote(id: string): Promise<void> {
-  if (!db) throw new Error("Firebase is not configured. Check your .env file.");
   const creditNoteDoc = doc(db, 'creditNotes', id);
   await deleteDoc(creditNoteDoc);
 }
