@@ -12,30 +12,31 @@ export function calculateDueDate(invoiceDate: Date, customer: Customer | null): 
   const plazoDays = customer.plazo || 0;
 
   switch (plazoDays) {
-    case 0:
+    case 0: // CONTADO
       return cleanInvoiceDate;
     
-    case 8:
+    case 8: // 8 DIAS
       return add(cleanInvoiceDate, { days: 8 });
 
-    case 15:
+    case 15: // 15 DIAS
       const dayOfMonth = cleanInvoiceDate.getDate();
       if (dayOfMonth <= 15) {
-        return setDate(cleanInvoiceDate, 30);
+        return setDate(cleanInvoiceDate, 30); // Vence el 30 del mismo mes
       } else {
         const nextMonth = add(cleanInvoiceDate, { months: 1 });
-        return setDate(nextMonth, 15);
+        return setDate(nextMonth, 15); // Vence el 15 del siguiente mes
       }
       
-    case 30:
+    case 30: // 30 DIAS
         const nextMonthFor30 = add(cleanInvoiceDate, { months: 1 });
-        return setDate(nextMonthFor30, 30);
+        return setDate(nextMonthFor30, 30); // Vence el 30 del siguiente mes
     
-    case 45:
+    case 45: // 45 DIAS
         const thirdMonth = add(cleanInvoiceDate, { months: 2 });
-        return setDate(thirdMonth, 15);
+        return setDate(thirdMonth, 15); // Vence el 15 del segundo mes posterior
 
     default:
+      // Para cualquier otro número de días, simplemente los sumamos
       return add(cleanInvoiceDate, { days: plazoDays });
   }
 }
