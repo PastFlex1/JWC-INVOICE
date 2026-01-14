@@ -1,5 +1,3 @@
-
-
 'use client';
 
 import { createContext, useContext, useState, useEffect, useCallback, type ReactNode, useMemo } from 'react';
@@ -154,8 +152,8 @@ export function AppDataProvider({ children }: { children: ReactNode }) {
         const saleBalance = calculateBalance('sale');
         const purchaseBalance = calculateBalance('purchase');
 
-        const saleStatus = invoice.type === 'purchase' ? 'N/A' : getInvoiceStatus(parseISO(invoice.farmDepartureDate), saleBalance, customer || null);
-        const purchaseStatus = invoice.type === 'sale' ? 'N/A' : getInvoiceStatus(parseISO(invoice.farmDepartureDate), purchaseBalance, customer || null);
+        const saleStatus: Invoice['saleStatus'] = invoice.type === 'purchase' ? 'N/A' : getInvoiceStatus(parseISO(invoice.farmDepartureDate), saleBalance, customer || null);
+        const purchaseStatus: Invoice['purchaseStatus'] = invoice.type === 'sale' ? 'N/A' : getInvoiceStatus(parseISO(invoice.farmDepartureDate), purchaseBalance, customer || null);
 
         return {
           ...invoice,

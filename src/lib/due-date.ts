@@ -1,6 +1,6 @@
 'use client';
 
-import type { Customer } from './types';
+import type { Customer, Invoice } from './types';
 import { add, setDate, startOfDay } from 'date-fns';
 
 export function calculateDueDate(invoiceDate: Date, customer: Customer | null): Date {
@@ -45,7 +45,7 @@ export function getInvoiceStatus(
     invoiceDate: Date, 
     balance: number, 
     customer: Customer | null
-): 'Paid' | 'Pending' | 'Overdue' {
+): 'Paid' | 'Pending' | 'Overdue' | 'N/A' {
     if (balance <= 0.01) {
         return 'Paid';
     }
