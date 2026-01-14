@@ -87,7 +87,9 @@ export async function addBulkPayment(
   invoicesToPay: { invoiceId: string; balance: number; amountToPay: number; type: 'sale' | 'purchase' | 'both', farmDepartureDate: string }[],
   bankFee?: number,
 ): Promise<void> {
-  if (!db) throw new Error("Firebase is not configured. Check your .env file.");
+  if (!db) {
+    throw new Error("Firebase is not configured. Check your .env file.");
+  }
 
   await runTransaction(db, async (transaction) => {
     const invoiceDocs = new Map<string, DocumentData | undefined>();
@@ -137,7 +139,9 @@ export async function addBulkPayment(
 
 
 export async function deleteAggregatedPayment(paymentIds: string[]): Promise<void> {
-    if (!db) throw new Error("Firebase is not configured.");
+    if (!db) {
+        throw new Error("Firebase is not configured.");
+    }
 
     await runTransaction(db, async (transaction) => {
         // Phase 1: Reads (optional, as we don't need the data to just delete)
