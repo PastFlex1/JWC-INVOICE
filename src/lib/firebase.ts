@@ -1,7 +1,8 @@
+
 // Import the functions you need from the SDKs you need
-import { getApp, getApps, initializeApp } from 'firebase/app';
-import { getFirestore } from 'firebase/firestore';
-import { getStorage } from "firebase/storage";
+import { getApp, getApps, initializeApp, type FirebaseApp } from 'firebase/app';
+import { getFirestore, type Firestore } from 'firebase/firestore';
+import { getStorage, type FirebaseStorage } from "firebase/storage";
 
 // Your web app's Firebase configuration
 // For security, these values are stored in environment variables
@@ -17,9 +18,9 @@ const firebaseConfig = {
 // Check if all firebase config keys are provided
 const isFirebaseConfigured = Object.values(firebaseConfig).every(value => !!value && !value.includes('YOUR_'));
 
-let app;
-let db;
-let storage;
+let app: FirebaseApp | undefined;
+let db: Firestore | undefined;
+let storage: FirebaseStorage | undefined;
 
 // Initialize Firebase only if the config is complete
 if (isFirebaseConfigured) {
