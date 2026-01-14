@@ -148,5 +148,3 @@ export async function deleteInvoice(id: string): Promise<void> {
   const invoiceDoc = doc(db, 'invoices', id);
   await deleteDoc(invoiceDoc);
 }
-
-    

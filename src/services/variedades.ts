@@ -47,4 +47,3 @@ export async function deleteVariedad(id: string): Promise<void> {
   const variedadDoc = doc(db, 'variedades', id);
   await deleteDoc(variedadDoc);
 }
-

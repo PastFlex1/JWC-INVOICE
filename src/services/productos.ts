@@ -2,6 +2,7 @@
 
 
 
+
 import { db } from '@/lib/firebase';
 import type { Producto } from '@/lib/types';
 import {
