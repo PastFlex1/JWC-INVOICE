@@ -23,6 +23,7 @@ import type { Carguera } from '@/lib/types';
 import { CargueraForm } from './carguera-form';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
+import { cargueras as defaultCargueras } from '@/lib/mock-data';
 
 type CargueraFormData = Omit<Carguera, 'id'> & { id?: string };
 
@@ -38,6 +39,8 @@ export function CarguerasClient() {
   const [editingCarguera, setEditingCarguera] = useState<Carguera | null>(null);
   const [cargueraToDelete, setCargueraToDelete] = useState<Carguera | null>(null);
   const { toast } = useToast();
+
+  const defaultCargueraIds = useMemo(() => new Set(defaultCargueras.map(c => c.id)), []);
 
   const totalPages = Math.ceil(cargueras.length / ITEMS_PER_PAGE);
 
@@ -64,11 +67,14 @@ export function CarguerasClient() {
     setIsSubmitting(true);
     
     try {
-        if (cargueraData.id) {
+        const isDefaultItem = cargueraData.id ? defaultCargueraIds.has(cargueraData.id) : false;
+
+        if (cargueraData.id && !isDefaultItem) {
             await updateCarguera(cargueraData.id, cargueraData as Carguera);
             toast({ title: t('common.success'), description: t('cargueras.toast.updated') });
         } else {
-            await addCarguera(cargueraData as Omit<Carguera, 'id'>);
+            const { id, ...dataToAdd } = cargueraData;
+            await addCarguera(dataToAdd as Omit<Carguera, 'id'>);
             toast({ title: t('common.success'), description: t('cargueras.toast.added') });
         }
         await refreshData();

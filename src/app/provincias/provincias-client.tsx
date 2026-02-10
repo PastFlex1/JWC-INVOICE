@@ -23,6 +23,7 @@ import type { Provincia } from '@/lib/types';
 import { ProvinciaForm } from './provincia-form';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
+import { provincias as defaultProvincias } from '@/lib/mock-data';
 
 type ProvinciaFormData = Omit<Provincia, 'id'> & { id?: string };
 
@@ -38,6 +39,8 @@ export function ProvinciasClient() {
   const [editingProvincia, setEditingProvincia] = useState<Provincia | null>(null);
   const [provinciaToDelete, setProvinciaToDelete] = useState<Provincia | null>(null);
   const { toast } = useToast();
+
+  const defaultProvinciaIds = useMemo(() => new Set(defaultProvincias.map(p => p.id)), []);
   
   const totalPages = Math.ceil(provincias.length / ITEMS_PER_PAGE);
 
@@ -65,11 +68,14 @@ export function ProvinciasClient() {
     setIsSubmitting(true);
     
     try {
-        if (provinciaData.id) {
+        const isDefaultItem = provinciaData.id ? defaultProvinciaIds.has(provinciaData.id) : false;
+
+        if (provinciaData.id && !isDefaultItem) {
             await updateProvincia(provinciaData.id, provinciaData as Provincia);
             toast({ title: 'Success', description: 'Province updated successfully.' });
         } else {
-            await addProvincia(provinciaData as Omit<Provincia, 'id'>);
+            const { id, ...dataToAdd } = provinciaData;
+            await addProvincia(dataToAdd as Omit<Provincia, 'id'>);
             toast({ title: 'Success', description: 'Province added successfully.' });
         }
         await refreshData();
