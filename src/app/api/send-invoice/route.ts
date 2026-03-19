@@ -34,12 +34,18 @@ export async function POST(request: Request) {
     
     const emailHtml = `
       <html>
-        <body>
+        <body style="font-family: Arial, sans-serif;">
           <p>${emailBody.replace(/\n/g, '<br>')}</p>
           <br>
           <p>Please don't answer to this email, because is automatically, if you need assistance, please contact to <a href="mailto:jcwf@outlook.es">jcwf@outlook.es</a></p>
           <br>
           <img src="${logoDataUri}" alt="JCW Flowers Logo" width="200" />
+          <br>
+          <br>
+          <hr style="border: 0; border-top: 1px solid #eee;" />
+          <p style="font-size: 10px; color: #888;">
+            Desarrollado por <strong>Palma Nexus Solutions - 099 821 2307</strong>
+          </p>
         </body>
       </html>
     `;

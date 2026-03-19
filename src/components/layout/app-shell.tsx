@@ -1,3 +1,4 @@
+
 'use client';
 
 import * as React from 'react';
@@ -181,7 +182,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="flex flex-col items-start gap-1">
                  <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">V1.0.1</span>
                  <p className="text-[11px] text-muted-foreground leading-tight">
-                    Desarrollado por <span className="text-primary font-medium">Palma Nexus Solutions</span>
+                    Desarrollado por <br /><span className="text-primary font-medium">Palma Nexus Solutions - 099 821 2307</span>
                  </p>
               </div>
             </div>
