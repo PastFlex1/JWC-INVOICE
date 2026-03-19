@@ -110,7 +110,7 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
                     <img src="/logo.png" alt="JCW Flowers Logo" width={180} height={54} className="mb-4" />
                     <div className="text-[10px] space-y-1 mt-6">
                         <p><strong>{t('invoices.view.email')}:</strong> jcwf@outlook.es</p>
-                        <p><strong>{t('invoices.view.phone')}:</strong> +593 096 744 1343</p>
+                        <p><strong>{t('invoices.view.phone')}:</strong> +593 99 617 9767</p>
                         <p><strong>{t('invoices.view.address')}:</strong> Pasaje F y Calle Quito, EL QUINCHE - QUITO - ECUADOR</p>
                     </div>
                 </div>

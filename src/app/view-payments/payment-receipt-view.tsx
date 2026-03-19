@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -37,7 +36,7 @@ export function PaymentReceiptView({ payment, t: tProp, onEditPayment, onDeleteP
               <p>Quito</p>
               <p>Ecuador</p>
               <p><strong>E-mail:</strong> jcwf@outlook.es</p>
-              <p><strong>Phone:</strong> 096 744 1343</p>
+              <p><strong>Phone:</strong> +593 99 617 9767</p>
             </div>
           </div>
           <div className="w-1/2 flex flex-col items-end">
