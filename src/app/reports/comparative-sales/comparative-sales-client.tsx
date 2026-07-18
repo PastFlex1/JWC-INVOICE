@@ -4,11 +4,7 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
-<<<<<<< HEAD
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-=======
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
->>>>>>> origin/main
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
@@ -16,10 +12,7 @@ import { Button } from '@/components/ui/button';
 import type { Invoice, BunchItem } from '@/lib/types';
 import { format, parseISO, getYear, getMonth } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
-<<<<<<< HEAD
 import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-=======
->>>>>>> origin/main
 
 
 type ComparativeData = {
@@ -33,7 +26,6 @@ type ComparativeData = {
   chargeClient: { [year: string]: number };
 };
 
-<<<<<<< HEAD
 const CHART_COLORS = [
   'hsl(var(--primary))',
   'hsl(var(--chart-2))',
@@ -46,8 +38,6 @@ const CHART_COLORS = [
   '#ea580c',
 ];
 
-=======
->>>>>>> origin/main
 export function ComparativeSalesClient() {
   const { invoices, fincas, customers } = useAppData();
   const { t, locale } = useTranslation();
@@ -67,17 +57,10 @@ export function ComparativeSalesClient() {
   }, [invoices]);
 
   useEffect(() => {
-<<<<<<< HEAD
     if (allAvailableYears.length > 0 && selectedYears.length === 0) {
       setSelectedYears(allAvailableYears);
     }
   }, [allAvailableYears, selectedYears]);
-=======
-    if (allAvailableYears.length > 0) {
-      setSelectedYears(allAvailableYears);
-    }
-  }, [allAvailableYears]);
->>>>>>> origin/main
 
   const filteredInvoices = useMemo(() => {
     let filtered = invoices;
@@ -123,7 +106,6 @@ export function ComparativeSalesClient() {
         let purchaseValue = 0;
 
         invoice.items.forEach(item => {
-<<<<<<< HEAD
             const numBoxes = item.numberOfBoxes || 1;
             (item.bunches || []).forEach((bunch: BunchItem) => {
                 const productLower = (bunch.product || '').toLowerCase();
@@ -137,12 +119,6 @@ export function ComparativeSalesClient() {
                     saleValue += stems * (bunch.salePrice || 0);
                     purchaseValue += stems * (bunch.purchasePrice || 0);
                 }
-=======
-            (item.bunches || []).forEach((bunch: BunchItem) => {
-                const stems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0);
-                saleValue += stems * (bunch.salePrice || 0);
-                purchaseValue += stems * (bunch.purchasePrice || 0);
->>>>>>> origin/main
             });
         });
         
@@ -159,7 +135,6 @@ export function ComparativeSalesClient() {
         return a.customerName.localeCompare(b.customerName);
     });
   }, [filteredInvoices, fincaMap, customerMap, t, dateLocale]);
-<<<<<<< HEAD
 
   const chartData = useMemo(() => {
     const data = Array.from({ length: 12 }, (_, i) => ({
@@ -195,8 +170,6 @@ export function ComparativeSalesClient() {
 
     return data;
   }, [filteredInvoices, dateLocale]);
-=======
->>>>>>> origin/main
   
   const displayedYears = useMemo(() => {
     return selectedYears.sort((a, b) => Number(a) - Number(b));
@@ -287,7 +260,6 @@ export function ComparativeSalesClient() {
 
       <Card>
         <CardHeader>
-<<<<<<< HEAD
           <CardTitle>{t('comparativeReport.chartTitle')}</CardTitle>
           <CardDescription>{t('comparativeReport.chartDescription')}</CardDescription>
         </CardHeader>
@@ -334,8 +306,6 @@ export function ComparativeSalesClient() {
 
       <Card>
         <CardHeader>
-=======
->>>>>>> origin/main
           <CardTitle>{t('comparativeReport.tableTitle')}</CardTitle>
         </CardHeader>
         <CardContent>

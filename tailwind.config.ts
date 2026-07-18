@@ -56,7 +56,6 @@ export default {
           '5': 'hsl(var(--chart-5))',
         },
         sidebar: {
-<<<<<<< HEAD
           DEFAULT: 'hsl(var(--sidebar-background))',
           foreground: 'hsl(var(--sidebar-foreground))',
           primary: 'hsl(var(--sidebar-primary))',
@@ -65,16 +64,6 @@ export default {
           'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
           border: 'hsl(var(--sidebar-border))',
           ring: 'hsl(var(--sidebar-ring))',
-=======
-          DEFAULT: 'hsl(var(--card))',
-          foreground: 'hsl(var(--card-foreground))',
-          primary: 'hsl(var(--primary))',
-          'primary-foreground': 'hsl(var(--primary-foreground))',
-          accent: 'hsl(var(--accent))',
-          'accent-foreground': 'hsl(var(--accent-foreground))',
-          border: 'hsl(var(--border))',
-          ring: 'hsl(var(--ring))',
->>>>>>> origin/main
         },
       },
       borderRadius: {

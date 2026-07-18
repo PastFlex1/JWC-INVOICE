@@ -1,8 +1,4 @@
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
 import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { format, parseISO } from 'date-fns';
@@ -32,32 +28,22 @@ export function InvoicePdfView({ invoice, customer, consignatario, carguera, pai
       totalBoxes += numBoxes;
       if (item.bunches && Array.isArray(item.bunches)) {
         item.bunches.forEach(bunch => {
-<<<<<<< HEAD
           const productLower = (bunch.product || '').toLowerCase();
           const isGyp = productLower.includes('gyp');
           
           const bunchesCount = Number(bunch.bunchesPerBox) || 0;
           const stemsPerBunch = Number(bunch.stemsPerBunch) || 0;
           const price = invoice.type === 'purchase' ? (Number(bunch.purchasePrice) || 0) : (Number(bunch.salePrice) || 0);
-=======
-          const bunchesCount = Number(bunch.bunchesPerBox) || 0;
-          const stemsPerBunch = Number(bunch.stemsPerBunch) || 0;
-          const salePrice = Number(bunch.salePrice) || 0;
->>>>>>> origin/main
 
           totalBunches += bunchesCount * numBoxes;
           const stemsInBunch = bunchesCount * stemsPerBunch;
           totalStems += stemsInBunch * numBoxes;
-<<<<<<< HEAD
           
           if (isGyp) {
             totalFob += (bunchesCount * price) * numBoxes;
           } else {
             totalFob += (stemsInBunch * price) * numBoxes;
           }
-=======
-          totalFob += (stemsInBunch * salePrice) * numBoxes;
->>>>>>> origin/main
         });
       }
     });
@@ -73,7 +59,6 @@ export function InvoicePdfView({ invoice, customer, consignatario, carguera, pai
 
   const totals = calculateTotals();
 
-<<<<<<< HEAD
   const getPriceHeader = () => {
     const items = invoice.items || [];
     let hasGyp = false;
@@ -94,14 +79,11 @@ export function InvoicePdfView({ invoice, customer, consignatario, carguera, pai
     return "P. VENTA";
   };
 
-=======
->>>>>>> origin/main
   const renderItemRow = (item: LineItem, index: number) => {
     const numBoxes = item.numberOfBoxes || 1;
     return (
        <React.Fragment key={item.id || index}>
         {(item.bunches || []).map((bunch, bunchIndex) => {
-<<<<<<< HEAD
             const productLower = (bunch.product || '').toLowerCase();
             const isGyp = productLower.includes('gyp');
             
@@ -112,10 +94,6 @@ export function InvoicePdfView({ invoice, customer, consignatario, carguera, pai
                 ? (bunch.bunchesPerBox * numBoxes * price)
                 : (totalStemsForBunch * price);
 
-=======
-            const totalStemsForBunch = bunch.stemsPerBunch * bunch.bunchesPerBox * numBoxes;
-            const totalPrice = totalStemsForBunch * bunch.salePrice;
->>>>>>> origin/main
             return (
                  <div key={bunch.id || bunchIndex} className="contents text-[10px] leading-tight">
                     <div className="border-b border-l border-gray-400 p-1 text-center">{bunchIndex === 0 ? item.numberOfBoxes : ''}</div>
@@ -126,11 +104,7 @@ export function InvoicePdfView({ invoice, customer, consignatario, carguera, pai
                     <div className="border-b border-l border-gray-400 p-1 text-center">{bunch.length}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-center">{totalStemsForBunch}</div>
                     <div className="border-b border-l border-gray-400 p-1 text-center">{bunch.bunchesPerBox * numBoxes}</div>
-<<<<<<< HEAD
                     <div className="border-b border-l border-gray-400 p-1 text-right">{price.toFixed(3)}</div>
-=======
-                    <div className="border-b border-l border-gray-400 p-1 text-right">{bunch.salePrice.toFixed(3)}</div>
->>>>>>> origin/main
                     <div className="border-b border-r border-l border-gray-400 p-1 text-right font-semibold">${totalPrice.toFixed(2)}</div>
                 </div>
             )
@@ -150,11 +124,7 @@ export function InvoicePdfView({ invoice, customer, consignatario, carguera, pai
                     <img src="/logo.png" alt="JCW Flowers Logo" width={180} height={54} className="mb-4" />
                     <div className="text-[10px] space-y-1 mt-6">
                         <p><strong>E-MAIL:</strong> jcwf@outlook.es</p>
-<<<<<<< HEAD
                         <p><strong>PHONE:</strong> +593 99 617 9767</p>
-=======
-                        <p><strong>PHONE:</strong> +593 096 744 1343</p>
->>>>>>> origin/main
                         <p><strong>ADDRESS:</strong> Pasaje F y Calle Quito, EL QUINCHE - QUITO - ECUADOR</p>
                     </div>
                 </div>
@@ -204,11 +174,7 @@ export function InvoicePdfView({ invoice, customer, consignatario, carguera, pai
                     <div className="p-1 border-r border-gray-400">LONG.</div>
                     <div className="p-1 border-r border-gray-400">TALLOS</div>
                     <div className="p-1 border-r border-gray-400">BUNCHES</div>
-<<<<<<< HEAD
                     <div className="p-1 border-r border-gray-400">{getPriceHeader()}</div>
-=======
-                    <div className="p-1 border-r border-gray-400">P. VENTA</div>
->>>>>>> origin/main
                     <div className="p-1">TOTAL</div>
                 </div>
                 

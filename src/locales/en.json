@@ -54,12 +54,9 @@
     "title": "Reports",
     "description": "Visualize your monthly sales, purchases, and profits.",
     "monthlyProfit": "Monthly Profit",
-<<<<<<< HEAD
     "avgPrice": "Average Price",
     "perStemGlobal": "global average per stem",
     "perStemFiltered": "average per stem for {product}",
-=======
->>>>>>> origin/main
     "chartTitle": "Monthly Performance",
     "colorSalesChartTitle": "Top Selling Flower Colors",
     "colorSalesChartDescription": "Sales distribution by flower color.",
@@ -73,11 +70,8 @@
     "allFarms": "All Farms",
     "filterByCustomer": "Filter by Customer",
     "allCustomers": "All Customers",
-<<<<<<< HEAD
     "filterByProductType": "Filter by Product",
     "allProductTypes": "All Products",
-=======
->>>>>>> origin/main
     "selectCustomers": "Select Customers...",
     "customersSelected": "{count} customers selected",
     "filterByYear": "Filter by Year",
@@ -85,11 +79,8 @@
     "selectYears": "Select years...",
     "filterByMonth": "Filter by Month",
     "allMonths": "All Months",
-<<<<<<< HEAD
     "filterByMetric": "Filter by Metric",
     "metricAll": "All (Sales, Purchases & Profit)",
-=======
->>>>>>> origin/main
     "noData": "No data available for the selected filters.",
     "table": {
       "date": "Date",
@@ -100,21 +91,15 @@
       "chargeFarm": "Purchase Value",
       "chargeClient": "Sale Value",
       "profit": "Profit",
-<<<<<<< HEAD
       "avgPrice": "Avg. Price",
-=======
->>>>>>> origin/main
       "total": "Total"
     }
   },
    "comparativeReport": {
     "title": "Comparative Sales Report",
     "description": "Compare sales data across different years.",
-<<<<<<< HEAD
     "chartTitle": "Sales Comparison by Year",
     "chartDescription": "Monthly performance visualization comparing selected years.",
-=======
->>>>>>> origin/main
     "tableTitle": "Comparative Data",
     "table": {
       "month": "Month",
@@ -196,11 +181,8 @@
         "stems": "STEMS",
         "bunches": "BUNCHES",
         "price": "PRICE",
-<<<<<<< HEAD
         "priceBunch": "BUNCH PRICE",
         "priceUnit": "UNIT PRICE",
-=======
->>>>>>> origin/main
         "total": "TOTAL",
         "totals": "TOTALS"
       },
@@ -571,13 +553,8 @@
       "noNotesFound": "No debit notes found.",
       "total": "TOTAL",
       "sheetName": "Farm Debit Notes",
-<<<<<<< HEAD
       "pdfFileName": "Reporte-Notas-de-Debito-Finca",
       "excelFileName": "Reporte-Notas-de-Debito-Finca",
-=======
-      "pdfFileName": "Farm-Debit-Note-Report",
-      "excelFileName": "Farm-Debit-Note-Report",
->>>>>>> origin/main
       "downloadPdf": "Download PDF",
       "downloadExcel": "Download Excel",
       "list": {
@@ -607,11 +584,7 @@
       },
       "email": {
         "reportTitle": "Farm Debit Note Report",
-<<<<<<< HEAD
         "reportDescription": "The attached report contains a summary of farm credit notes for the selected period."
-=======
-        "reportDescription": "The attached report contains a summary of farm debit notes for the selected period."
->>>>>>> origin/main
       }
     }
   },
@@ -827,7 +800,6 @@
       "outstandingAmount": "Outstanding Amount"
     }
   },
-<<<<<<< HEAD
   "email": {
     "title": "Email",
     "description": "Manage your sales and customer emails directly in the ERP.",
@@ -881,8 +853,6 @@
       "sendSuccessDesc": "Email sent successfully."
     }
   },
-=======
->>>>>>> origin/main
   "viewPayments": {
     "title": "Payment History",
     "description": "View all payments registered in the system.",

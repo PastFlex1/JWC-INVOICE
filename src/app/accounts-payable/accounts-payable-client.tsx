@@ -141,7 +141,6 @@ export function AccountsPayableClient() {
         if (!item.bunches) return acc;
         const numberOfBoxes = item.numberOfBoxes || 1;
         const itemSubtotal = item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
-<<<<<<< HEAD
             const productLower = (bunch.product || '').toLowerCase();
             const isGyp = productLower.includes('gyp');
             
@@ -150,10 +149,6 @@ export function AccountsPayableClient() {
             }
             const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
             return bunchAcc + (stems * (bunch.purchasePrice || 0));
-=======
-            const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
-            return bunchAcc + (stems * bunch.purchasePrice);
->>>>>>> origin/main
         }, 0);
         return acc + (itemSubtotal * numberOfBoxes);
     }, 0);

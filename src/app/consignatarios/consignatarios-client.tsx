@@ -29,11 +29,7 @@ type ConsignatarioFormData = Omit<Consignatario, 'id'> & { id?: string };
 const ITEMS_PER_PAGE = 10;
 
 export function ConsignatariosClient() {
-<<<<<<< HEAD
   const { consignatarios, paises, customers, provincias, cargueras, refreshData } = useAppData();
-=======
-  const { consignatarios, paises, customers, provincias, refreshData } = useAppData();
->>>>>>> origin/main
   const { t } = useTranslation();
   
   const [currentPage, setCurrentPage] = useState(1);
@@ -50,7 +46,6 @@ export function ConsignatariosClient() {
     }, {} as Record<string, string>);
   }, [customers]);
 
-<<<<<<< HEAD
   const carrierMap = useMemo(() => {
     return (cargueras || []).reduce((acc, carrier) => {
       acc[carrier.id] = carrier.nombreCarguera;
@@ -58,8 +53,6 @@ export function ConsignatariosClient() {
     }, {} as Record<string, string>);
   }, [cargueras]);
 
-=======
->>>>>>> origin/main
   const totalPages = Math.ceil(consignatarios.length / ITEMS_PER_PAGE);
 
   const paginatedConsignatarios = useMemo(() => {
@@ -158,10 +151,7 @@ export function ConsignatariosClient() {
               paises={paises}
               customers={customers}
               provincias={provincias}
-<<<<<<< HEAD
               cargueras={cargueras}
-=======
->>>>>>> origin/main
               isSubmitting={isSubmitting}
             />
           </DialogContent>
@@ -179,10 +169,7 @@ export function ConsignatariosClient() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Customer</TableHead>
-<<<<<<< HEAD
                     <TableHead>Agencia</TableHead>
-=======
->>>>>>> origin/main
                     <TableHead>Country</TableHead>
                     <TableHead>Province</TableHead>
                     <TableHead>Address</TableHead>
@@ -194,10 +181,7 @@ export function ConsignatariosClient() {
                     <TableRow key={consignatario.id}>
                       <TableCell className="font-medium">{consignatario.nombreConsignatario}</TableCell>
                       <TableCell>{customerMap[consignatario.customerId] || 'N/A'}</TableCell>
-<<<<<<< HEAD
                       <TableCell>{carrierMap[consignatario.carrierId || ''] || 'N/A'}</TableCell>
-=======
->>>>>>> origin/main
                       <TableCell>{consignatario.pais}</TableCell>
                       <TableCell>{consignatario.provincia}</TableCell>
                       <TableCell>{consignatario.direccion}</TableCell>

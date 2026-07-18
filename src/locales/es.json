@@ -46,11 +46,7 @@
     "sellers": "Vendedores",
     "markings": "Marcaciones",
     "countries": "Países",
-<<<<<<< HEAD
     "provincias": "Provincias",
-=======
-    "provinces": "Provincias",
->>>>>>> origin/main
     "dae": "DAE",
     "carriers": "Cargueras"
   },
@@ -58,12 +54,9 @@
     "title": "Reportes",
     "description": "Visualiza tus ventas, compras y ganancias mensuales.",
     "monthlyProfit": "Ganancia Mensual",
-<<<<<<< HEAD
     "avgPrice": "Precio Promedio",
     "perStemGlobal": "promedio global por tallo",
     "perStemFiltered": "promedio por tallo de {product}",
-=======
->>>>>>> origin/main
     "chartTitle": "Rendimiento Mensual",
     "colorSalesChartTitle": "Colores de Flores Más Vendidos",
     "colorSalesChartDescription": "Distribución de ventas por color de flor.",
@@ -77,11 +70,8 @@
     "allFarms": "Todas las Fincas",
     "filterByCustomer": "Filtrar por Cliente",
     "allCustomers": "Todos los Clientes",
-<<<<<<< HEAD
     "filterByProductType": "Filtrar por Producto",
     "allProductTypes": "Todos los Productos",
-=======
->>>>>>> origin/main
     "selectCustomers": "Seleccionar Clientes...",
     "customersSelected": "{count} clientes seleccionados",
     "filterByYear": "Filtrar por Año",
@@ -89,11 +79,8 @@
     "selectYears": "Seleccionar años...",
     "filterByMonth": "Filtrar por Mes",
     "allMonths": "Todos los Meses",
-<<<<<<< HEAD
     "filterByMetric": "Filtrar por Métrica",
     "metricAll": "Todo (Ventas, Compras y Ganancias)",
-=======
->>>>>>> origin/main
     "noData": "No hay datos disponibles para los filtros seleccionados.",
     "table": {
       "date": "Fecha",
@@ -104,21 +91,15 @@
       "chargeFarm": "Valor Compra",
       "chargeClient": "Valor Venta",
       "profit": "Utilidad",
-<<<<<<< HEAD
       "avgPrice": "P. Promedio",
-=======
->>>>>>> origin/main
       "total": "Total"
     }
   },
   "comparativeReport": {
     "title": "Reporte Comparativo de Ventas",
     "description": "Compare datos de ventas a través de diferentes años.",
-<<<<<<< HEAD
     "chartTitle": "Comparativa de Ventas por Año",
     "chartDescription": "Visualización del rendimiento mensual comparando los años seleccionados.",
-=======
->>>>>>> origin/main
     "tableTitle": "Datos Comparativos",
     "table": {
       "month": "Mes",
@@ -190,11 +171,7 @@
       "clientAddress": "Dirección",
       "country": "País",
       "table": {
-<<<<<<< HEAD
         "boxes": "BOXES",
-=======
-        "boxes": "CAJAS",
->>>>>>> origin/main
         "type": "TIPO",
         "fullBox": "FULL BOX",
         "brand": "MARCA",
@@ -204,11 +181,8 @@
         "stems": "TALLOS",
         "bunches": "BUNCHES",
         "price": "P. VENTA",
-<<<<<<< HEAD
         "priceBunch": "P. RAMO",
         "priceUnit": "P. UNIT.",
-=======
->>>>>>> origin/main
         "total": "TOTAL",
         "totals": "TOTALES"
       },
@@ -578,11 +552,7 @@
       "reportTitle": "REPORTE DE NOTAS DE DÉBITO (FINCA)",
       "noNotesFound": "No se encontraron notas de débito.",
       "total": "TOTAL",
-<<<<<<< HEAD
       "sheetName": "Farm Debit Notes",
-=======
-      "sheetName": "Notas de Débito Finca",
->>>>>>> origin/main
       "pdfFileName": "Reporte-Notas-de-Debito-Finca",
       "excelFileName": "Reporte-Notas-de-Debito-Finca",
       "downloadPdf": "Descargar PDF",
@@ -690,13 +660,8 @@
     "selectFarmPlaceholder": "Seleccione una finca...",
     "filterByCustomer": "Filtrar por cliente...",
     "allCustomers": "Todos los Clientes",
-<<<<<<< HEAD
     "filterByConsignatario": "Filtrar por consignatario...",
     "allConsignatarios": "Todos los Consignatarios",
-=======
-    "filterByConsignee": "Filtrar por consignatario...",
-    "allConsignees": "Todos los Consignatarios",
->>>>>>> origin/main
     "filterByMonth": "Filtrar por mes...",
     "allMonths": "Todos los Meses",
     "noInvoices": "No se encontraron facturas para el período seleccionado.",
@@ -835,7 +800,6 @@
       "outstandingAmount": "Monto Pendiente"
     }
   },
-<<<<<<< HEAD
   "email": {
     "title": "Correo Electrónico",
     "description": "Gestiona tus correos de ventas y clientes directamente en el ERP.",
@@ -889,8 +853,6 @@
       "sendSuccessDesc": "Correo enviado correctamente."
     }
   },
-=======
->>>>>>> origin/main
   "viewPayments": {
     "title": "Historial de Pagos",
     "description": "Consulte todos los pagos registrados en el sistema.",
@@ -939,11 +901,7 @@
       "breakdown": "Desglose de Pago",
       "invoiceNo": "N° Factura",
       "customer": "Cliente",
-<<<<<<< HEAD
       "consignatario": "Consignatario",
-=======
-      "consignee": "Consignatario",
->>>>>>> origin/main
       "amountApplied": "Monto Aplicado",
       "totalPaid": "TOTAL PAGADO",
       "sheetName": "Recibo de Pago",

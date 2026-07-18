@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 import { NextResponse } from 'next/server';
 import nodemailer from 'nodemailer';
 import { ImapFlow } from 'imapflow';
@@ -12,22 +11,6 @@ export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
-=======
-
-import { NextResponse } from 'next/server';
-import { Resend } from 'resend';
-import * as fs from 'fs';
-import * as path from 'path';
-
-const resend = new Resend(process.env.RESEND_API_KEY);
-
-export async function POST(request: Request) {
-  try {
-    if (!process.env.RESEND_API_KEY) {
-      throw new Error('Resend API key is not configured.');
-    }
-
->>>>>>> origin/main
     const body = await request.json();
     const { to, bcc, subject, body: emailBody, attachments: pdfAttachments } = body;
 
@@ -38,15 +21,10 @@ export async function POST(request: Request) {
     const toEmails = to.split(',').map((email: string) => email.trim()).filter(Boolean);
     const bccEmails = bcc ? bcc.split(',').map((email: string) => email.trim()).filter(Boolean) : [];
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
     if (toEmails.length === 0) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
     }
 
-<<<<<<< HEAD
     const fromAddress = process.env.MAIL_FROM_ADDRESS || 'sales@jcwflowers.com';
     const fromName = process.env.MAIL_FROM_NAME || 'JCW Flowers';
     const replyTo = process.env.MAIL_REPLY_TO || 'sales@jcwflowers.com';
@@ -61,27 +39,15 @@ export async function POST(request: Request) {
     // Read logo file and convert to Buffer
     const logoPath = path.join(process.cwd(), 'public', 'logo.png');
     const logoBuffer = fs.readFileSync(logoPath);
-=======
-    // Read logo file and convert to Base64 string
-    const logoPath = path.join(process.cwd(), 'public', 'logo.png');
-    const logoBase64 = fs.readFileSync(logoPath).toString('base64');
-    const logoDataUri = `data:image/png;base64,${logoBase64}`;
->>>>>>> origin/main
     
     const emailHtml = `
       <html>
         <body style="font-family: Arial, sans-serif;">
           <p>${emailBody.replace(/\n/g, '<br>')}</p>
           <br>
-<<<<<<< HEAD
           <p>Please don't answer to this email, because is automatically, if you need assistance, please contact to <a href="mailto:sales@jcwflowers.com">sales@jcwflowers.com</a></p>
           <br>
           <img src="cid:logo" alt="JCW Flowers Logo" width="200" />
-=======
-          <p>Please don't answer to this email, because is automatically, if you need assistance, please contact to <a href="mailto:jcwf@outlook.es">jcwf@outlook.es</a></p>
-          <br>
-          <img src="${logoDataUri}" alt="JCW Flowers Logo" width="200" />
->>>>>>> origin/main
           <br>
           <br>
           <hr style="border: 0; border-top: 1px solid #eee;" />
@@ -92,7 +58,6 @@ export async function POST(request: Request) {
       </html>
     `;
 
-<<<<<<< HEAD
     const attachments: any[] = pdfAttachments || [];
     attachments.push({
       filename: 'logo.png',
@@ -197,20 +162,6 @@ export async function POST(request: Request) {
     const docId = await addEmail(emailData);
 
     return NextResponse.json({ message: 'Email sent successfully!', docId, messageId: messageIdStr }, { status: 200 });
-=======
-    const attachments = pdfAttachments || [];
-
-    await resend.emails.send({
-      from: 'JCW FLOWERS <facturacion@puntodeventastore.store>',
-      to: toEmails,
-      bcc: bccEmails.length > 0 ? bccEmails : undefined,
-      subject: subject,
-      html: emailHtml,
-      attachments: attachments,
-    });
-
-    return NextResponse.json({ message: 'Email sent successfully!' }, { status: 200 });
->>>>>>> origin/main
 
   } catch (error) {
     console.error('Failed to send invoice:', error);

@@ -2,10 +2,6 @@
 'use client';
 
 import { useState } from 'react';
-<<<<<<< HEAD
-=======
-import * as XLSX from 'xlsx';
->>>>>>> origin/main
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -22,18 +18,11 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
   const { toast } = useToast();
   const { t } = useTranslation();
 
-<<<<<<< HEAD
   const handleDownloadExcel = async () => {
     setIsGenerating(true);
     try {
       const { generateStyledExcel } = await import('@/lib/excel-generator');
       const ws_data: any[][] = [
-=======
-  const handleDownloadExcel = () => {
-    setIsGenerating(true);
-    try {
-      const ws_data: (string | number)[][] = [
->>>>>>> origin/main
         [t('farmAccountStatement.view.title', { farmName: data.finca.name.toUpperCase() })],
         [],
         [t('farmAccountStatement.view.supplier'), data.finca.name],
@@ -103,7 +92,6 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
         data.totalOutstanding
       ]);
 
-<<<<<<< HEAD
       const colWidths = [12, 15, 30, 30, 15, 15, 15, 15];
       const fileName = `${t('farmAccountStatement.excel.fileName')}-${data.finca.name.replace(/ /g, '_')}.xlsx`;
 
@@ -113,20 +101,6 @@ export default function FarmAccountStatementExcelButton({ data }: FarmAccountSta
         sheetName: t('farmAccountStatement.excel.sheetName'),
         colWidths,
       });
-=======
-      const ws = XLSX.utils.aoa_to_sheet(ws_data);
-
-      ws['!cols'] = [
-        { wch: 12 }, { wch: 15 }, { wch: 30 }, { wch: 30 }, { wch: 15 }, 
-        { wch: 15 }, { wch: 15 }, { wch: 15 }
-      ];
-      
-      const wb = XLSX.utils.book_new();
-      XLSX.utils.book_append_sheet(wb, ws, t('farmAccountStatement.excel.sheetName'));
-
-      const fileName = `${t('farmAccountStatement.excel.fileName')}-${data.finca.name.replace(/ /g, '_')}.xlsx`;
-      XLSX.writeFile(wb, fileName);
->>>>>>> origin/main
       
       toast({
         title: t('common.success'),

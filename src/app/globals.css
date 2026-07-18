@@ -36,7 +36,6 @@ body {
     --input: 140 15% 90%; /* Sage Input */
     --ring: 142 76% 36%;
     
-<<<<<<< HEAD
     --sidebar-background: 140 40% 10%; /* Deep Forest Green */
     --sidebar-foreground: 140 20% 88%; /* Light Sage */
     --sidebar-accent: 140 30% 16%; /* Lighter green for hover */
@@ -44,8 +43,6 @@ body {
     --sidebar-border: 140 30% 14%;
     --sidebar-ring: 142 76% 36%;
     
-=======
->>>>>>> origin/main
     --radius: 0.5rem;
 
     /* Chart Colors */
@@ -85,7 +82,6 @@ body {
     --input: 140 10% 25%;
     --ring: 142 76% 46%;
 
-<<<<<<< HEAD
     --sidebar-background: 140 45% 7%; /* Deeper night green */
     --sidebar-foreground: 140 20% 90%;
     --sidebar-accent: 140 25% 14%;
@@ -93,8 +89,6 @@ body {
     --sidebar-border: 140 25% 11%;
     --sidebar-ring: 142 76% 46%;
 
-=======
->>>>>>> origin/main
     /* Chart Colors */
     --chart-1: 142 76% 46%;
     --chart-2: 45 90% 65%;
@@ -112,7 +106,6 @@ body {
     @apply bg-background text-foreground;
   }
 }
-<<<<<<< HEAD
 
 /* Custom Sidebar Menu Enhancements */
 [data-sidebar="sidebar"] {
@@ -178,5 +171,3 @@ body {
   padding: 10px 12px;
   backdrop-filter: blur(8px);
 }
-=======
->>>>>>> origin/main

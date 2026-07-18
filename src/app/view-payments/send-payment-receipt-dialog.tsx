@@ -5,11 +5,6 @@ import { useState, useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
-<<<<<<< HEAD
-=======
-import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
->>>>>>> origin/main
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
@@ -85,15 +80,10 @@ export function SendPaymentReceiptDialog({ payment, isOpen, onClose }: SendPayme
       }
       
       try {
-<<<<<<< HEAD
       const html2canvas = (await import('html2canvas')).default;
       const { default: jsPDF } = await import('jspdf');
         const canvas = await html2canvas(receiptElement, {
           scale: 1.5,
-=======
-        const canvas = await html2canvas(receiptElement, {
-          scale: 3,
->>>>>>> origin/main
           useCORS: true,
           logging: false,
           width: receiptElement.scrollWidth,
@@ -102,11 +92,7 @@ export function SendPaymentReceiptDialog({ payment, isOpen, onClose }: SendPayme
           windowHeight: document.documentElement.scrollHeight,
         });
 
-<<<<<<< HEAD
         const imgData = canvas.toDataURL('image/jpeg', 0.75);
-=======
-        const imgData = canvas.toDataURL('image/png');
->>>>>>> origin/main
         const pdf = new jsPDF('p', 'pt', 'a4');
 
         const pdfWidth = pdf.internal.pageSize.getWidth();
@@ -123,21 +109,13 @@ export function SendPaymentReceiptDialog({ payment, isOpen, onClose }: SendPayme
         let position = 0;
         let remainingHeight = imgHeight;
 
-<<<<<<< HEAD
         pdf.addImage(imgData, 'JPEG', x, position, canvasWidth * ratio, imgHeight);
-=======
-        pdf.addImage(imgData, 'PNG', x, position, canvasWidth * ratio, imgHeight);
->>>>>>> origin/main
         remainingHeight -= pdfHeight;
 
         while (remainingHeight > 0) {
             position -= pdfHeight;
             pdf.addPage();
-<<<<<<< HEAD
             pdf.addImage(imgData, 'JPEG', x, position, canvasWidth * ratio, imgHeight);
-=======
-            pdf.addImage(imgData, 'PNG', x, position, canvasWidth * ratio, imgHeight);
->>>>>>> origin/main
             remainingHeight -= pdfHeight;
         }
 

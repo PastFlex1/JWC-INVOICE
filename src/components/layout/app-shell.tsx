@@ -16,13 +16,10 @@ import {
   SidebarInset,
   SidebarFooter,
   SidebarRail,
-<<<<<<< HEAD
   SidebarGroup,
   SidebarGroupLabel,
   SidebarGroupContent,
   SidebarContent,
-=======
->>>>>>> origin/main
   useSidebar,
 } from '@/components/ui/sidebar';
 import {
@@ -49,12 +46,8 @@ import {
   Archive,
   BookCheck,
   LineChart,
-<<<<<<< HEAD
   BarChart3,
   Mail,
-=======
-  BarChartHorizontal,
->>>>>>> origin/main
 } from 'lucide-react';
 import { useTranslation } from '@/context/i18n-context';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -69,7 +62,6 @@ import {
 
 function AppShellHeader() {
   const { state } = useSidebar();
-<<<<<<< HEAD
   const isCollapsed = state === "collapsed";
   
   return (
@@ -89,23 +81,6 @@ function AppShellHeader() {
                 <p className="text-[11px] text-green-300/60 font-medium">Para Floristas</p>
               </div>
             )}
-=======
-  return (
-    <SidebarHeader className="p-4">
-      <Button
-        variant="ghost"
-        className="flex h-auto w-full items-center justify-start gap-2 p-0 hover:bg-transparent"
-        asChild
-      >
-        <Link href="/">
-            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg">
-            <Flower2 className="h-6 w-6 text-primary" />
-            </div>
-            <div className="flex flex-col items-start gap-px overflow-hidden whitespace-nowrap transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">
-            <h2 className="text-lg font-semibold font-headline">JCW FLOWERS</h2>
-            <p className="text-sm text-muted-foreground">Para Floristas</p>
-            </div>
->>>>>>> origin/main
         </Link>
       </Button>
     </SidebarHeader>
@@ -124,19 +99,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   };
 
   const mainNavItems = [
-<<<<<<< HEAD
     { href: '/email', label: 'Correo', icon: Mail },
-=======
->>>>>>> origin/main
     { href: '/invoices', label: t('sidebar.invoices'), icon: FileText },
     { href: '/accounts-payable', label: t('sidebar.accountsPayable'), icon: Receipt },
     { href: '/view-payments', label: t('sidebar.viewPayments'), icon: BookCheck },
     { href: '/reports', label: t('sidebar.reports'), icon: LineChart },
-<<<<<<< HEAD
     { href: '/reports/comparative-sales', label: t('sidebar.comparativeReport'), icon: BarChart3 },
-=======
-    { href: '/reports/comparative-sales', label: t('sidebar.comparativeReport'), icon: BarChartHorizontal },
->>>>>>> origin/main
     { href: '/reports/customer-report', label: t('sidebar.customerReport'), icon: Users },
   ];
   
@@ -173,7 +141,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
-<<<<<<< HEAD
       <Sidebar collapsible="icon">
         <AppShellHeader />
 
@@ -235,62 +202,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               <div className="hidden group-data-[collapsible=icon]:flex h-8 w-8 items-center justify-center rounded-full bg-neutral-900 border border-neutral-800 shrink-0">
                  <span className="text-white font-bold text-xs">N</span>
               </div>
-=======
-      <Sidebar>
-        <AppShellHeader />
-
-        <SidebarMenu className="flex-grow">
-          <div className="px-4 py-2">
-            <h3 className="mb-2 px-2 text-lg font-semibold tracking-tight transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">{t('sidebar.main')}</h3>
-            <div className="space-y-1">
-               {mainNavItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname.startsWith(item.href)}
-                    className="gap-3"
-                    tooltip={item.label}
-                  >
-                    <Link href={item.href} prefetch={true}>
-                      <item.icon className="h-5 w-5" />
-                      <span className='transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0'>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </div>
-          </div>
-          <div className="px-4 py-2">
-            <h3 className="mb-2 px-2 text-lg font-semibold tracking-tight transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">{t('sidebar.configuration')}</h3>
-            <div className="space-y-1">
-               {settingsNavItems.map((item) => (
-                <SidebarMenuItem key={item.href}>
-                  <SidebarMenuButton
-                    asChild
-                    isActive={pathname.startsWith(item.href)}
-                    className="gap-3"
-                    tooltip={item.label}
-                  >
-                    <Link href={item.href} prefetch={true}>
-                      <item.icon className="h-5 w-5" />
-                      <span className='transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0'>{item.label}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </div>
-          </div>
-        </SidebarMenu>
-
-        <SidebarFooter className="p-4 mt-auto transition-all duration-300 group-data-[collapsible=icon]:-ml-12 group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0">
-           <div className="flex items-center gap-3 w-full px-2">
-              <div className="flex flex-col items-start gap-1">
-                 <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-semibold">V1.0.1</span>
-                 <p className="text-[11px] text-muted-foreground leading-tight">
-                    Desarrollado por <br /><span className="text-primary font-medium">Palma Nexus Solutions - 099 821 2307</span>
-                 </p>
-              </div>
->>>>>>> origin/main
             </div>
         </SidebarFooter>
         <SidebarRail />

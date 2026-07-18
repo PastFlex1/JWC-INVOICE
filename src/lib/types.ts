@@ -1,8 +1,4 @@
 
-<<<<<<< HEAD
-=======
-
->>>>>>> origin/main
 export interface Customer {
   id: string;
   type: 'National' | 'International';
@@ -114,10 +110,7 @@ export interface Consignatario {
   customerId: string;
   direccion: string;
   provincia: string;
-<<<<<<< HEAD
   carrierId?: string;
-=======
->>>>>>> origin/main
 }
 
 export interface Variedad {
@@ -174,7 +167,6 @@ export type Financials = {
     creditNotes: CreditNote[];
     debitNotes: DebitNote[];
 };
-<<<<<<< HEAD
 
 export interface EmailAttachment {
   id: string;
@@ -204,5 +196,3 @@ export interface EmailMessage {
   createdBy?: string;
   createdAt?: string;
 }
-=======
->>>>>>> origin/main

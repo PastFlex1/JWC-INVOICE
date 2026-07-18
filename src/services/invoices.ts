@@ -12,10 +12,7 @@ import {
   type QueryDocumentSnapshot,
   type DocumentSnapshot,
   Timestamp,
-<<<<<<< HEAD
   onSnapshot,
-=======
->>>>>>> origin/main
 } from 'firebase/firestore';
 import { getCustomerById } from './customers';
 import { getConsignatarioById } from './consignatarios';
@@ -140,7 +137,6 @@ export async function deleteInvoice(id: string): Promise<void> {
   const invoiceDoc = doc(db, 'invoices', id);
   await deleteDoc(invoiceDoc);
 }
-<<<<<<< HEAD
 
 export function subscribeInvoices(callback: (invoices: Invoice[]) => void) {
   const invoicesCollection = collection(db, 'invoices');
@@ -148,5 +144,3 @@ export function subscribeInvoices(callback: (invoices: Invoice[]) => void) {
     callback(snapshot.docs.map(fromFirestore));
   });
 }
-=======
->>>>>>> origin/main

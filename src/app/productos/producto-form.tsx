@@ -1,13 +1,6 @@
-<<<<<<< HEAD
 'use client';
 
 import { useEffect, useMemo } from 'react';
-=======
-
-'use client';
-
-import { useEffect } from 'react';
->>>>>>> origin/main
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
@@ -40,7 +33,6 @@ type ProductoFormProps = {
 
 export function ProductoForm({ onSubmit, onClose, initialData, isSubmitting, variedades }: ProductoFormProps) {
   const { t } = useTranslation();
-<<<<<<< HEAD
   
   // Ensure unique variety names for the select dropdown to avoid key/value collisions
   const uniqueVariedades = useMemo(() => {
@@ -52,8 +44,6 @@ export function ProductoForm({ onSubmit, onClose, initialData, isSubmitting, var
     });
   }, [variedades]);
 
-=======
->>>>>>> origin/main
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
@@ -107,11 +97,7 @@ export function ProductoForm({ onSubmit, onClose, initialData, isSubmitting, var
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
-<<<<<<< HEAD
                     {uniqueVariedades.map(v => (
-=======
-                    {variedades.map(v => (
->>>>>>> origin/main
                       <SelectItem key={v.id} value={v.nombre}>
                         {v.nombre}
                       </SelectItem>

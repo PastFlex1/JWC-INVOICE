@@ -24,10 +24,7 @@ import {
   AlertDialogCancel,
 } from '@/components/ui/alert-dialog';
 import { InvoiceDetailView } from '@/app/invoices/[id]/invoice-detail-view';
-<<<<<<< HEAD
 import { cn } from '@/lib/utils';
-=======
->>>>>>> origin/main
 
 
 type MonthlyData = {
@@ -53,10 +50,7 @@ type InvoiceDetailReport = {
   chargeFarm: number;
   chargeClient: number;
   profit: number;
-<<<<<<< HEAD
   avgPrice: number;
-=======
->>>>>>> origin/main
 };
 
 type PreviewData = {
@@ -80,25 +74,16 @@ const CustomYAxisTick = (props: any) => {
 };
 
 export function ReportsClient() {
-<<<<<<< HEAD
   const { invoices, creditNotes, debitNotes, fincas, customers, productos, cargueras, consignatarios, paises, variedades, payments } = useAppData();
-=======
-  const { invoices, creditNotes, debitNotes, fincas, customers, productos, cargueras, consignatarios, paises, payments } = useAppData();
->>>>>>> origin/main
   const { t, locale } = useTranslation();
   const dateLocale = useMemo(() => (locale === 'es' ? es : enUS), [locale]);
 
   const [selectedFincaId, setSelectedFincaId] = useState<string>('all');
   const [selectedCustomerId, setSelectedCustomerId] = useState<string>('all');
-<<<<<<< HEAD
   const [selectedProductType, setSelectedProductType] = useState<string>('all');
   const [selectedYear, setSelectedYear] = useState<string>('all');
   const [selectedMonth, setSelectedMonth] = useState<string>('all');
   const [selectedMetric, setSelectedMetric] = useState<'all' | 'sales' | 'purchases' | 'profit'>('all');
-=======
-  const [selectedYear, setSelectedYear] = useState<string>('all');
-  const [selectedMonth, setSelectedMonth] = useState<string>('all');
->>>>>>> origin/main
   const [previewData, setPreviewData] = useState<PreviewData | null>(null);
 
   const availableYears = useMemo(() => {
@@ -107,7 +92,6 @@ export function ReportsClient() {
   }, [invoices]);
   
   const availableMonths = useMemo(() => {
-<<<<<<< HEAD
     const monthSet = new Set<string>();
     const yearNumeric = selectedYear !== 'all' ? parseInt(selectedYear) : null;
     
@@ -117,15 +101,6 @@ export function ReportsClient() {
     
     invoicesForYear.forEach(inv => monthSet.add(format(parseISO(inv.farmDepartureDate), 'MM')));
     return Array.from(monthSet).sort();
-=======
-    if (selectedYear === 'all') return [];
-    const months = new Set(
-      invoices
-        .filter(inv => getYear(parseISO(inv.farmDepartureDate)) === parseInt(selectedYear))
-        .map(inv => format(parseISO(inv.farmDepartureDate), 'MM'))
-    );
-    return Array.from(months).sort();
->>>>>>> origin/main
   }, [invoices, selectedYear]);
 
   const filteredInvoices = useMemo(() => {
@@ -140,13 +115,8 @@ export function ReportsClient() {
         const year = parseInt(selectedYear);
         filtered = filtered.filter(inv => getYear(parseISO(inv.farmDepartureDate)) === year);
     }
-<<<<<<< HEAD
      if (selectedMonth !== 'all') {
         const month = parseInt(selectedMonth) - 1;
-=======
-     if (selectedMonth !== 'all' && selectedYear !== 'all') {
-        const month = parseInt(selectedMonth) -1;
->>>>>>> origin/main
         filtered = filtered.filter(inv => parseISO(inv.farmDepartureDate).getMonth() === month);
     }
     return filtered;
@@ -156,18 +126,13 @@ export function ReportsClient() {
     const fincaMap = new Map(fincas.map(f => [f.id, f.name]));
     const customerMap = new Map(customers.map(c => [c.id, c.name]));
     
-<<<<<<< HEAD
     let details = filteredInvoices.map(invoice => {
-=======
-    return filteredInvoices.map(invoice => {
->>>>>>> origin/main
         let saleValue = 0;
         let purchaseValue = 0;
         let totalStems = 0;
 
         invoice.items.forEach(item => {
             (item.bunches || []).forEach((bunch: BunchItem) => {
-<<<<<<< HEAD
                 if (selectedProductType !== 'all' && bunch.product !== selectedProductType) {
                     return;
                 }
@@ -192,20 +157,10 @@ export function ReportsClient() {
                     } else {
                         purchaseValue += stems * (bunch.purchasePrice || 0);
                     }
-=======
-                const stems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0);
-                totalStems += stems;
-                if (invoice.type === 'sale' || invoice.type === 'both') {
-                    saleValue += stems * (bunch.salePrice || 0);
-                }
-                if (invoice.type === 'purchase' || invoice.type === 'both') {
-                    purchaseValue += stems * (bunch.purchasePrice || 0);
->>>>>>> origin/main
                 }
             });
         });
 
-<<<<<<< HEAD
         if (selectedProductType === 'all') {
             const relatedCreditNotes = creditNotes.filter(note => note.invoiceId === invoice.id);
             const relatedDebitNotes = debitNotes.filter(note => note.invoiceId === invoice.id);
@@ -220,20 +175,6 @@ export function ReportsClient() {
                 else purchaseValue += note.amount;
             });
         }
-=======
-        const relatedCreditNotes = creditNotes.filter(note => note.invoiceId === invoice.id);
-        const relatedDebitNotes = debitNotes.filter(note => note.invoiceId === invoice.id);
-
-        relatedCreditNotes.forEach(note => {
-            if (note.type === 'sale') saleValue -= note.amount;
-            else purchaseValue -= note.amount;
-        });
-
-        relatedDebitNotes.forEach(note => {
-            if (note.type === 'sale') saleValue += note.amount;
-            else purchaseValue += note.amount;
-        });
->>>>>>> origin/main
         
         return {
             id: invoice.id,
@@ -245,7 +186,6 @@ export function ReportsClient() {
             chargeClient: saleValue,
             chargeFarm: purchaseValue,
             profit: saleValue - purchaseValue,
-<<<<<<< HEAD
             avgPrice: totalStems > 0 ? saleValue / totalStems : 0,
         };
     }).filter(d => d.totalStems > 0 || Math.abs(d.chargeClient) > 0.01 || Math.abs(d.chargeFarm) > 0.01);
@@ -261,12 +201,6 @@ export function ReportsClient() {
     return details.sort((a,b) => parseISO(b.date).getTime() - parseISO(a.date).getTime());
 
   }, [filteredInvoices, creditNotes, debitNotes, fincas, customers, t, selectedMetric, selectedProductType]);
-=======
-        };
-    }).sort((a,b) => parseISO(b.date).getTime() - parseISO(a.date).getTime())
-
-  }, [filteredInvoices, creditNotes, debitNotes, fincas, customers, t]);
->>>>>>> origin/main
 
 
   const monthlyData = useMemo(() => {
@@ -299,7 +233,6 @@ export function ReportsClient() {
     const productMap = new Map<string, Producto>(productos.map(p => [p.id, p]));
 
     filteredInvoices.forEach(invoice => {
-<<<<<<< HEAD
       if (invoice.type === 'purchase' && selectedMetric === 'sales') return;
       if (invoice.type === 'sale' && selectedMetric === 'purchases') return;
 
@@ -322,15 +255,6 @@ export function ReportsClient() {
                 saleValue = bunch.stemsPerBunch * bunch.bunchesPerBox * numBoxes * (bunch.salePrice || 0);
             }
             
-=======
-      if (invoice.type === 'purchase') return;
-
-      invoice.items.forEach(item => {
-        item.bunches.forEach(bunch => {
-          const product = productMap.get(bunch.productoId);
-          if (product) {
-            const saleValue = bunch.stemsPerBunch * bunch.bunchesPerBox * bunch.salePrice;
->>>>>>> origin/main
             if (!salesByColor[product.nombreColor]) {
               salesByColor[product.nombreColor] = { totalSales: 0, colorHex: product.color };
             }
@@ -347,13 +271,8 @@ export function ReportsClient() {
         colorHex: data.colorHex,
       }))
       .sort((a, b) => b.totalSales - a.totalSales)
-<<<<<<< HEAD
       .slice(0, 15);
   }, [filteredInvoices, productos, selectedMetric, selectedProductType]);
-=======
-      .slice(0, 15); // Top 15 colors
-  }, [filteredInvoices, productos]);
->>>>>>> origin/main
 
   const handlePreviewClick = (invoiceId: string) => {
     const invoice = invoices.find(inv => inv.id === invoiceId);
@@ -386,7 +305,6 @@ export function ReportsClient() {
   const totalProfit = invoiceDetails.reduce((acc, data) => acc + data.profit, 0);
   const totalStems = invoiceDetails.reduce((acc, data) => acc + data.totalStems, 0);
 
-<<<<<<< HEAD
   const getWeightedAveragePrice = () => {
     if (totalStems === 0) return 0;
     if (selectedMetric === 'purchases') return totalPurchases / totalStems;
@@ -396,8 +314,6 @@ export function ReportsClient() {
   
   const totalAvgPricePerStem = getWeightedAveragePrice();
 
-=======
->>>>>>> origin/main
   const getMonthName = (monthNumber: string) => {
       const year = selectedYear !== 'all' ? parseInt(selectedYear) : new Date().getFullYear();
       const date = new Date(year, parseInt(monthNumber) - 1, 1);
@@ -406,27 +322,20 @@ export function ReportsClient() {
   
   const getXAxisFormatter = (monthKey: string) => {
     if (selectedYear === 'all') {
-<<<<<<< HEAD
       try {
         return format(parseISO(monthKey + "-01"), "MMM yyyy", { locale: dateLocale });
       } catch (e) {
         return monthKey;
       }
-=======
-      return format(parseISO(monthKey), "MMM yyyy", { locale: dateLocale });
->>>>>>> origin/main
     }
     return getMonthName(monthKey);
   };
 
-<<<<<<< HEAD
   const allMonths = Array.from({ length: 12 }, (_, i) => {
     const m = (i + 1).toString().padStart(2, '0');
     return { value: m, name: getMonthName(m) };
   });
 
-=======
->>>>>>> origin/main
   return (
     <>
     <div className="space-y-6">
@@ -440,7 +349,6 @@ export function ReportsClient() {
             <CardTitle>{t('reports.filters')}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-wrap gap-4">
-<<<<<<< HEAD
             <Select value={selectedMetric} onValueChange={(v: any) => setSelectedMetric(v)}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[180px]">
                     <SelectValue placeholder={t('reports.filterByMetric')} />
@@ -453,8 +361,6 @@ export function ReportsClient() {
                 </SelectContent>
             </Select>
 
-=======
->>>>>>> origin/main
             <Select value={selectedFincaId} onValueChange={setSelectedFincaId}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[200px]">
                     <SelectValue placeholder={t('reports.filterByFarm')} />
@@ -473,7 +379,6 @@ export function ReportsClient() {
                     {customers.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
                 </SelectContent>
             </Select>
-<<<<<<< HEAD
 
             <Select value={selectedProductType} onValueChange={setSelectedProductType}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[200px]">
@@ -485,8 +390,6 @@ export function ReportsClient() {
                 </SelectContent>
             </Select>
 
-=======
->>>>>>> origin/main
             <Select value={selectedYear} onValueChange={(value) => {setSelectedYear(value); setSelectedMonth('all');}}>
                 <SelectTrigger className="w-full md:w-auto md:min-w-[150px]">
                     <SelectValue placeholder={t('reports.filterByYear')} />
@@ -496,27 +399,18 @@ export function ReportsClient() {
                     {availableYears.map(y => <SelectItem key={y} value={String(y)}>{y}</SelectItem>)}
                 </SelectContent>
             </Select>
-<<<<<<< HEAD
              <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-=======
-             <Select value={selectedMonth} onValueChange={setSelectedMonth} disabled={selectedYear === 'all'}>
->>>>>>> origin/main
                 <SelectTrigger className="w-full md:w-auto md:min-w-[150px]">
                     <SelectValue placeholder={t('reports.filterByMonth')} />
                 </SelectTrigger>
                 <SelectContent>
                     <SelectItem value="all">{t('reports.allMonths')}</SelectItem>
-<<<<<<< HEAD
                     {allMonths.map(m => <SelectItem key={m.value} value={m.value}>{m.name}</SelectItem>)}
-=======
-                    {availableMonths.map(m => <SelectItem key={m} value={m}>{getMonthName(m)}</SelectItem>)}
->>>>>>> origin/main
                 </SelectContent>
             </Select>
         </CardContent>
        </Card>
 
-<<<<<<< HEAD
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         {(selectedMetric === 'all' || selectedMetric === 'sales') && (
           <Card className={cn(selectedMetric === 'sales' && "border-primary border-2")}>
@@ -555,31 +449,6 @@ export function ReportsClient() {
           <CardContent>
             <div className="text-2xl font-bold">${totalAvgPricePerStem.toFixed(3)}</div>
             <p className="text-xs text-muted-foreground mt-1">{t('reports.perStemGlobal')}</p>
-=======
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('reports.sales')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalSales)}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('reports.purchases')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalPurchases)}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">{t('reports.profit')}</CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">{formatCurrency(totalProfit)}</div>
->>>>>>> origin/main
           </CardContent>
         </Card>
       </div>
@@ -596,7 +465,6 @@ export function ReportsClient() {
               <YAxis tickFormatter={(value) => `$${value / 1000}k`} />
               <Tooltip formatter={(value: number) => formatCurrency(value)} />
               <Legend />
-<<<<<<< HEAD
               {(selectedMetric === 'all' || selectedMetric === 'sales') && (
                 <Bar dataKey="sales" fill="hsl(var(--primary))" name={t('reports.sales')} />
               )}
@@ -606,11 +474,6 @@ export function ReportsClient() {
               {(selectedMetric === 'all' || selectedMetric === 'profit') && (
                 <Bar dataKey="profit" fill="hsl(var(--chart-2))" name={t('reports.profit')} />
               )}
-=======
-              <Bar dataKey="sales" fill="hsl(var(--primary))" name={t('reports.sales')} />
-              <Bar dataKey="purchases" fill="hsl(var(--destructive))" name={t('reports.purchases')} />
-              <Bar dataKey="profit" fill="hsl(var(--chart-2))" name={t('reports.profit')} />
->>>>>>> origin/main
             </BarChart>
           </ResponsiveContainer>
         </CardContent>
@@ -654,16 +517,12 @@ export function ReportsClient() {
                 <TableHead className="text-right">{t('reports.table.totalStems')}</TableHead>
                 <TableHead className="text-right">{t('reports.table.chargeFarm')}</TableHead>
                 <TableHead className="text-right">{t('reports.table.chargeClient')}</TableHead>
-<<<<<<< HEAD
                 <TableHead className="text-right">{t('reports.table.avgPrice')}</TableHead>
-=======
->>>>>>> origin/main
                 <TableHead className="text-right">{t('reports.table.profit')}</TableHead>
                 <TableHead className="text-right">{t('common.actions.title')}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
-<<<<<<< HEAD
               {invoiceDetails.map((data) => {
                 const rowAvgPrice = data.totalStems > 0 ? (
                   selectedMetric === 'purchases' ? data.chargeFarm / data.totalStems :
@@ -690,39 +549,14 @@ export function ReportsClient() {
                   </TableRow>
                 );
               })}
-=======
-              {invoiceDetails.map((data) => (
-                <TableRow key={data.id}>
-                  <TableCell>{format(parseISO(data.date), 'dd/MM/yyyy')}</TableCell>
-                  <TableCell className="font-medium">{data.invoiceNumber}</TableCell>
-                  <TableCell>{data.farmName}</TableCell>
-                  <TableCell>{data.customerName}</TableCell>
-                  <TableCell className="text-right">{data.totalStems}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(data.chargeFarm)}</TableCell>
-                  <TableCell className="text-right">{formatCurrency(data.chargeClient)}</TableCell>
-                  <TableCell className="text-right font-semibold">{formatCurrency(data.profit)}</TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="icon" title={t('invoices.view.invoiceTitle')} onClick={() => handlePreviewClick(data.id)}>
-                      <Eye className="h-4 w-4" />
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              ))}
->>>>>>> origin/main
             </TableBody>
              <TableFooter>
                 <TableRow className="font-bold text-lg">
                     <TableCell colSpan={4}>{t('reports.table.total')}</TableCell>
-<<<<<<< HEAD
                     <TableCell className="text-right">{totalStems.toLocaleString()}</TableCell>
                     <TableCell className="text-right">{formatCurrency(totalPurchases)}</TableCell>
                     <TableCell className="text-right">{formatCurrency(totalSales)}</TableCell>
                     <TableCell className="text-right text-muted-foreground">${totalAvgPricePerStem.toFixed(3)}</TableCell>
-=======
-                    <TableCell className="text-right">{totalStems}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(totalPurchases)}</TableCell>
-                    <TableCell className="text-right">{formatCurrency(totalSales)}</TableCell>
->>>>>>> origin/main
                     <TableCell className="text-right">{formatCurrency(totalProfit)}</TableCell>
                     <TableCell />
                 </TableRow>
