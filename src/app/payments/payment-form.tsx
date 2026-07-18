@@ -152,8 +152,20 @@ export function PaymentForm({
               const priceField = paymentType === 'purchase' ? 'purchasePrice' : 'salePrice';
               
               const itemSubtotal = item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
+<<<<<<< HEAD
+                const productLower = (bunch.product || '').toLowerCase();
+                const isGyp = productLower.includes('gyp');
+                const price = bunch[priceField] || 0;
+                
+                if (isGyp) {
+                    return bunchAcc + (bunch.bunchesPerBox * price);
+                }
+                const stems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0);
+                return bunchAcc + (stems * price);
+=======
                 const stems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0);
                 return bunchAcc + (stems * (bunch[priceField] || 0));
+>>>>>>> origin/main
               }, 0);
               
               return acc + (itemSubtotal * numberOfBoxes);

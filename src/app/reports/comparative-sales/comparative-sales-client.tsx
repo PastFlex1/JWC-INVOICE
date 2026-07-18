@@ -4,7 +4,11 @@
 import { useMemo, useState, useEffect } from 'react';
 import { useAppData } from '@/context/app-data-context';
 import { useTranslation } from '@/context/i18n-context';
+<<<<<<< HEAD
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+=======
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+>>>>>>> origin/main
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableFooter } from '@/components/ui/table';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { DropdownMenu, DropdownMenuTrigger, DropdownMenuContent, DropdownMenuCheckboxItem, DropdownMenuLabel, DropdownMenuSeparator } from '@/components/ui/dropdown-menu';
@@ -12,6 +16,10 @@ import { Button } from '@/components/ui/button';
 import type { Invoice, BunchItem } from '@/lib/types';
 import { format, parseISO, getYear, getMonth } from 'date-fns';
 import { es, enUS } from 'date-fns/locale';
+<<<<<<< HEAD
+import { Line, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+=======
+>>>>>>> origin/main
 
 
 type ComparativeData = {
@@ -25,6 +33,21 @@ type ComparativeData = {
   chargeClient: { [year: string]: number };
 };
 
+<<<<<<< HEAD
+const CHART_COLORS = [
+  'hsl(var(--primary))',
+  'hsl(var(--chart-2))',
+  'hsl(var(--chart-3))',
+  'hsl(var(--chart-4))',
+  'hsl(var(--chart-5))',
+  '#2563eb',
+  '#7c3aed',
+  '#db2777',
+  '#ea580c',
+];
+
+=======
+>>>>>>> origin/main
 export function ComparativeSalesClient() {
   const { invoices, fincas, customers } = useAppData();
   const { t, locale } = useTranslation();
@@ -44,10 +67,17 @@ export function ComparativeSalesClient() {
   }, [invoices]);
 
   useEffect(() => {
+<<<<<<< HEAD
+    if (allAvailableYears.length > 0 && selectedYears.length === 0) {
+      setSelectedYears(allAvailableYears);
+    }
+  }, [allAvailableYears, selectedYears]);
+=======
     if (allAvailableYears.length > 0) {
       setSelectedYears(allAvailableYears);
     }
   }, [allAvailableYears]);
+>>>>>>> origin/main
 
   const filteredInvoices = useMemo(() => {
     let filtered = invoices;
@@ -93,10 +123,26 @@ export function ComparativeSalesClient() {
         let purchaseValue = 0;
 
         invoice.items.forEach(item => {
+<<<<<<< HEAD
+            const numBoxes = item.numberOfBoxes || 1;
+            (item.bunches || []).forEach((bunch: BunchItem) => {
+                const productLower = (bunch.product || '').toLowerCase();
+                const isGyp = productLower.includes('gyp');
+                const stems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0) * numBoxes;
+                
+                if (isGyp) {
+                    saleValue += (bunch.bunchesPerBox * numBoxes * (bunch.salePrice || 0));
+                    purchaseValue += (bunch.bunchesPerBox * numBoxes * (bunch.purchasePrice || 0));
+                } else {
+                    saleValue += stems * (bunch.salePrice || 0);
+                    purchaseValue += stems * (bunch.purchasePrice || 0);
+                }
+=======
             (item.bunches || []).forEach((bunch: BunchItem) => {
                 const stems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0);
                 saleValue += stems * (bunch.salePrice || 0);
                 purchaseValue += stems * (bunch.purchasePrice || 0);
+>>>>>>> origin/main
             });
         });
         
@@ -113,6 +159,44 @@ export function ComparativeSalesClient() {
         return a.customerName.localeCompare(b.customerName);
     });
   }, [filteredInvoices, fincaMap, customerMap, t, dateLocale]);
+<<<<<<< HEAD
+
+  const chartData = useMemo(() => {
+    const data = Array.from({ length: 12 }, (_, i) => ({
+      month: i,
+      monthName: format(new Date(2000, i, 1), 'MMM', { locale: dateLocale }),
+    })) as any[];
+
+    filteredInvoices.forEach(invoice => {
+      const month = getMonth(parseISO(invoice.farmDepartureDate));
+      const year = getYear(parseISO(invoice.farmDepartureDate)).toString();
+      
+      let saleValue = 0;
+      invoice.items.forEach(item => {
+        const numBoxes = item.numberOfBoxes || 1;
+        (item.bunches || []).forEach((bunch: BunchItem) => {
+          const productLower = (bunch.product || '').toLowerCase();
+          const isGyp = productLower.includes('gyp');
+          const stems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0) * numBoxes;
+          
+          if (isGyp) {
+            saleValue += (bunch.bunchesPerBox * numBoxes * (bunch.salePrice || 0));
+          } else {
+            saleValue += stems * (bunch.salePrice || 0);
+          }
+        });
+      });
+
+      if (!data[month][year]) {
+        data[month][year] = 0;
+      }
+      data[month][year] += saleValue;
+    });
+
+    return data;
+  }, [filteredInvoices, dateLocale]);
+=======
+>>>>>>> origin/main
   
   const displayedYears = useMemo(() => {
     return selectedYears.sort((a, b) => Number(a) - Number(b));
@@ -203,6 +287,55 @@ export function ComparativeSalesClient() {
 
       <Card>
         <CardHeader>
+<<<<<<< HEAD
+          <CardTitle>{t('comparativeReport.chartTitle')}</CardTitle>
+          <CardDescription>{t('comparativeReport.chartDescription')}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="h-[400px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <LineChart data={chartData} margin={{ top: 5, right: 30, left: 20, bottom: 5 }}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                <XAxis 
+                  dataKey="monthName" 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12 }}
+                />
+                <YAxis 
+                  axisLine={false}
+                  tickLine={false}
+                  tick={{ fontSize: 12 }}
+                  tickFormatter={(value) => `$${value / 1000}k`}
+                />
+                <Tooltip 
+                  formatter={(value: number) => formatCurrency(value)}
+                  labelStyle={{ fontWeight: 'bold', marginBottom: '4px' }}
+                  contentStyle={{ borderRadius: '8px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                />
+                <Legend iconType="circle" />
+                {displayedYears.map((year, index) => (
+                  <Line
+                    key={year}
+                    type="monotone"
+                    dataKey={year}
+                    name={year}
+                    stroke={CHART_COLORS[index % CHART_COLORS.length]}
+                    strokeWidth={3}
+                    dot={{ r: 4, strokeWidth: 2 }}
+                    activeDot={{ r: 6, strokeWidth: 0 }}
+                  />
+                ))}
+              </LineChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+=======
+>>>>>>> origin/main
           <CardTitle>{t('comparativeReport.tableTitle')}</CardTitle>
         </CardHeader>
         <CardContent>

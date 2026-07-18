@@ -9,6 +9,10 @@ import {
   deleteDoc,
   type DocumentData,
   type QueryDocumentSnapshot,
+<<<<<<< HEAD
+  onSnapshot,
+=======
+>>>>>>> origin/main
 } from 'firebase/firestore';
 
 const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData>): Provincia => {
@@ -40,3 +44,13 @@ export async function deleteProvincia(id: string): Promise<void> {
   const provinciaDoc = doc(db, 'provincias', id);
   await deleteDoc(provinciaDoc);
 }
+<<<<<<< HEAD
+
+export function subscribeProvincias(callback: (provincias: Provincia[]) => void) {
+  const provinciasCollection = collection(db, 'provincias');
+  return onSnapshot(provinciasCollection, (snapshot) => {
+    callback(snapshot.docs.map(fromFirestore));
+  });
+}
+=======
+>>>>>>> origin/main

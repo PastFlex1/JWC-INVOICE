@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
 'use client';
 
 import React, { useMemo } from 'react';
@@ -34,6 +38,12 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
       totalBoxTypeValue += (boxTypeValues[item.boxType] || 0) * numBoxes;
       if (item.bunches && Array.isArray(item.bunches)) {
         item.bunches.forEach(bunch => {
+<<<<<<< HEAD
+          const productLower = (bunch.product || '').toLowerCase();
+          const isGyp = productLower.includes('gyp');
+          
+=======
+>>>>>>> origin/main
           const bunchesCount = Number(bunch.bunchesPerBox) || 0;
           const stemsPerBunch = Number(bunch.stemsPerBunch) || 0;
           const price = invoice.type === 'purchase' ? (Number(bunch.purchasePrice) || 0) : (Number(bunch.salePrice) || 0);
@@ -41,7 +51,16 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
           totalBunches += bunchesCount * numBoxes;
           const stemsInBunch = bunchesCount * stemsPerBunch;
           totalStems += stemsInBunch * numBoxes;
+<<<<<<< HEAD
+          
+          if (isGyp) {
+            totalFob += (bunchesCount * price) * numBoxes;
+          } else {
+            totalFob += (stemsInBunch * price) * numBoxes;
+          }
+=======
           totalFob += (stemsInBunch * price) * numBoxes;
+>>>>>>> origin/main
         });
       }
     });
@@ -52,6 +71,29 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
     return { totalBoxes, totalBunches, totalStems, totalFob, iva, totalConIva, totalBoxTypeValue };
   }, [invoice, isNational, boxTypeValues]);
 
+<<<<<<< HEAD
+  const priceHeader = useMemo(() => {
+    const items = invoice.items || [];
+    let hasGyp = false;
+    let hasOthers = false;
+    
+    items.forEach(item => {
+      item.bunches?.forEach(bunch => {
+        if ((bunch.product || '').toLowerCase().includes('gyp')) {
+          hasGyp = true;
+        } else {
+          hasOthers = true;
+        }
+      });
+    });
+
+    if (hasGyp && !hasOthers) return t('invoices.view.table.priceBunch');
+    if (hasGyp && hasOthers) return t('invoices.view.table.priceUnit');
+    return t('invoices.view.table.price');
+  }, [invoice.items, t]);
+
+=======
+>>>>>>> origin/main
 
   const renderItemRow = (item: LineItem, index: number) => {
     const itemBoxValue = boxTypeValues[item.boxType] || 0;
@@ -60,12 +102,26 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
     return (
        <React.Fragment key={item.id || index}>
         {(item.bunches || []).map((bunch, bunchIndex) => {
+<<<<<<< HEAD
+            const productLower = (bunch.product || '').toLowerCase();
+            const isGyp = productLower.includes('gyp');
+            
+=======
+>>>>>>> origin/main
             const stemsPerBunch = bunch.stemsPerBunch || 0;
             const bunchesPerBox = bunch.bunchesPerBox || 0;
             const pricePerStem = invoice.type === 'purchase' ? bunch.purchasePrice : bunch.salePrice;
 
             const totalStemsForBunch = stemsPerBunch * bunchesPerBox * numBoxes;
+<<<<<<< HEAD
+            
+            // Custom calculation for Gypsophila
+            const totalPrice = isGyp 
+                ? (bunchesPerBox * numBoxes * pricePerStem)
+                : (totalStemsForBunch * pricePerStem);
+=======
             const totalPrice = totalStemsForBunch * pricePerStem;
+>>>>>>> origin/main
             
             return (
                  <div key={bunch.id || bunchIndex} className="contents text-[10px] leading-tight">
@@ -103,10 +159,15 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
         
         <Card className="p-4 bg-white text-black shadow-lg border print:shadow-none print:border-0" id="invoice-to-print">
           <CardContent className="p-0 text-xs leading-tight">
+<<<<<<< HEAD
+            <header className="flex justify-between items-start mb-4">
+                <div className="w-1/2">
+=======
             {/* Header Section */}
             <header className="flex justify-between items-start mb-4">
                 <div className="w-1/2">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
+>>>>>>> origin/main
                     <img src="/logo.png" alt="JCW Flowers Logo" width={180} height={54} className="mb-4" />
                     <div className="text-[10px] space-y-1 mt-6">
                         <p><strong>{t('invoices.view.email')}:</strong> jcwf@outlook.es</p>
@@ -139,7 +200,10 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
                 </div>
             </header>
 
+<<<<<<< HEAD
+=======
             {/* Client Info Section */}
+>>>>>>> origin/main
             <section className="border border-gray-400 p-2 mb-4 text-[10px]">
                 <div className="grid grid-cols-[auto,1fr] gap-x-2 gap-y-1">
                     <strong>{t('invoices.view.nameClient')}:</strong> <span>{consignatario?.nombreConsignatario || customer?.name}</span>
@@ -149,7 +213,10 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
                 </div>
             </section>
 
+<<<<<<< HEAD
+=======
             {/* Items Table */}
+>>>>>>> origin/main
             <section>
                 <div className="grid grid-cols-[30px,40px,55px,0.8fr,1.5fr,1fr,45px,45px,55px,55px,65px] font-bold text-center bg-gray-100 border-t border-l border-r border-gray-400 text-[9px] leading-tight">
                     <div className="p-1 border-r border-gray-400">{t('invoices.view.table.boxes')}</div>
@@ -161,7 +228,11 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
                     <div className="p-1 border-r border-gray-400">{t('invoices.view.table.length')}</div>
                     <div className="p-1 border-r border-gray-400">{t('invoices.view.table.stems')}</div>
                     <div className="p-1 border-r border-gray-400">{t('invoices.view.table.bunches')}</div>
+<<<<<<< HEAD
+                    <div className="p-1 border-r border-gray-400">{priceHeader}</div>
+=======
                     <div className="p-1 border-r border-gray-400">{t('invoices.view.table.price')}</div>
+>>>>>>> origin/main
                     <div className="p-1">{t('invoices.view.table.total')}</div>
                 </div>
                 
@@ -175,12 +246,19 @@ export function InvoiceDetailView({ invoice, customer, consignatario, carguera, 
                     <div className="p-1 border-r border-gray-400 col-span-4 text-center">{t('invoices.view.table.totals')}</div>
                     <div className="p-1 border-r border-gray-400">{totals.totalStems}</div>
                     <div className="p-1 border-r border-gray-400">{totals.totalBunches}</div>
+<<<<<<< HEAD
+                    <div className="p-1 border-r border-gray-400"></div>
+=======
                     <div className="p-1 border-r border-gray-400"></div> {/* unit price */}
+>>>>>>> origin/main
                     <div className="p-1 font-bold">${totals.totalFob.toFixed(2)}</div>
                 </div>
             </section>
 
+<<<<<<< HEAD
+=======
             {/* Footer */}
+>>>>>>> origin/main
             <footer className="mt-4 flex justify-between items-start">
                 <p className="text-[8px] max-w-[450px]">
                     {t('invoices.view.footerNote')}

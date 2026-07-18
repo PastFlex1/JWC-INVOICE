@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+<<<<<<< HEAD
+=======
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+>>>>>>> origin/main
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -32,13 +35,24 @@ export default function CreditNotesDownloadPdfButton({ notes }: CreditNotesDownl
 
     setIsGenerating(true);
     try {
+<<<<<<< HEAD
+      const html2canvas = (await import('html2canvas')).default;
+      const { default: jsPDF } = await import('jspdf');
+      const canvas = await html2canvas(reportElement, {
+        scale: 1.5,
+=======
       const canvas = await html2canvas(reportElement, {
         scale: 3,
+>>>>>>> origin/main
         useCORS: true,
         logging: false,
       });
 
+<<<<<<< HEAD
+      const imgData = canvas.toDataURL('image/jpeg', 0.75);
+=======
       const imgData = canvas.toDataURL('image/png');
+>>>>>>> origin/main
       const pdf = new jsPDF('p', 'pt', 'a4');
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = pdf.internal.pageSize.getHeight();
@@ -48,7 +62,11 @@ export default function CreditNotesDownloadPdfButton({ notes }: CreditNotesDownl
       
       const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
       
+<<<<<<< HEAD
+      pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth * ratio, imgHeight * ratio);
+=======
       pdf.addImage(imgData, 'PNG', 0, 0, imgWidth * ratio, imgHeight * ratio);
+>>>>>>> origin/main
       
       const fileName = `${t('creditNotes.pdfFileName')}.pdf`;
       pdf.save(fileName);

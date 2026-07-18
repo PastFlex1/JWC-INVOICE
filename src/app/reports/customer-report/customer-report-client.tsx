@@ -102,10 +102,29 @@ export function CustomerReportClient() {
       }
 
       invoice.items.forEach(item => {
+<<<<<<< HEAD
+        const numBoxes = item.numberOfBoxes || 1;
+        (item.bunches || []).forEach((bunch: BunchItem) => {
+          const productLower = (bunch.product || '').toLowerCase();
+          const isGyp = productLower.includes('gyp');
+          const stems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0) * numBoxes;
+          
+          let purchaseValue = 0;
+          let saleValue = 0;
+          
+          if (isGyp) {
+            purchaseValue = (bunch.bunchesPerBox * numBoxes * (bunch.purchasePrice || 0));
+            saleValue = (bunch.bunchesPerBox * numBoxes * (bunch.salePrice || 0));
+          } else {
+            purchaseValue = stems * (bunch.purchasePrice || 0);
+            saleValue = stems * (bunch.salePrice || 0);
+          }
+=======
         (item.bunches || []).forEach((bunch: BunchItem) => {
           const stems = (bunch.stemsPerBunch || 0) * (bunch.bunchesPerBox || 0) * (item.numberOfBoxes || 1);
           const purchaseValue = stems * (bunch.purchasePrice || 0);
           const saleValue = stems * (bunch.salePrice || 0);
+>>>>>>> origin/main
           
           dataByCustomer[customerId].totalStems += stems;
           dataByCustomer[customerId].totalPurchaseValue += purchaseValue;

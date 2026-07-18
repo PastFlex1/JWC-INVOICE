@@ -12,6 +12,10 @@ import {
   type QueryDocumentSnapshot,
   Timestamp,
   runTransaction,
+<<<<<<< HEAD
+  onSnapshot,
+=======
+>>>>>>> origin/main
 } from 'firebase/firestore';
 
 const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData>): DebitNote => {
@@ -90,3 +94,13 @@ export async function deleteDebitNote(id: string): Promise<void> {
   const debitNoteDoc = doc(db, 'debitNotes', id);
   await deleteDoc(debitNoteDoc);
 }
+<<<<<<< HEAD
+
+export function subscribeDebitNotes(callback: (debitNotes: DebitNote[]) => void) {
+  const debitNotesCollection = collection(db, 'debitNotes');
+  return onSnapshot(debitNotesCollection, (snapshot) => {
+    callback(snapshot.docs.map(fromFirestore));
+  });
+}
+=======
+>>>>>>> origin/main

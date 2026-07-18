@@ -9,6 +9,10 @@ import {
   deleteDoc,
   type DocumentData,
   type QueryDocumentSnapshot,
+<<<<<<< HEAD
+  onSnapshot,
+=======
+>>>>>>> origin/main
 } from 'firebase/firestore';
 
 // Helper function to convert a Firestore document to our Finca type
@@ -66,3 +70,13 @@ export async function deleteFinca(id: string): Promise<void> {
   const fincaDoc = doc(db, 'fincas', id);
   await deleteDoc(fincaDoc);
 }
+<<<<<<< HEAD
+
+export function subscribeFincas(callback: (fincas: Finca[]) => void) {
+  const fincasCollection = collection(db, 'fincas');
+  return onSnapshot(fincasCollection, (snapshot) => {
+    callback(snapshot.docs.map(fromFirestore));
+  });
+}
+=======
+>>>>>>> origin/main

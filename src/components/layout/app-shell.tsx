@@ -16,6 +16,13 @@ import {
   SidebarInset,
   SidebarFooter,
   SidebarRail,
+<<<<<<< HEAD
+  SidebarGroup,
+  SidebarGroupLabel,
+  SidebarGroupContent,
+  SidebarContent,
+=======
+>>>>>>> origin/main
   useSidebar,
 } from '@/components/ui/sidebar';
 import {
@@ -42,7 +49,12 @@ import {
   Archive,
   BookCheck,
   LineChart,
+<<<<<<< HEAD
+  BarChart3,
+  Mail,
+=======
   BarChartHorizontal,
+>>>>>>> origin/main
 } from 'lucide-react';
 import { useTranslation } from '@/context/i18n-context';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
@@ -57,6 +69,27 @@ import {
 
 function AppShellHeader() {
   const { state } = useSidebar();
+<<<<<<< HEAD
+  const isCollapsed = state === "collapsed";
+  
+  return (
+    <SidebarHeader className={isCollapsed ? "p-2 items-center" : "p-4"}>
+      <Button
+        variant="ghost"
+        className={`sidebar-logo-container flex h-auto w-full items-center p-0 hover:bg-transparent ${isCollapsed ? 'justify-center' : 'justify-start gap-3'}`}
+        asChild
+      >
+        <Link href="/">
+            <div className={`sidebar-logo-icon flex shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-green-600 to-green-800 ${isCollapsed ? 'h-8 w-8' : 'h-10 w-10'}`}>
+              <Flower2 className={`text-white ${isCollapsed ? 'h-4 w-4' : 'h-5 w-5'}`} />
+            </div>
+            {!isCollapsed && (
+              <div className="flex flex-col items-start gap-0.5 overflow-hidden whitespace-nowrap">
+                <h2 className="text-md font-bold font-headline tracking-wide text-white">JCW FLOWERS</h2>
+                <p className="text-[11px] text-green-300/60 font-medium">Para Floristas</p>
+              </div>
+            )}
+=======
   return (
     <SidebarHeader className="p-4">
       <Button
@@ -72,6 +105,7 @@ function AppShellHeader() {
             <h2 className="text-lg font-semibold font-headline">JCW FLOWERS</h2>
             <p className="text-sm text-muted-foreground">Para Floristas</p>
             </div>
+>>>>>>> origin/main
         </Link>
       </Button>
     </SidebarHeader>
@@ -90,11 +124,19 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   };
 
   const mainNavItems = [
+<<<<<<< HEAD
+    { href: '/email', label: 'Correo', icon: Mail },
+=======
+>>>>>>> origin/main
     { href: '/invoices', label: t('sidebar.invoices'), icon: FileText },
     { href: '/accounts-payable', label: t('sidebar.accountsPayable'), icon: Receipt },
     { href: '/view-payments', label: t('sidebar.viewPayments'), icon: BookCheck },
     { href: '/reports', label: t('sidebar.reports'), icon: LineChart },
+<<<<<<< HEAD
+    { href: '/reports/comparative-sales', label: t('sidebar.comparativeReport'), icon: BarChart3 },
+=======
     { href: '/reports/comparative-sales', label: t('sidebar.comparativeReport'), icon: BarChartHorizontal },
+>>>>>>> origin/main
     { href: '/reports/customer-report', label: t('sidebar.customerReport'), icon: Users },
   ];
   
@@ -131,6 +173,69 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <SidebarProvider>
+<<<<<<< HEAD
+      <Sidebar collapsible="icon">
+        <AppShellHeader />
+
+        <SidebarContent>
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-green-400/50 font-bold tracking-wider">{t('sidebar.main')}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                 {mainNavItems.map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname.startsWith(item.href)}
+                      tooltip={item.label}
+                    >
+                      <Link href={item.href} prefetch={true}>
+                        <item.icon />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+
+          <SidebarGroup>
+            <SidebarGroupLabel className="text-green-400/50 font-bold tracking-wider">{t('sidebar.configuration')}</SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                 {settingsNavItems.map((item) => (
+                  <SidebarMenuItem key={item.href}>
+                    <SidebarMenuButton
+                      asChild
+                      isActive={pathname.startsWith(item.href)}
+                      tooltip={item.label}
+                    >
+                      <Link href={item.href} prefetch={true}>
+                        <item.icon />
+                        <span>{item.label}</span>
+                      </Link>
+                    </SidebarMenuButton>
+                  </SidebarMenuItem>
+                ))}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        </SidebarContent>
+
+        <SidebarFooter className="p-4 mt-auto transition-all duration-300 group-data-[collapsible=icon]:p-2 group-data-[collapsible=icon]:opacity-100">
+           <div className="sidebar-footer-card flex items-center gap-3 w-full group-data-[collapsible=icon]:justify-center">
+              <div className="flex flex-col items-start gap-1 transition-all duration-300 group-data-[collapsible=icon]:hidden">
+                 <span className="text-[9px] text-green-400/40 uppercase tracking-wider font-bold">V1.0.1</span>
+                 <p className="text-[10px] text-neutral-400 leading-normal">
+                    Desarrollado por <br /><span className="text-green-400 font-semibold">Palma Nexus Solutions</span><br />
+                    <span className="text-[9px] text-neutral-500">099 821 2307</span>
+                 </p>
+              </div>
+              <div className="hidden group-data-[collapsible=icon]:flex h-8 w-8 items-center justify-center rounded-full bg-neutral-900 border border-neutral-800 shrink-0">
+                 <span className="text-white font-bold text-xs">N</span>
+              </div>
+=======
       <Sidebar>
         <AppShellHeader />
 
@@ -185,6 +290,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     Desarrollado por <br /><span className="text-primary font-medium">Palma Nexus Solutions - 099 821 2307</span>
                  </p>
               </div>
+>>>>>>> origin/main
             </div>
         </SidebarFooter>
         <SidebarRail />

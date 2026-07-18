@@ -1,5 +1,8 @@
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> origin/main
 export interface Customer {
   id: string;
   type: 'National' | 'International';
@@ -111,6 +114,10 @@ export interface Consignatario {
   customerId: string;
   direccion: string;
   provincia: string;
+<<<<<<< HEAD
+  carrierId?: string;
+=======
+>>>>>>> origin/main
 }
 
 export interface Variedad {
@@ -167,3 +174,35 @@ export type Financials = {
     creditNotes: CreditNote[];
     debitNotes: DebitNote[];
 };
+<<<<<<< HEAD
+
+export interface EmailAttachment {
+  id: string;
+  filename: string;
+  contentType: string;
+  size: number;
+  url?: string;
+}
+
+export interface EmailMessage {
+  id: string;
+  messageId?: string;
+  uid?: number;
+  type: "inbox" | "sent";
+  from: string;
+  to: string[];
+  cc?: string[];
+  bcc?: string[];
+  subject: string;
+  text?: string;
+  html?: string;
+  date: string;
+  isRead: boolean;
+  status?: "delivered" | "bounced" | "pending";
+  threadId?: string;
+  attachments?: EmailAttachment[];
+  createdBy?: string;
+  createdAt?: string;
+}
+=======
+>>>>>>> origin/main

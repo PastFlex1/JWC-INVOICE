@@ -17,6 +17,10 @@ import {
   updateDoc,
   deleteDoc,
   Transaction,
+<<<<<<< HEAD
+  onSnapshot,
+=======
+>>>>>>> origin/main
 } from 'firebase/firestore';
 import { getInvoiceStatus } from '@/lib/due-date';
 import { parseISO } from 'date-fns';
@@ -153,3 +157,13 @@ export async function updateSinglePayment(paymentId: string, newAmount: number):
     await updateDoc(paymentRef, { amount: newAmount });
     // Status will be recalculated on next data fetch.
 }
+<<<<<<< HEAD
+
+export function subscribePayments(callback: (payments: Payment[]) => void) {
+  const paymentsCollection = collection(db, 'payments');
+  return onSnapshot(paymentsCollection, (snapshot) => {
+    callback(snapshot.docs.map(paymentFromFirestore));
+  });
+}
+=======
+>>>>>>> origin/main

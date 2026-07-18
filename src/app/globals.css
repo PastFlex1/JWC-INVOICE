@@ -36,6 +36,16 @@ body {
     --input: 140 15% 90%; /* Sage Input */
     --ring: 142 76% 36%;
     
+<<<<<<< HEAD
+    --sidebar-background: 140 40% 10%; /* Deep Forest Green */
+    --sidebar-foreground: 140 20% 88%; /* Light Sage */
+    --sidebar-accent: 140 30% 16%; /* Lighter green for hover */
+    --sidebar-accent-foreground: 142 80% 60%; /* Vibrant Mint Green */
+    --sidebar-border: 140 30% 14%;
+    --sidebar-ring: 142 76% 36%;
+    
+=======
+>>>>>>> origin/main
     --radius: 0.5rem;
 
     /* Chart Colors */
@@ -75,6 +85,16 @@ body {
     --input: 140 10% 25%;
     --ring: 142 76% 46%;
 
+<<<<<<< HEAD
+    --sidebar-background: 140 45% 7%; /* Deeper night green */
+    --sidebar-foreground: 140 20% 90%;
+    --sidebar-accent: 140 25% 14%;
+    --sidebar-accent-foreground: 142 80% 65%;
+    --sidebar-border: 140 25% 11%;
+    --sidebar-ring: 142 76% 46%;
+
+=======
+>>>>>>> origin/main
     /* Chart Colors */
     --chart-1: 142 76% 46%;
     --chart-2: 45 90% 65%;
@@ -92,3 +112,71 @@ body {
     @apply bg-background text-foreground;
   }
 }
+<<<<<<< HEAD
+
+/* Custom Sidebar Menu Enhancements */
+[data-sidebar="sidebar"] {
+  background: linear-gradient(180deg, hsl(140, 40%, 10%) 0%, hsl(140, 45%, 6%) 100%) !important;
+}
+
+/* Sidebar header / Logo section styling */
+.sidebar-logo-container {
+  transition: all 0.3s ease;
+}
+.sidebar-logo-icon {
+  background: linear-gradient(135deg, hsl(142, 76%, 36%) 0%, hsl(142, 60%, 25%) 100%);
+  box-shadow: 0 4px 12px rgba(22, 163, 74, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: all 0.3s ease;
+}
+.sidebar-logo-container:hover .sidebar-logo-icon {
+  transform: scale(1.08) rotate(10deg);
+  box-shadow: 0 4px 20px rgba(22, 163, 74, 0.45);
+}
+
+/* Menu Button enhancements */
+[data-sidebar="menu-button"] {
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+  border-left: 3px solid transparent !important;
+  border-radius: 0 8px 8px 0 !important; /* Elegant rounded end */
+  margin-right: 8px !important;
+}
+
+[data-sidebar="menu-button"] svg {
+  transition: transform 0.25s ease !important;
+  color: hsl(140, 10%, 75%) !important;
+}
+
+[data-sidebar="menu-button"]:hover {
+  padding-left: 14px !important;
+}
+
+[data-sidebar="menu-button"]:hover svg {
+  transform: scale(1.15) rotate(5deg) !important;
+  color: hsl(142, 80%, 60%) !important;
+}
+
+/* Active Item styling */
+[data-sidebar="menu-button"][data-active="true"] {
+  background: linear-gradient(90deg, rgba(22, 163, 74, 0.15) 0%, rgba(22, 163, 74, 0.02) 100%) !important;
+  border-left-color: hsl(142, 80%, 50%) !important;
+  color: hsl(142, 80%, 55%) !important;
+  font-weight: 600 !important;
+}
+
+[data-sidebar="menu-button"][data-active="true"] svg {
+  color: hsl(142, 80%, 55%) !important;
+  filter: drop-shadow(0 0 5px rgba(22, 163, 74, 0.4));
+}
+
+/* Sidebar Footer / Developer section card */
+.sidebar-footer-card {
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 8px;
+  padding: 10px 12px;
+  backdrop-filter: blur(8px);
+}
+=======
+>>>>>>> origin/main

@@ -2,7 +2,10 @@
 'use client';
 
 import { useState } from 'react';
+<<<<<<< HEAD
+=======
 import * as XLSX from 'xlsx';
+>>>>>>> origin/main
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -19,10 +22,18 @@ export default function PaymentReceiptDownloadExcelButton({ payment }: PaymentRe
   const { toast } = useToast();
   const { t } = useTranslation();
 
+<<<<<<< HEAD
+  const handleDownloadExcel = async () => {
+    setIsGenerating(true);
+    try {
+      const { generateStyledExcel } = await import('@/lib/excel-generator');
+      const ws_data: any[][] = [
+=======
   const handleDownloadExcel = () => {
     setIsGenerating(true);
     try {
       const ws_data: (string | number)[][] = [
+>>>>>>> origin/main
         [t('viewPayments.receipt.title')],
         [],
         [t('viewPayments.receipt.paidBy'), payment.entityName.toUpperCase()],
@@ -53,6 +64,18 @@ export default function PaymentReceiptDownloadExcelButton({ payment }: PaymentRe
       }
       ws_data.push(["", "", t('viewPayments.receipt.totalPaid'), payment.amount - payment.bankFee]);
 
+<<<<<<< HEAD
+      const colWidths = [15, 30, 30, 15];
+      const fileName = `${t('viewPayments.receipt.excelFileName')}-${payment.entityName.replace(/ /g, '_')}.xlsx`;
+
+      await generateStyledExcel({
+        ws_data,
+        fileName,
+        sheetName: t('viewPayments.receipt.sheetName'),
+        colWidths,
+        headerRowIndex: payment.reference || payment.notes ? (payment.reference && payment.notes ? 9 : 8) : 7 // Dynamic based on optional fields pushed
+      });
+=======
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
 
       ws['!cols'] = [
@@ -64,6 +87,7 @@ export default function PaymentReceiptDownloadExcelButton({ payment }: PaymentRe
 
       const fileName = `${t('viewPayments.receipt.excelFileName')}-${payment.entityName.replace(/ /g, '_')}.xlsx`;
       XLSX.writeFile(wb, fileName);
+>>>>>>> origin/main
       
       toast({
         title: t('common.success'),

@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
 'use client';
 
 import { useEffect, useMemo } from 'react';
@@ -9,7 +13,11 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+<<<<<<< HEAD
+import type { Consignatario, Pais, Customer, Provincia, Carguera } from '@/lib/types';
+=======
 import type { Consignatario, Pais, Customer, Provincia } from '@/lib/types';
+>>>>>>> origin/main
 import { Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -19,6 +27,10 @@ const formSchema = z.object({
   direccion: z.string().min(5, { message: "The address must be at least 5 characters." }),
   provincia: z.string().min(1, { message: "Please select a province/city." }),
   pais: z.string().min(1, { message: "Please select a country." }),
+<<<<<<< HEAD
+  carrierId: z.string().optional(),
+=======
+>>>>>>> origin/main
 });
 
 type ConsignatarioFormData = Omit<Consignatario, 'id'> & { id?: string };
@@ -30,6 +42,20 @@ type ConsignatarioFormProps = {
   paises: Pais[];
   customers: Customer[];
   provincias: Provincia[];
+<<<<<<< HEAD
+  cargueras: Carguera[];
+  isSubmitting: boolean;
+};
+
+export function ConsignatarioForm({ onSubmit, onClose, initialData, paises, customers, provincias, cargueras, isSubmitting }: ConsignatarioFormProps) {
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    mode: 'onChange',
+    defaultValues: initialData ? {
+      ...initialData,
+      carrierId: initialData.carrierId || '',
+    } : {
+=======
   isSubmitting: boolean;
 };
 
@@ -38,11 +64,16 @@ export function ConsignatarioForm({ onSubmit, onClose, initialData, paises, cust
     resolver: zodResolver(formSchema),
     mode: 'onChange',
     defaultValues: initialData || {
+>>>>>>> origin/main
       nombreConsignatario: '',
       pais: '',
       customerId: '',
       direccion: '',
       provincia: '',
+<<<<<<< HEAD
+      carrierId: '',
+=======
+>>>>>>> origin/main
     },
   });
 
@@ -50,29 +81,52 @@ export function ConsignatarioForm({ onSubmit, onClose, initialData, paises, cust
   const selectedPais = form.watch('pais');
 
   useEffect(() => {
+<<<<<<< HEAD
+    if (selectedCustomerId && !initialData) {
+=======
     if (selectedCustomerId) {
+>>>>>>> origin/main
       const customer = customers.find(c => c.id === selectedCustomerId);
       if (customer) {
         form.setValue('pais', customer.pais, { shouldValidate: true });
         form.setValue('provincia', customer.estadoCiudad, { shouldValidate: true });
       }
     }
+<<<<<<< HEAD
+  }, [selectedCustomerId, customers, form, initialData]);
+
+
+  useEffect(() => {
+    form.reset(initialData ? {
+      ...initialData,
+      carrierId: initialData.carrierId || '',
+    } : {
+=======
   }, [selectedCustomerId, customers, form]);
 
 
   useEffect(() => {
     form.reset(initialData || {
+>>>>>>> origin/main
       nombreConsignatario: '',
       pais: '',
       customerId: '',
       direccion: '',
       provincia: '',
+<<<<<<< HEAD
+      carrierId: '',
+=======
+>>>>>>> origin/main
     });
   }, [initialData, form]);
 
   function handleSubmit(values: z.infer<typeof formSchema>) {
     const dataToSubmit = initialData ? { ...values, id: initialData.id } : values;
+<<<<<<< HEAD
+    onSubmit(dataToSubmit as ConsignatarioFormData);
+=======
     onSubmit(dataToSubmit);
+>>>>>>> origin/main
   }
 
   const isNational = useMemo(() => selectedPais === 'Ecuador', [selectedPais]);
@@ -99,7 +153,11 @@ export function ConsignatarioForm({ onSubmit, onClose, initialData, paises, cust
           render={({ field }) => (
             <FormItem>
               <FormLabel>Customer</FormLabel>
+<<<<<<< HEAD
+               <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+=======
                <Select onValueChange={field.onChange} defaultValue={field.value}>
+>>>>>>> origin/main
                   <FormControl>
                     <SelectTrigger>
                       <SelectValue placeholder="Select a customer" />
@@ -119,6 +177,33 @@ export function ConsignatarioForm({ onSubmit, onClose, initialData, paises, cust
         />
         <FormField
           control={form.control}
+<<<<<<< HEAD
+          name="carrierId"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Agencia (Carguera)</FormLabel>
+               <Select onValueChange={field.onChange} defaultValue={field.value} value={field.value}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Seleccione una carguera" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {cargueras.map(c => (
+                      <SelectItem key={c.id} value={c.id}>
+                        {c.nombreCarguera}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+=======
+>>>>>>> origin/main
           name="direccion"
           render={({ field }) => (
             <FormItem>

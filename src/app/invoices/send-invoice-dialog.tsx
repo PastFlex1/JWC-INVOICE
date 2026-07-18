@@ -4,8 +4,11 @@ import { useState, useEffect, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+<<<<<<< HEAD
+=======
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+>>>>>>> origin/main
 
 import { Button } from '@/components/ui/button';
 import {
@@ -101,13 +104,24 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
       }
       
       try {
+<<<<<<< HEAD
+      const html2canvas = (await import('html2canvas')).default;
+      const { default: jsPDF } = await import('jspdf');
+        const canvas = await html2canvas(invoiceElement, {
+          scale: 1.5,
+=======
         const canvas = await html2canvas(invoiceElement, {
           scale: 2,
+>>>>>>> origin/main
           useCORS: true,
           logging: false,
         });
 
+<<<<<<< HEAD
+        const imgData = canvas.toDataURL('image/jpeg', 0.75);
+=======
         const imgData = canvas.toDataURL('image/png');
+>>>>>>> origin/main
         const pdf = new jsPDF('p', 'pt', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
@@ -121,13 +135,21 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
         let position = 0;
         let remainingHeight = finalImgHeight;
         
+<<<<<<< HEAD
+        pdf.addImage(imgData, 'JPEG', xPos, position, finalImgWidth, finalImgHeight);
+=======
         pdf.addImage(imgData, 'PNG', xPos, position, finalImgWidth, finalImgHeight);
+>>>>>>> origin/main
         remainingHeight -= pdfHeight;
 
         while (remainingHeight > 0) {
             position -= pdfHeight;
             pdf.addPage();
+<<<<<<< HEAD
+            pdf.addImage(imgData, 'JPEG', xPos, position, finalImgWidth, finalImgHeight);
+=======
             pdf.addImage(imgData, 'PNG', xPos, position, finalImgWidth, finalImgHeight);
+>>>>>>> origin/main
             remainingHeight -= pdfHeight;
         }
 

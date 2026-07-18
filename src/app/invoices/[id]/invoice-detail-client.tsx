@@ -26,10 +26,20 @@ export function InvoiceDetailClient({ invoiceId }: InvoiceDetailClientProps) {
   const invoiceData = useMemo(() => {
     if (!hydrated) return null;
 
+<<<<<<< HEAD
+    const rawInvoice = invoices.find(inv => inv.id === invoiceId);
+    if (!rawInvoice) return null;
+
+    // Create a safe deep copy to avoid mutating the global state
+    const invoice = JSON.parse(JSON.stringify(rawInvoice)) as Invoice;
+
+    // Ensure items and bunches have IDs for client-side key props
+=======
     const invoice = invoices.find(inv => inv.id === invoiceId);
     if (!invoice) return null;
 
     // Ensure items and bunches have IDs for client-side key props, important for re-renders
+>>>>>>> origin/main
     if (invoice.items && Array.isArray(invoice.items)) {
       invoice.items.forEach(item => {
         if (!item.id) item.id = uuidv4();

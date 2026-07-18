@@ -142,6 +142,15 @@ export function InvoicesClient() {
       if (!item.bunches) return acc;
       const numberOfBoxes = item.numberOfBoxes || 1;
       const itemSubtotal = item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
+<<<<<<< HEAD
+        const productLower = (bunch.product || '').toLowerCase();
+        const isGyp = productLower.includes('gyp');
+        
+        if (isGyp) {
+            return bunchAcc + (bunch.bunchesPerBox * bunch.salePrice);
+        }
+=======
+>>>>>>> origin/main
         const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
         return bunchAcc + (stems * bunch.salePrice);
       }, 0);

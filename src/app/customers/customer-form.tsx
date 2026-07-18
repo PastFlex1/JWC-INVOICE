@@ -128,9 +128,22 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
         if (form.getValues('cedula') === '1234567890' || form.getValues('cedula') === '8888888888888') {
             form.setValue('cedula', '');
         }
+<<<<<<< HEAD
+        
+        // Ensure we match the exact case of Ecuador if it exists in the DB, otherwise fallback to 'Ecuador'
+        const ecuadorInDb = paises.find(p => p.nombre.toLowerCase() === 'ecuador');
+        if (ecuadorInDb) {
+          form.setValue('pais', ecuadorInDb.id, { shouldValidate: true });
+        } else {
+          form.setValue('pais', 'Ecuador', { shouldValidate: true });
+        }
+    }
+  }, [customerType, form, paises]);
+=======
         form.setValue('pais', 'Ecuador');
     }
   }, [customerType, form]);
+>>>>>>> origin/main
 
 
   useEffect(() => {
@@ -252,6 +265,12 @@ export function CustomerForm({ onSubmit, onClose, initialData, paises, cargueras
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
+<<<<<<< HEAD
+                    {customerType === 'National' && !filteredPaises.some(p => p.nombre.toLowerCase() === 'ecuador') && (
+                      <SelectItem value="Ecuador">Ecuador</SelectItem>
+                    )}
+=======
+>>>>>>> origin/main
                     {filteredPaises.map(p => (
                       <SelectItem key={p.id} value={p.nombre}>
                         {p.nombre}

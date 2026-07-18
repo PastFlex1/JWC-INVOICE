@@ -2,7 +2,10 @@
 'use client';
 
 import { useState } from 'react';
+<<<<<<< HEAD
+=======
 import * as XLSX from 'xlsx';
+>>>>>>> origin/main
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -19,10 +22,18 @@ export default function HistoricalAccountStatementExcelButton({ data }: Historic
   const { toast } = useToast();
   const { t } = useTranslation();
 
+<<<<<<< HEAD
+  const handleDownloadExcel = async () => {
+    setIsGenerating(true);
+    try {
+      const { generateStyledExcel } = await import('@/lib/excel-generator');
+      const ws_data: any[][] = [
+=======
   const handleDownloadExcel = () => {
     setIsGenerating(true);
     try {
       const ws_data: (string | number)[][] = [
+>>>>>>> origin/main
         [t('historicalAccountStatement.excel.title'), data.customer.name.toUpperCase()],
         [],
         [t('accountStatement.excel.customer'), data.customer.name],
@@ -61,6 +72,17 @@ export default function HistoricalAccountStatementExcelButton({ data }: Historic
         data.totalOutstanding
       ]);
 
+<<<<<<< HEAD
+      const colWidths = [12, 15, 30, 15, 15, 15, 15];
+      const fileName = `${t('historicalAccountStatement.excel.fileName')}-${data.customer.name.replace(/ /g, '_')}.xlsx`;
+
+      await generateStyledExcel({
+        ws_data,
+        fileName,
+        sheetName: t('historicalAccountStatement.excel.sheetName'),
+        colWidths,
+      });
+=======
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
 
       ws['!cols'] = [
@@ -73,6 +95,7 @@ export default function HistoricalAccountStatementExcelButton({ data }: Historic
 
       const fileName = `${t('historicalAccountStatement.excel.fileName')}-${data.customer.name.replace(/ /g, '_')}.xlsx`;
       XLSX.writeFile(wb, fileName);
+>>>>>>> origin/main
       
       toast({
         title: t('common.success'),

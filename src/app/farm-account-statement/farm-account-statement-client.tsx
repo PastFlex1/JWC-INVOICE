@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -19,7 +23,10 @@ type InvoiceStatus = "Paid" | "Pending" | "Overdue" | "N/A";
 const getStatus = (inv: Invoice): InvoiceStatus => {
   if (inv.type === "purchase") return inv.purchaseStatus ?? "N/A";
   if (inv.type === "sale") return inv.saleStatus ?? "N/A";
+<<<<<<< HEAD
+=======
   // both
+>>>>>>> origin/main
   return inv.purchaseStatus ?? inv.saleStatus ?? "N/A";
 };
 
@@ -114,8 +121,21 @@ export function FarmAccountStatementClient() {
         if (!item.bunches) return acc;
         const numberOfBoxes = item.numberOfBoxes || 1;
         const itemSubtotal = item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
+<<<<<<< HEAD
+            const productLower = (bunch.product || '').toLowerCase();
+            const isGyp = productLower.includes('gyp');
+            
+            const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
+            const price = bunch.purchasePrice || 0;
+            
+            if (isGyp) {
+                return bunchAcc + (bunch.bunchesPerBox * price);
+            }
+            return bunchAcc + (stems * price);
+=======
             const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
             return bunchAcc + (stems * bunch.purchasePrice);
+>>>>>>> origin/main
         }, 0);
         return acc + (itemSubtotal * numberOfBoxes);
       }, 0);

@@ -2,7 +2,10 @@
 'use client';
 
 import { useState } from 'react';
+<<<<<<< HEAD
+=======
 import * as XLSX from 'xlsx';
+>>>>>>> origin/main
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -21,10 +24,18 @@ export default function FarmCreditNotesDownloadExcelButton({ notes }: FarmCredit
   const { toast } = useToast();
   const { t } = useTranslation();
 
+<<<<<<< HEAD
+  const handleDownloadExcel = async () => {
+    setIsGenerating(true);
+    try {
+      const { generateStyledExcel } = await import('@/lib/excel-generator');
+      const ws_data: any[][] = [
+=======
   const handleDownloadExcel = () => {
     setIsGenerating(true);
     try {
       const ws_data: (string | number)[][] = [
+>>>>>>> origin/main
         [t('creditNotes.farm.reportTitle')],
         [],
         [
@@ -50,6 +61,17 @@ export default function FarmCreditNotesDownloadExcelButton({ notes }: FarmCredit
       ws_data.push([]);
       ws_data.push(["", "", "", t('creditNotes.farm.total'), totalAmount]);
 
+<<<<<<< HEAD
+      const colWidths = [12, 15, 30, 40, 15];
+      const fileName = `${t('creditNotes.farm.excelFileName')}.xlsx`;
+
+      await generateStyledExcel({
+        ws_data,
+        fileName,
+        sheetName: t('creditNotes.farm.sheetName'),
+        colWidths,
+      });
+=======
       const ws = XLSX.utils.aoa_to_sheet(ws_data);
 
       ws['!cols'] = [
@@ -61,6 +83,7 @@ export default function FarmCreditNotesDownloadExcelButton({ notes }: FarmCredit
 
       const fileName = `${t('creditNotes.farm.excelFileName')}.xlsx`;
       XLSX.writeFile(wb, fileName);
+>>>>>>> origin/main
 
       toast({
         title: t('common.success'),

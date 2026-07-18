@@ -54,6 +54,12 @@
     "title": "Reports",
     "description": "Visualize your monthly sales, purchases, and profits.",
     "monthlyProfit": "Monthly Profit",
+<<<<<<< HEAD
+    "avgPrice": "Average Price",
+    "perStemGlobal": "global average per stem",
+    "perStemFiltered": "average per stem for {product}",
+=======
+>>>>>>> origin/main
     "chartTitle": "Monthly Performance",
     "colorSalesChartTitle": "Top Selling Flower Colors",
     "colorSalesChartDescription": "Sales distribution by flower color.",
@@ -67,6 +73,11 @@
     "allFarms": "All Farms",
     "filterByCustomer": "Filter by Customer",
     "allCustomers": "All Customers",
+<<<<<<< HEAD
+    "filterByProductType": "Filter by Product",
+    "allProductTypes": "All Products",
+=======
+>>>>>>> origin/main
     "selectCustomers": "Select Customers...",
     "customersSelected": "{count} customers selected",
     "filterByYear": "Filter by Year",
@@ -74,6 +85,11 @@
     "selectYears": "Select years...",
     "filterByMonth": "Filter by Month",
     "allMonths": "All Months",
+<<<<<<< HEAD
+    "filterByMetric": "Filter by Metric",
+    "metricAll": "All (Sales, Purchases & Profit)",
+=======
+>>>>>>> origin/main
     "noData": "No data available for the selected filters.",
     "table": {
       "date": "Date",
@@ -84,12 +100,21 @@
       "chargeFarm": "Purchase Value",
       "chargeClient": "Sale Value",
       "profit": "Profit",
+<<<<<<< HEAD
+      "avgPrice": "Avg. Price",
+=======
+>>>>>>> origin/main
       "total": "Total"
     }
   },
    "comparativeReport": {
     "title": "Comparative Sales Report",
     "description": "Compare sales data across different years.",
+<<<<<<< HEAD
+    "chartTitle": "Sales Comparison by Year",
+    "chartDescription": "Monthly performance visualization comparing selected years.",
+=======
+>>>>>>> origin/main
     "tableTitle": "Comparative Data",
     "table": {
       "month": "Month",
@@ -171,6 +196,11 @@
         "stems": "STEMS",
         "bunches": "BUNCHES",
         "price": "PRICE",
+<<<<<<< HEAD
+        "priceBunch": "BUNCH PRICE",
+        "priceUnit": "UNIT PRICE",
+=======
+>>>>>>> origin/main
         "total": "TOTAL",
         "totals": "TOTALS"
       },
@@ -541,8 +571,13 @@
       "noNotesFound": "No debit notes found.",
       "total": "TOTAL",
       "sheetName": "Farm Debit Notes",
+<<<<<<< HEAD
+      "pdfFileName": "Reporte-Notas-de-Debito-Finca",
+      "excelFileName": "Reporte-Notas-de-Debito-Finca",
+=======
       "pdfFileName": "Farm-Debit-Note-Report",
       "excelFileName": "Farm-Debit-Note-Report",
+>>>>>>> origin/main
       "downloadPdf": "Download PDF",
       "downloadExcel": "Download Excel",
       "list": {
@@ -572,7 +607,11 @@
       },
       "email": {
         "reportTitle": "Farm Debit Note Report",
+<<<<<<< HEAD
+        "reportDescription": "The attached report contains a summary of farm credit notes for the selected period."
+=======
         "reportDescription": "The attached report contains a summary of farm debit notes for the selected period."
+>>>>>>> origin/main
       }
     }
   },
@@ -788,6 +827,62 @@
       "outstandingAmount": "Outstanding Amount"
     }
   },
+<<<<<<< HEAD
+  "email": {
+    "title": "Email",
+    "description": "Manage your sales and customer emails directly in the ERP.",
+    "sync": "Sync",
+    "compose": "Compose",
+    "inbox": "Inbox",
+    "sent": "Sent",
+    "searchPlaceholder": "Search emails...",
+    "noEmails": "No emails found.",
+    "noSubject": "(No subject)",
+    "syncComplete": "Sync complete",
+    "syncSuccess": "Synchronized {count} new emails.",
+    "syncError": "Error syncing emails",
+    "loading": "Loading email...",
+    "notFound": "Email not found",
+    "backToInbox": "Back to inbox",
+    "back": "Back",
+    "reply": "Reply",
+    "to": "To:",
+    "cc": "Cc:",
+    "noText": "This email contains no text.",
+    "attachments": "Attachments",
+    "attachmentError": "Attachment has no data or is too large to download.",
+    "deleteTitle": "Delete email",
+    "deleteDescription": "Are you sure you want to delete this email? This action will permanently remove it from both sides and cannot be undone.",
+    "deleting": "Deleting...",
+    "yesDelete": "Yes, delete",
+    "deletedTitle": "Email deleted",
+    "deletedDescription": "The email has been permanently deleted.",
+    "deleteError": "Error deleting",
+    "composeSection": {
+      "replyTitle": "Reply to Email",
+      "newTitle": "New Email",
+      "modalDescription": "Modal to compose or reply to an email.",
+      "to": "To:",
+      "toPlaceholder": "customer@company.com",
+      "cc": "Cc:",
+      "ccPlaceholder": "Optional (comma separated)",
+      "subject": "Subject:",
+      "subjectPlaceholder": "Email subject",
+      "bodyPlaceholder": "Write your message here...",
+      "attachFiles": "Attach files",
+      "sendingAs": "Sending as",
+      "cancel": "Cancel",
+      "sending": "Sending...",
+      "send": "Send",
+      "fileTooLargeTitle": "File too large",
+      "fileTooLargeDesc": "File {name} exceeds 5MB.",
+      "requiredFields": "To, Subject, and Message are required.",
+      "sendError": "Error sending email",
+      "sendSuccessDesc": "Email sent successfully."
+    }
+  },
+=======
+>>>>>>> origin/main
   "viewPayments": {
     "title": "Payment History",
     "description": "View all payments registered in the system.",

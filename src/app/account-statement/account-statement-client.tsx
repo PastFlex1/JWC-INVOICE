@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
 'use client';
 
 import { useState, useMemo, useEffect } from 'react';
@@ -19,7 +23,10 @@ type InvoiceStatus = "Paid" | "Pending" | "Overdue" | "N/A";
 const getStatus = (inv: Invoice): InvoiceStatus => {
   if (inv.type === "purchase") return inv.purchaseStatus ?? "N/A";
   if (inv.type === "sale") return inv.saleStatus ?? "N/A";
+<<<<<<< HEAD
+=======
   // both
+>>>>>>> origin/main
   return inv.purchaseStatus ?? inv.saleStatus ?? "N/A";
 };
 
@@ -79,7 +86,18 @@ export function AccountStatementClient() {
         if (!item.bunches) return acc;
         const numberOfBoxes = item.numberOfBoxes || 1;
         const itemSubtotal = item.bunches.reduce((bunchAcc, bunch: BunchItem) => {
+<<<<<<< HEAD
+            const productLower = (bunch.product || '').toLowerCase();
+            const isGyp = productLower.includes('gyp');
+            
             const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
+            
+            if (isGyp) {
+                return bunchAcc + (bunch.bunchesPerBox * bunch.salePrice);
+            }
+=======
+            const stems = bunch.stemsPerBunch * bunch.bunchesPerBox;
+>>>>>>> origin/main
             return bunchAcc + (stems * bunch.salePrice);
         }, 0);
         return acc + (itemSubtotal * numberOfBoxes);

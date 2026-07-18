@@ -12,6 +12,10 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
   Timestamp,
+<<<<<<< HEAD
+  onSnapshot,
+=======
+>>>>>>> origin/main
 } from 'firebase/firestore';
 
 const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData>): CreditNote => {
@@ -60,3 +64,13 @@ export async function deleteCreditNote(id: string): Promise<void> {
   const creditNoteDoc = doc(db, 'creditNotes', id);
   await deleteDoc(creditNoteDoc);
 }
+<<<<<<< HEAD
+
+export function subscribeCreditNotes(callback: (creditNotes: CreditNote[]) => void) {
+  const creditNotesCollection = collection(db, 'creditNotes');
+  return onSnapshot(creditNotesCollection, (snapshot) => {
+    callback(snapshot.docs.map(fromFirestore));
+  });
+}
+=======
+>>>>>>> origin/main

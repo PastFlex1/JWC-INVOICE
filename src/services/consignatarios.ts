@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+
+=======
+>>>>>>> origin/main
 import { db } from '@/lib/firebase';
 import type { Consignatario } from '@/lib/types';
 import {
@@ -11,6 +15,10 @@ import {
   type DocumentData,
   type QueryDocumentSnapshot,
   type DocumentSnapshot,
+<<<<<<< HEAD
+  onSnapshot,
+=======
+>>>>>>> origin/main
 } from 'firebase/firestore';
 
 const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData> | DocumentSnapshot<DocumentData>): Consignatario => {
@@ -23,13 +31,21 @@ const fromFirestore = (snapshot: QueryDocumentSnapshot<DocumentData> | DocumentS
     customerId: data.customerId,
     direccion: data.direccion || '',
     provincia: data.provincia || '',
+<<<<<<< HEAD
+    carrierId: data.carrierId || '',
+=======
+>>>>>>> origin/main
   };
 };
 
 export async function getConsignatarios(): Promise<Consignatario[]> {
   const consignatariosCollection = collection(db, 'consignatarios');
   const snapshot = await getDocs(consignatariosCollection);
+<<<<<<< HEAD
+  return snapshot.docs.map(doc => fromFirestore(doc));
+=======
   return snapshot.docs.map(fromFirestore);
+>>>>>>> origin/main
 }
 
 export async function getConsignatarioById(id: string): Promise<Consignatario | null> {
@@ -56,3 +72,13 @@ export async function deleteConsignatario(id: string): Promise<void> {
   const consignatarioDoc = doc(db, 'consignatarios', id);
   await deleteDoc(consignatarioDoc);
 }
+<<<<<<< HEAD
+
+export function subscribeConsignatarios(callback: (consignatarios: Consignatario[]) => void) {
+  const consignatariosCollection = collection(db, 'consignatarios');
+  return onSnapshot(consignatariosCollection, (snapshot) => {
+    callback(snapshot.docs.map(fromFirestore));
+  });
+}
+=======
+>>>>>>> origin/main

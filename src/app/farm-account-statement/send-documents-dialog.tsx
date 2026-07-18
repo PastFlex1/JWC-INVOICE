@@ -20,8 +20,11 @@ import { useToast } from '@/hooks/use-toast';
 import { Loader2, Send } from 'lucide-react';
 import type { Finca, Invoice } from '@/lib/types';
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+<<<<<<< HEAD
+=======
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+>>>>>>> origin/main
 import { Textarea } from '@/components/ui/textarea';
 import { useTranslation } from '@/context/i18n-context';
 
@@ -65,8 +68,15 @@ async function generatePdfForElement(elementId: string): Promise<string | null> 
     if (!element) return null;
 
     try {
+<<<<<<< HEAD
+      const html2canvas = (await import('html2canvas')).default;
+      const { default: jsPDF } = await import('jspdf');
+        const canvas = await html2canvas(element, {
+            scale: 1.5,
+=======
         const canvas = await html2canvas(element, {
             scale: 2,
+>>>>>>> origin/main
             useCORS: true,
             logging: false,
         });
@@ -81,13 +91,21 @@ async function generatePdfForElement(elementId: string): Promise<string | null> 
         const x = (pdfWidth - imgWidth) / 2;
         let position = 0;
 
+<<<<<<< HEAD
+        pdf.addImage(canvas.toDataURL('image/jpeg', 0.75), 'JPEG', x, position, imgWidth, imgHeight);
+=======
         pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, position, imgWidth, imgHeight);
+>>>>>>> origin/main
         let remainingHeight = imgHeight - pdfHeight;
         
         while (remainingHeight > 0) {
             position -= pdfHeight;
             pdf.addPage();
+<<<<<<< HEAD
+            pdf.addImage(canvas.toDataURL('image/jpeg', 0.75), 'JPEG', x, position, imgWidth, imgHeight);
+=======
             pdf.addImage(canvas.toDataURL('image/png'), 'PNG', x, position, imgWidth, imgHeight);
+>>>>>>> origin/main
             remainingHeight -= pdfHeight;
         }
 

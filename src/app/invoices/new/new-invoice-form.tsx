@@ -35,7 +35,11 @@ import { useToast } from '@/hooks/use-toast';
 import { useTranslation } from '@/context/i18n-context';
 
 import { addInvoice, updateInvoice } from '@/services/invoices';
+<<<<<<< HEAD
+import type { Invoice, BunchItem, LineItem, Producto, Consignatario } from '@/lib/types';
+=======
 import type { Invoice, BunchItem, LineItem } from '@/lib/types';
+>>>>>>> origin/main
 import { useAppData } from '@/context/app-data-context';
 import { getInvoiceStatus } from '@/lib/due-date';
 
@@ -101,7 +105,11 @@ export function NewInvoiceForm() {
   const idToLoad = editId || duplicateId;
   
   const [isSubmitting, setIsSubmitting] = useState(false);
+<<<<<<< HEAD
+  const [filteredConsignatarios, setFilteredConsignatarios] = useState<Consignatario[]>([]);
+=======
   const [filteredConsignatarios, setFilteredConsignatarios] = useState<typeof consignatarios>([]);
+>>>>>>> origin/main
   const [filteredMarcaciones, setFilteredMarcaciones] = useState<typeof marcaciones>([]);
   const [itemToDelete, setItemToDelete] = useState<{ lineItemIndex: number; bunchIndex: number } | null>(null);
   const [isReferenceOpen, setIsReferenceOpen] = useState(false);
@@ -113,18 +121,32 @@ export function NewInvoiceForm() {
     mode: 'onBlur',
     defaultValues: {
       items: [],
+<<<<<<< HEAD
+      consignatarioId: '',
+      reference: '',
+      carrierId: '',
+    }
+  });
+  
+=======
     }
   });
   
   // Effect to load existing invoice for editing/duplicating
+>>>>>>> origin/main
   useEffect(() => {
     if (idToLoad && !isAppDataLoading) {
       const invoiceToLoad = invoices.find(inv => inv.id === idToLoad);
       if (invoiceToLoad) {
         const dataForForm: any = {
           ...invoiceToLoad,
+<<<<<<< HEAD
+          id: duplicateId ? undefined : invoiceToLoad.id,
+          invoiceNumber: duplicateId ? '' : invoiceToLoad.invoiceNumber,
+=======
           id: duplicateId ? undefined : invoiceToLoad.id, // clear ID if duplicating
           invoiceNumber: duplicateId ? '' : invoiceToLoad.invoiceNumber, // clear invoice number if duplicating
+>>>>>>> origin/main
           farmDepartureDate: parseISO(invoiceToLoad.farmDepartureDate),
           flightDate: parseISO(invoiceToLoad.flightDate),
           consignatarioId: invoiceToLoad.consignatarioId || '',
@@ -135,21 +157,31 @@ export function NewInvoiceForm() {
             bunches: item.bunches.map(bunch => ({
               ...bunch,
               id: uuidv4(),
+<<<<<<< HEAD
+              length: String(bunch.length),
+=======
               length: String(bunch.length), // Ensure length is a string
+>>>>>>> origin/main
             })),
           })),
         };
         delete dataForForm.saleStatus;
         delete dataForForm.purchaseStatus;
         form.reset(dataForForm);
+<<<<<<< HEAD
+=======
       } else {
         console.warn(`Invoice with id ${idToLoad} not found.`);
+>>>>>>> origin/main
       }
     }
   }, [idToLoad, isAppDataLoading, invoices, form, duplicateId]);
 
 
+<<<<<<< HEAD
+=======
   // Effect for session storage, only for new invoices
+>>>>>>> origin/main
   useEffect(() => {
     if (!idToLoad) {
         const savedData = sessionStorage.getItem(SESSION_STORAGE_KEY);
@@ -161,7 +193,10 @@ export function NewInvoiceForm() {
                 form.reset(parsed);
             } catch (e) {
                 console.error("Could not parse saved form data:", e);
+<<<<<<< HEAD
+=======
                 form.reset({});
+>>>>>>> origin/main
             }
         }
     }
@@ -200,14 +235,26 @@ export function NewInvoiceForm() {
         acc.totalBunches += (Number(item.numberOfBunches) || 0) * numBoxes;
         
         item.bunches.forEach(bunch => {
+<<<<<<< HEAD
+            const productLower = (bunch.product || '').toLowerCase();
+            const isGyp = productLower.includes('gyp');
+            
+            const bunchesCount = Number(bunch.bunchesPerBox) || 0;
+=======
             const bunchesPerBox = Number(bunch.bunchesPerBox) || 0;
+>>>>>>> origin/main
             const stemsPerBunch = Number(bunch.stemsPerBunch) || 0;
             const purchasePrice = Number(bunch.purchasePrice) || 0;
             const salePrice = Number(bunch.salePrice) || 0;
 
             acc.totalStemsPerBunch += stemsPerBunch;
+<<<<<<< HEAD
+            acc.totalBunchesPerBox += bunchesCount;
+            const totalStemsForBunch = stemsPerBunch * bunchesCount;
+=======
             acc.totalBunchesPerBox += bunchesPerBox;
             const totalStemsForBunch = stemsPerBunch * bunchesPerBox;
+>>>>>>> origin/main
             const totalStemsForLine = totalStemsForBunch * numBoxes;
             acc.totalStems += totalStemsForLine;
 
@@ -223,7 +270,15 @@ export function NewInvoiceForm() {
                 acc.differenceCount += 1;
             }
 
+<<<<<<< HEAD
+            if (isGyp) {
+                acc.totalValue += (bunchesCount * numBoxes * salePrice);
+            } else {
+                acc.totalValue += totalStemsForLine * salePrice;
+            }
+=======
             acc.totalValue += totalStemsForLine * salePrice;
+>>>>>>> origin/main
         });
         return acc;
     }, {
@@ -255,8 +310,11 @@ export function NewInvoiceForm() {
     };
   }, [watchedItems]);
 
+<<<<<<< HEAD
+=======
   let rowCounter = 0;
 
+>>>>>>> origin/main
   const uniqueProducts = useMemo(() => {
     const unique = new Map<string, { id: string; price: number; tallosPorRamo: number }>();
     productos.filter(p => p.estado === 'Activo').forEach(p => {
@@ -275,15 +333,38 @@ export function NewInvoiceForm() {
   
   const getColorsForVariety = useCallback((productName: string, varietyName: string) => {
     if (!productName || !varietyName) return [];
+<<<<<<< HEAD
+    const colorMap = new Map<string, { color: string; productoId: string; tallosPorRamo: number }>();
+    
+    productos
+      .filter(p => p.variedad === productName && p.nombre === varietyName && p.estado === 'Activo')
+      .forEach(p => {
+        if (!colorMap.has(p.nombreColor)) {
+          colorMap.set(p.nombreColor, {
+            color: p.nombreColor,
+            productoId: p.id,
+            tallosPorRamo: p.tallosPorRamo
+          });
+        }
+      });
+      
+    return Array.from(colorMap.values());
+=======
     return productos.filter(p => p.variedad === productName && p.nombre === varietyName && p.estado === 'Activo').map(p => ({
         color: p.nombreColor,
         productoId: p.id,
         tallosPorRamo: p.tallosPorRamo
     }));
+>>>>>>> origin/main
   }, [productos]);
 
 
   const selectedCustomerId = form.watch('customerId');
+<<<<<<< HEAD
+  const selectedConsignatarioId = form.watch('consignatarioId');
+
+=======
+>>>>>>> origin/main
   useEffect(() => {
     setCreditError(null);
     setCreditWarning(null);
@@ -305,8 +386,11 @@ export function NewInvoiceForm() {
     setFilteredConsignatarios(consignatarios.filter((c) => c.customerId === selectedCustomerId));
     setFilteredMarcaciones(marcaciones.filter((m) => m.cliente === selectedCustomerId));
 
+<<<<<<< HEAD
+=======
     // Only reset consignatario/reference if the customer was changed by the user,
     // not when the form is first loaded.
+>>>>>>> origin/main
     if (form.formState.dirtyFields.customerId) {
       form.setValue('consignatarioId', '');
       form.setValue('reference', '');
@@ -314,6 +398,18 @@ export function NewInvoiceForm() {
 
   }, [selectedCustomerId, customers, paises, consignatarios, marcaciones, form]);
 
+<<<<<<< HEAD
+  useEffect(() => {
+    if (selectedConsignatarioId) {
+      const consignatario = consignatarios.find(c => c.id === selectedConsignatarioId);
+      if (consignatario && consignatario.carrierId) {
+         form.setValue('carrierId', consignatario.carrierId, { shouldValidate: true });
+      }
+    }
+  }, [selectedConsignatarioId, consignatarios, form]);
+
+=======
+>>>>>>> origin/main
 
   const handleAddLineItem = () => {
     appendLineItem({
@@ -416,7 +512,10 @@ export function NewInvoiceForm() {
     setCreditError(null);
     setCreditWarning(null);
 
+<<<<<<< HEAD
+=======
     // Credit Check
+>>>>>>> origin/main
     const customer = customers.find(c => c.id === values.customerId);
     let creditCheckPassed = true;
     let warningMessage = '';
@@ -436,7 +535,18 @@ export function NewInvoiceForm() {
             const paid = payments.filter(p => p.invoiceId === inv.id && p.type === 'sale').reduce((sum, payment) => sum + payment.amount, 0);
 
             const invoiceTotal = inv.items.reduce((total, item) => {
+<<<<<<< HEAD
+                return total + item.bunches.reduce((sub, bunch) => {
+                    const productLower = (bunch.product || '').toLowerCase();
+                    const isGyp = productLower.includes('gyp');
+                    if (isGyp) {
+                        return sub + (bunch.bunchesPerBox * item.numberOfBoxes * bunch.salePrice);
+                    }
+                    return sub + (bunch.stemsPerBunch * bunch.bunchesPerBox * item.numberOfBoxes * bunch.salePrice);
+                }, 0);
+=======
                 return total + item.bunches.reduce((sub, bunch) => sub + (bunch.stemsPerBunch * bunch.bunchesPerBox * bunch.salePrice), 0);
+>>>>>>> origin/main
             }, 0);
             
             const balance = invoiceTotal + debits - credits - paid;
@@ -503,7 +613,11 @@ export function NewInvoiceForm() {
           title: t('invoices.new.toast.successTitle'),
           description: t('invoices.new.toast.successDescription'),
         });
+<<<<<<< HEAD
+        if (!duplicateId) {
+=======
         if (!duplicateId) { // Only clear session storage for brand new invoices
+>>>>>>> origin/main
           sessionStorage.removeItem(SESSION_STORAGE_KEY);
         }
       }
@@ -536,6 +650,11 @@ export function NewInvoiceForm() {
         </div>
     );
   }
+<<<<<<< HEAD
+
+  let rowCounter = 0;
+=======
+>>>>>>> origin/main
   
   return (
     <>
@@ -656,7 +775,11 @@ export function NewInvoiceForm() {
                         </FormControl>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
+<<<<<<< HEAD
+                        <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date > new Date() || date < new Date('1900-01-01')} initialFocus />
+=======
                         <Calendar mode="single" selected={field.value} onSelect={field.onChange} disabled={(date) => date < new Date('1900-01-01')} initialFocus />
+>>>>>>> origin/main
                       </PopoverContent>
                     </Popover>
                     <FormMessage />
@@ -924,6 +1047,12 @@ export function NewInvoiceForm() {
                                         const bunchPath = `items.${lineItemIndex}.bunches.${bunchIndex}` as const;
                                         const lineItemPath = `items.${lineItemIndex}` as const;
                                         
+<<<<<<< HEAD
+                                        const productName = form.watch(`${bunchPath}.product`) || '';
+                                        const isGyp = productName.toLowerCase().includes('gyp');
+                                        
+=======
+>>>>>>> origin/main
                                         const salePrice = form.watch(`${bunchPath}.salePrice`) || 0;
                                         const purchasePrice = form.watch(`${bunchPath}.purchasePrice`) || 0;
                                         const stemsPerBunch = form.watch(`${bunchPath}.stemsPerBunch`) || 0;
@@ -931,7 +1060,16 @@ export function NewInvoiceForm() {
                                         const numberOfBoxes = form.watch(`${lineItemPath}.numberOfBoxes`) || 0;
 
                                         const totalStems = stemsPerBunch * bunchesPerBox * numberOfBoxes;
+<<<<<<< HEAD
+                                        
+                                        const totalValueNumeric = isGyp 
+                                            ? (bunchesPerBox * numberOfBoxes * salePrice)
+                                            : (totalStems * salePrice);
+                                            
+                                        const totalValue = totalValueNumeric.toFixed(2);
+=======
                                         const totalValue = (totalStems * salePrice).toFixed(2);
+>>>>>>> origin/main
                                         
                                         let differencePercent = '0 %';
                                         if (purchasePrice > 0) {
@@ -1001,7 +1139,15 @@ export function NewInvoiceForm() {
                                                         handleColorChange(lineItemIndex, bunchIndex, colorData); 
                                                     }} value={field.value ?? ''} disabled={!selectedVariety}>
                                                         <FormControl><SelectTrigger className="py-2"><SelectValue placeholder={t('invoices.new.items.colorPlaceholder')} /></SelectTrigger></FormControl>
+<<<<<<< HEAD
+                                                        <SelectContent>
+                                                          {colors.map(c => (
+                                                            <SelectItem key={c.productoId} value={c.color}>{c.color}</SelectItem>
+                                                          ))}
+                                                        </SelectContent>
+=======
                                                         <SelectContent>{colors.map(c => <SelectItem key={c.productoId} value={c.color}>{c.color}</SelectItem>)}</SelectContent>
+>>>>>>> origin/main
                                                     </Select>
                                                 )}/></TableCell>
                                                 <TableCell>

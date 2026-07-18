@@ -5,8 +5,11 @@ import { useState, useTransition } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import * as z from 'zod';
+<<<<<<< HEAD
+=======
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+>>>>>>> origin/main
 
 import { Button } from '@/components/ui/button';
 import {
@@ -93,8 +96,15 @@ export default function SendReportDialog({
       }
       
       try {
+<<<<<<< HEAD
+      const html2canvas = (await import('html2canvas')).default;
+      const { default: jsPDF } = await import('jspdf');
+        const canvas = await html2canvas(reportElement, { scale: 1.5, useCORS: true, logging: false });
+        const imgData = canvas.toDataURL('image/jpeg', 0.75);
+=======
         const canvas = await html2canvas(reportElement, { scale: 2, useCORS: true, logging: false });
         const imgData = canvas.toDataURL('image/png');
+>>>>>>> origin/main
         const pdf = new jsPDF('p', 'pt', 'a4');
         const pdfWidth = pdf.internal.pageSize.getWidth();
         const pdfHeight = pdf.internal.pageSize.getHeight();
@@ -102,7 +112,11 @@ export default function SendReportDialog({
         const imgHeight = canvas.height;
         const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
         
+<<<<<<< HEAD
+        pdf.addImage(imgData, 'JPEG', 0, 0, imgWidth * ratio, imgHeight * ratio);
+=======
         pdf.addImage(imgData, 'PNG', 0, 0, imgWidth * ratio, imgHeight * ratio);
+>>>>>>> origin/main
         const pdfBase64 = pdf.output('datauristring').split(',')[1];
         
         const response = await fetch('/api/send-invoice', {

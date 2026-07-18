@@ -1,8 +1,11 @@
 'use client';
 
 import { useState } from 'react';
+<<<<<<< HEAD
+=======
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+>>>>>>> origin/main
 import { Button } from '@/components/ui/button';
 import { Download, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
@@ -32,8 +35,15 @@ export default function HistoricalFarmAccountStatementDownloadButton({ data }: H
 
     setIsGenerating(true);
     try {
+<<<<<<< HEAD
+      const html2canvas = (await import('html2canvas')).default;
+      const { default: jsPDF } = await import('jspdf');
+      const canvas = await html2canvas(statementElement, {
+        scale: 1.5,
+=======
       const canvas = await html2canvas(statementElement, {
         scale: 3,
+>>>>>>> origin/main
         useCORS: true,
         logging: false,
         width: statementElement.scrollWidth,
@@ -42,7 +52,11 @@ export default function HistoricalFarmAccountStatementDownloadButton({ data }: H
         windowHeight: document.documentElement.scrollHeight,
       });
 
+<<<<<<< HEAD
+      const imgData = canvas.toDataURL('image/jpeg', 0.75);
+=======
       const imgData = canvas.toDataURL('image/png');
+>>>>>>> origin/main
       
       const pdf = new jsPDF({
         orientation: 'p',
@@ -64,13 +78,21 @@ export default function HistoricalFarmAccountStatementDownloadButton({ data }: H
       let position = 0;
       let remainingHeight = imgHeight;
 
+<<<<<<< HEAD
+      pdf.addImage(imgData, 'JPEG', x, position, canvasWidth * ratio, imgHeight);
+=======
       pdf.addImage(imgData, 'PNG', x, position, canvasWidth * ratio, imgHeight);
+>>>>>>> origin/main
       remainingHeight -= pdfHeight;
 
       while (remainingHeight > 0) {
         position -= pdfHeight;
         pdf.addPage();
+<<<<<<< HEAD
+        pdf.addImage(imgData, 'JPEG', x, position, canvasWidth * ratio, imgHeight);
+=======
         pdf.addImage(imgData, 'PNG', x, position, canvasWidth * ratio, imgHeight);
+>>>>>>> origin/main
         remainingHeight -= pdfHeight;
       }
       

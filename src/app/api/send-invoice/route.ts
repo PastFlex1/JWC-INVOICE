@@ -1,3 +1,18 @@
+<<<<<<< HEAD
+import { NextResponse } from 'next/server';
+import nodemailer from 'nodemailer';
+import { ImapFlow } from 'imapflow';
+import { addEmail } from '@/services/emails';
+import type { EmailMessage } from '@/lib/types';
+import * as fs from 'fs';
+import * as path from 'path';
+
+export const dynamic = 'force-dynamic';
+export const maxDuration = 60; 
+
+export async function POST(request: Request) {
+  try {
+=======
 
 import { NextResponse } from 'next/server';
 import { Resend } from 'resend';
@@ -12,6 +27,7 @@ export async function POST(request: Request) {
       throw new Error('Resend API key is not configured.');
     }
 
+>>>>>>> origin/main
     const body = await request.json();
     const { to, bcc, subject, body: emailBody, attachments: pdfAttachments } = body;
 
@@ -22,24 +38,50 @@ export async function POST(request: Request) {
     const toEmails = to.split(',').map((email: string) => email.trim()).filter(Boolean);
     const bccEmails = bcc ? bcc.split(',').map((email: string) => email.trim()).filter(Boolean) : [];
 
+<<<<<<< HEAD
+=======
 
+>>>>>>> origin/main
     if (toEmails.length === 0) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
     }
 
+<<<<<<< HEAD
+    const fromAddress = process.env.MAIL_FROM_ADDRESS || 'sales@jcwflowers.com';
+    const fromName = process.env.MAIL_FROM_NAME || 'JCW Flowers';
+    const replyTo = process.env.MAIL_REPLY_TO || 'sales@jcwflowers.com';
+    const mailPassword = process.env.MAIL_PASSWORD;
+    const smtpHost = process.env.SMTP_HOST || 'mail.privateemail.com';
+    const smtpPort = process.env.SMTP_PORT ? parseInt(process.env.SMTP_PORT) : 465;
+
+    if (!mailPassword) {
+      return NextResponse.json({ error: 'MAIL_PASSWORD missing in environment' }, { status: 500 });
+    }
+
+    // Read logo file and convert to Buffer
+    const logoPath = path.join(process.cwd(), 'public', 'logo.png');
+    const logoBuffer = fs.readFileSync(logoPath);
+=======
     // Read logo file and convert to Base64 string
     const logoPath = path.join(process.cwd(), 'public', 'logo.png');
     const logoBase64 = fs.readFileSync(logoPath).toString('base64');
     const logoDataUri = `data:image/png;base64,${logoBase64}`;
+>>>>>>> origin/main
     
     const emailHtml = `
       <html>
         <body style="font-family: Arial, sans-serif;">
           <p>${emailBody.replace(/\n/g, '<br>')}</p>
           <br>
+<<<<<<< HEAD
+          <p>Please don't answer to this email, because is automatically, if you need assistance, please contact to <a href="mailto:sales@jcwflowers.com">sales@jcwflowers.com</a></p>
+          <br>
+          <img src="cid:logo" alt="JCW Flowers Logo" width="200" />
+=======
           <p>Please don't answer to this email, because is automatically, if you need assistance, please contact to <a href="mailto:jcwf@outlook.es">jcwf@outlook.es</a></p>
           <br>
           <img src="${logoDataUri}" alt="JCW Flowers Logo" width="200" />
+>>>>>>> origin/main
           <br>
           <br>
           <hr style="border: 0; border-top: 1px solid #eee;" />
@@ -50,6 +92,112 @@ export async function POST(request: Request) {
       </html>
     `;
 
+<<<<<<< HEAD
+    const attachments: any[] = pdfAttachments || [];
+    attachments.push({
+      filename: 'logo.png',
+      content: logoBuffer,
+      cid: 'logo' // nodemailer uses 'cid' instead of 'content_id'
+    });
+
+    const transporter = nodemailer.createTransport({
+      host: smtpHost,
+      port: smtpPort,
+      secure: smtpPort === 465,
+      auth: {
+        user: process.env.IMAP_USER || fromAddress,
+        pass: mailPassword,
+      },
+    });
+    
+    const mailOptions: any = {
+      from: `"${fromName}" <${fromAddress}>`,
+      to: toEmails,
+      bcc: bccEmails,
+      subject: subject,
+      html: emailHtml,
+      replyTo,
+      attachments: attachments
+    };
+
+    const info = await transporter.sendMail(mailOptions);
+    const messageIdStr = info.messageId;
+
+    // IMAP Append to Sent folder
+    const imapClient = new ImapFlow({
+      host: process.env.IMAP_HOST || 'mail.privateemail.com',
+      port: parseInt(process.env.IMAP_PORT || '993', 10),
+      secure: process.env.IMAP_SECURE !== 'false',
+      auth: {
+        user: process.env.IMAP_USER || fromAddress,
+        pass: mailPassword
+      },
+      logger: false
+    });
+
+    try {
+      await imapClient.connect();
+      const MailComposer = require('nodemailer/lib/mail-composer');
+      const mail = new MailComposer(mailOptions);
+      const rawMessage = await mail.compile().build();
+      
+      let sentFolder = 'Sent Items'; 
+      const mailboxes = await imapClient.list();
+      const sentMailbox = mailboxes.find(mb => mb.specialUse === '\\Sent' || mb.path.toLowerCase().includes('sent'));
+      if (sentMailbox) {
+         sentFolder = sentMailbox.path;
+      }
+      await imapClient.append(sentFolder, rawMessage, ['\\Seen']);
+    } catch (imapErr) {
+      console.error('Error appending to IMAP Sent folder:', imapErr);
+    } finally {
+      await imapClient.logout();
+    }
+
+    // Prepare attachments for Firestore (base64 string without logo binary)
+    const firestoreAttachments = [];
+    if (pdfAttachments && pdfAttachments.length > 0) {
+      for (const att of pdfAttachments) {
+        if (att.cid === 'logo') continue;
+        let dataStr = att.content;
+        if (Buffer.isBuffer(att.content)) {
+          dataStr = `data:application/pdf;base64,${att.content.toString('base64')}`;
+        } else if (typeof att.content === 'string' && !att.content.startsWith('data:')) {
+          dataStr = `data:application/pdf;base64,${att.content}`;
+        }
+        firestoreAttachments.push({
+          filename: att.filename,
+          contentType: 'application/pdf',
+          size: Buffer.isBuffer(att.content) ? att.content.length : Math.round(att.content.length * 0.75),
+          data: dataStr
+        });
+      }
+    }
+
+    const emailData: Omit<EmailMessage, 'id'> = {
+      messageId: messageIdStr,
+      type: 'sent',
+      from: fromAddress,
+      to: toEmails,
+      bcc: bccEmails,
+      subject,
+      text: emailBody, // fallback to the plain body
+      html: emailHtml,
+      date: new Date().toISOString(),
+      isRead: true, 
+      status: 'delivered', 
+      createdBy: 'admin',
+      createdAt: new Date().toISOString()
+    };
+    
+    if (firestoreAttachments.length > 0) {
+       (emailData as any).attachments = firestoreAttachments;
+    }
+
+    const docId = await addEmail(emailData);
+
+    return NextResponse.json({ message: 'Email sent successfully!', docId, messageId: messageIdStr }, { status: 200 });
+=======
     const attachments = pdfAttachments || [];
 
     await resend.emails.send({
@@ -62,6 +210,7 @@ export async function POST(request: Request) {
     });
 
     return NextResponse.json({ message: 'Email sent successfully!' }, { status: 200 });
+>>>>>>> origin/main
 
   } catch (error) {
     console.error('Failed to send invoice:', error);
