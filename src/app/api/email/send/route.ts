@@ -15,7 +15,18 @@ export async function POST(req: Request) {
     const body = await req.json();
     const { to, cc, bcc, subject, text, html, createdBy, threadId, inReplyTo, isAutomatic, attachments } = body;
 
-    if (!to || !subject) {
+    const parseEmails = (input: any): string[] => {
+      if (!input) return [];
+      if (Array.isArray(input)) return input;
+      if (typeof input === 'string') return input.split(',').map(e => e.trim()).filter(Boolean);
+      return [];
+    };
+
+    const toArray = parseEmails(to);
+    const ccArray = parseEmails(cc);
+    const bccArray = parseEmails(bcc);
+
+    if (toArray.length === 0 || !subject) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
@@ -38,9 +49,9 @@ export async function POST(req: Request) {
     if (isAutomatic && resend) {
       const { data, error } = await resend.emails.send({
         from: `${fromName} <${fromAddress}>`,
-        to,
-        cc,
-        bcc,
+        to: toArray,
+        cc: ccArray.length > 0 ? ccArray : undefined,
+        bcc: bccArray.length > 0 ? bccArray : undefined,
         subject,
         text,
         html,
@@ -70,9 +81,9 @@ export async function POST(req: Request) {
       
       const mailOptions: any = {
         from: `"${fromName}" <${fromAddress}>`,
-        to,
-        cc,
-        bcc,
+        to: toArray.join(', '),
+        cc: ccArray.length > 0 ? ccArray.join(', ') : undefined,
+        bcc: bccArray.length > 0 ? bccArray.join(', ') : undefined,
         subject,
         text,
         html,

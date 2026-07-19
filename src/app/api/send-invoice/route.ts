@@ -25,6 +25,9 @@ export async function POST(request: Request) {
       return NextResponse.json({ message: 'At least one recipient email is required.' }, { status: 400 });
     }
 
+    const toString = toEmails.join(', ');
+    const bccString = bccEmails.join(', ');
+
     const fromAddress = process.env.MAIL_FROM_ADDRESS || 'sales@jcwflowers.com';
     const fromName = process.env.MAIL_FROM_NAME || 'JCW Flowers';
     const replyTo = process.env.MAIL_REPLY_TO || 'sales@jcwflowers.com';
@@ -77,8 +80,8 @@ export async function POST(request: Request) {
     
     const mailOptions: any = {
       from: `"${fromName}" <${fromAddress}>`,
-      to: toEmails,
-      bcc: bccEmails,
+      to: toString,
+      bcc: bccString,
       subject: subject,
       html: emailHtml,
       replyTo,
