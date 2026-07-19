@@ -53,6 +53,7 @@ export function InvoiceActions({ invoice, customer, consignatario, carguera, pai
         onClose={() => setIsSendDialogOpen(false)}
         invoice={invoice}
         customer={customer}
+        consignatario={consignatario}
       />
     </>
   );

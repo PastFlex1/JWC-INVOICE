@@ -18,7 +18,7 @@ import { Input } from '@/components/ui/input';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
 import { useToast } from '@/hooks/use-toast';
 import { Loader2, Send } from 'lucide-react';
-import type { Invoice, Customer } from '@/lib/types';
+import type { Invoice, Customer, Consignatario } from '@/lib/types';
 import { useTranslation } from '@/context/i18n-context';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Textarea } from '@/components/ui/textarea';
@@ -55,11 +55,12 @@ const formSchema = z.object({
 type SendInvoiceDialogProps = {
   invoice: Invoice | null;
   customer: Customer | null;
+  consignatario?: Consignatario | null;
   isOpen: boolean;
   onClose: () => void;
 };
 
-export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendInvoiceDialogProps) {
+export function SendInvoiceDialog({ invoice, customer, consignatario, isOpen, onClose }: SendInvoiceDialogProps) {
   const { toast } = useToast();
   const { t } = useTranslation();
   const [isPending, startTransition] = useTransition();
@@ -72,14 +73,16 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
 
   useEffect(() => {
     if (customer && isOpen) {
+      const recipientName = consignatario?.nombreConsignatario || customer.name;
+      const defaultBody = t('sendInvoiceDialog.defaultBody', { customerName: recipientName });
       form.reset({
         to: customer.email || '',
         bcc: '',
-        body: '',
+        body: defaultBody,
       });
       setError(null);
     }
-  }, [customer, isOpen, form]);
+  }, [customer, consignatario, isOpen, form, t]);
   
   if (!invoice || !customer) {
     return null;
@@ -89,8 +92,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
     setError(null);
     startTransition(async () => {
       const subject = t('sendInvoiceDialog.defaultSubject', { invoiceNumber: invoice.invoiceNumber });
-      const defaultBody = t('sendInvoiceDialog.defaultBody', { customerName: customer.name });
-      const body = values.body ? `${defaultBody}\n\n${values.body}` : defaultBody;
+      const body = values.body || '';
       
       const invoiceElement = document.getElementById('invoice-to-print');
       if (!invoiceElement) {
@@ -182,7 +184,7 @@ export function SendInvoiceDialog({ invoice, customer, isOpen, onClose }: SendIn
             <DialogHeader>
               <DialogTitle>{t('sendInvoiceDialog.title')}</DialogTitle>
               <DialogDescription>
-                {t('sendInvoiceDialog.description', { invoiceNumber: invoice.invoiceNumber, customerName: customer.name })}
+                {t('sendInvoiceDialog.description', { invoiceNumber: invoice.invoiceNumber, customerName: consignatario?.nombreConsignatario || customer.name })}
               </DialogDescription>
             </DialogHeader>
 
