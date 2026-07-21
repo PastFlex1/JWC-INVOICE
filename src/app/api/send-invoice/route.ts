@@ -61,7 +61,16 @@ export async function POST(request: Request) {
       </html>
     `;
 
-    const attachments: any[] = pdfAttachments || [];
+    const attachments: any[] = (pdfAttachments || []).map((att: any) => {
+      if (typeof att.content === 'string' && !att.content.startsWith('data:')) {
+        return {
+          ...att,
+          encoding: 'base64'
+        };
+      }
+      return att;
+    });
+
     attachments.push({
       filename: 'logo.png',
       content: logoBuffer,
