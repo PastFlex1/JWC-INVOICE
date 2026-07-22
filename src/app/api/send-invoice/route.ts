@@ -7,7 +7,7 @@ import * as fs from 'fs';
 import * as path from 'path';
 
 export const dynamic = 'force-dynamic';
-export const maxDuration = 60; 
+export const maxDuration = 60;
 
 export async function POST(request: Request) {
   try {
@@ -42,13 +42,13 @@ export async function POST(request: Request) {
     // Read logo file and convert to Buffer
     const logoPath = path.join(process.cwd(), 'public', 'logo.png');
     const logoBuffer = fs.readFileSync(logoPath);
-    
+
     const emailHtml = `
       <html>
         <body style="font-family: Arial, sans-serif;">
           <p>${emailBody.replace(/\n/g, '<br>')}</p>
           <br>
-          <p>email: <a href="mailto:sales@jcwflowers.com">sales@jcwflowers.com</a> / <a href="mailto:jcwf@outlook.es">jcwf@outlook.es</a></p>
+          <p>email: <a href="mailto:jcwf@outlook.es">jcwf@outlook.es</a> / <a href="mailto:sales@jcwflowers.com">sales@jcwflowers.com</a></p>
           <br>
           <img src="cid:logo" alt="JCW Flowers Logo" width="200" />
           <br>
@@ -88,7 +88,7 @@ export async function POST(request: Request) {
         pass: mailPassword,
       },
     });
-    
+
     const mailOptions: any = {
       from: `"${fromName}" <${fromAddress}>`,
       to: toString,
@@ -119,12 +119,12 @@ export async function POST(request: Request) {
       const MailComposer = require('nodemailer/lib/mail-composer');
       const mail = new MailComposer(mailOptions);
       const rawMessage = await mail.compile().build();
-      
-      let sentFolder = 'Sent Items'; 
+
+      let sentFolder = 'Sent Items';
       const mailboxes = await imapClient.list();
       const sentMailbox = mailboxes.find(mb => mb.specialUse === '\\Sent' || mb.path.toLowerCase().includes('sent'));
       if (sentMailbox) {
-         sentFolder = sentMailbox.path;
+        sentFolder = sentMailbox.path;
       }
       await imapClient.append(sentFolder, rawMessage, ['\\Seen']);
     } catch (imapErr) {
@@ -163,14 +163,14 @@ export async function POST(request: Request) {
       text: emailBody, // fallback to the plain body
       html: emailHtml,
       date: new Date().toISOString(),
-      isRead: true, 
-      status: 'delivered', 
+      isRead: true,
+      status: 'delivered',
       createdBy: 'admin',
       createdAt: new Date().toISOString()
     };
-    
+
     if (firestoreAttachments.length > 0) {
-       (emailData as any).attachments = firestoreAttachments;
+      (emailData as any).attachments = firestoreAttachments;
     }
 
     const docId = await addEmail(emailData);
