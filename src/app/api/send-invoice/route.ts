@@ -65,7 +65,8 @@ export async function POST(request: Request) {
       if (typeof att.content === 'string' && !att.content.startsWith('data:')) {
         return {
           ...att,
-          encoding: 'base64'
+          encoding: 'base64',
+          contentType: 'application/pdf'
         };
       }
       return att;
@@ -74,7 +75,8 @@ export async function POST(request: Request) {
     attachments.push({
       filename: 'logo.png',
       content: logoBuffer,
-      cid: 'logo' // nodemailer uses 'cid' instead of 'content_id'
+      cid: 'logo', // nodemailer uses 'cid' instead of 'content_id'
+      contentDisposition: 'inline'
     });
 
     const transporter = nodemailer.createTransport({
