@@ -48,7 +48,7 @@ export async function POST(request: Request) {
         <body style="font-family: Arial, sans-serif;">
           <p>${emailBody.replace(/\n/g, '<br>')}</p>
           <br>
-          <p>email: <a href="mailto:sales@jcwflowers.com">sales@jcwflowers.com</a></p>
+          <p>email: <a href="mailto:sales@jcwflowers.com">sales@jcwflowers.com</a> / <a href="mailto:jcwf@outlook.es">jcwf@outlook.es</a></p>
           <br>
           <img src="cid:logo" alt="JCW Flowers Logo" width="200" />
           <br>
